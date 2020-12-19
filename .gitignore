@@ -1,1 +1,7 @@
 .Rproj.user
+
+*.tmp
+
+*.gcda
+
+*.gcno
