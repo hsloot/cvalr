@@ -22,8 +22,8 @@ test_that("eddl is calculated correctly", {
 
 test_that("upfront payment is calculated correctly", {
   spread <- 0.05
-  lower <- 0
-  upper <- 0.03
+  lower <- 0.03
+  upper <- 0.1
   expected_losses <- pmin(
     pmax(
       (1 - recovery_rate) * expected_default_count - lower,
@@ -45,8 +45,8 @@ test_that("upfront payment is calculated correctly", {
 })
 
 test_that("upfront spread is calculated correctly", {
-  lower <- 0
-  upper <- 0.03
+  lower <- 0.03
+  upper <- 0.1
   expected_losses <- pmin(
     pmax(
       (1 - recovery_rate) * expected_default_count - lower,
