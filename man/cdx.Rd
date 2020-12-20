@@ -18,6 +18,7 @@ upfront_payment(
   expected_default_counts,
   times,
   discount_factors,
+  lower,
   upper,
   spread,
   recovery_rate
@@ -27,6 +28,7 @@ upfront_spread(
   expected_default_counts,
   times,
   discount_factors,
+  lower,
   upper,
   recovery_rate
 )
@@ -41,9 +43,11 @@ at \code{times}}
 
 \item{recovery_rate}{The recovery rate}
 
-\item{upper}{Upper attachement of the CDO equity tranche}
+\item{lower}{Lower attachement of the CDO tranche}
 
-\item{spread}{Constant spread of the CDO equity tranche}
+\item{upper}{Upper attachement of the CDO tranche}
+
+\item{spread}{Constant spread of the CDO tranche}
 }
 \description{
 Portfolio CDS spread and CDO methods

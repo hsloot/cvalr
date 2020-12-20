@@ -32,31 +32,32 @@ double portfolio_cds_spread(const NumericVector& expected_default_counts,
 
 //' @rdname cdx
 //'
-//' @param upper Upper attachement of the CDO equity tranche
-//' @param spread Constant spread of the CDO equity tranche
+//' @param lower Lower attachement of the CDO tranche
+//' @param upper Upper attachement of the CDO tranche
+//' @param spread Constant spread of the CDO tranche
 //'
 //' @export
 // [[Rcpp::export]]
 double upfront_payment(const NumericVector& expected_default_counts,
                        const NumericVector& times,
                        const NumericVector& discount_factors,
-                       const double upper, const double spread,
-                       const double recovery_rate) {
-  const auto eddl = cvalr::eddl(
-      expected_default_counts.cbegin(), expected_default_counts.cend(),
-      discount_factors.cbegin(), [recovery_rate, upper](const auto val) {
-        return std::min(std::max((1 - recovery_rate) * val, decltype(val){0}),
-                        upper);
-      });
-  const auto edpl1 = cvalr::edpl1(
-      expected_default_counts.cbegin(), expected_default_counts.cend(),
-      times.cbegin(), discount_factors.cbegin(),
-      [recovery_rate, upper](const auto val) {
-        return upper -
-               std::min(std::max((1 - recovery_rate) * val, decltype(val){0}),
-                        upper);
-      });
-  return (eddl - spread * edpl1) / upper;
+                       const double lower, const double upper,
+                       const double spread, const double recovery_rate) {
+  const auto tranche_loss = [recovery_rate, lower, upper](const auto val) {
+    return std::min(
+        std::max((1 - recovery_rate) * val - lower, decltype(val){0}),
+        upper - lower);
+  };
+  const auto eddl = cvalr::eddl(expected_default_counts.cbegin(),
+                                expected_default_counts.cend(),
+                                discount_factors.cbegin(), tranche_loss);
+  const auto edpl1 = cvalr::edpl1(expected_default_counts.cbegin(),
+                                  expected_default_counts.cend(),
+                                  times.cbegin(), discount_factors.cbegin(),
+                                  [lower, upper, tranche_loss](const auto val) {
+                                    return upper - lower - tranche_loss(val);
+                                  });
+  return (eddl - spread * edpl1) / (upper - lower);
 }
 
 //' @rdname cdx
@@ -65,13 +66,14 @@ double upfront_payment(const NumericVector& expected_default_counts,
 // [[Rcpp::export]]
 double upfront_spread(const NumericVector& expected_default_counts,
                       const NumericVector& times,
-                      const NumericVector& discount_factors, const double upper,
-                      const double recovery_rate) {
+                      const NumericVector& discount_factors, const double lower,
+                      const double upper, const double recovery_rate) {
   const auto eddl = cvalr::eddl(
       expected_default_counts.cbegin(), expected_default_counts.cend(),
-      discount_factors.cbegin(), [recovery_rate, upper](const auto val) {
-        return std::min(std::max((1 - recovery_rate) * val, decltype(val){0}),
-                        upper);
+      discount_factors.cbegin(), [recovery_rate, lower, upper](const auto val) {
+        return std::min(
+            std::max((1 - recovery_rate) * val - lower, decltype(val){0}),
+            upper - lower);
       });
   const auto edpl1 = cvalr::edpl1(
       expected_default_counts.cbegin(), expected_default_counts.cend(),
