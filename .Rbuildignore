@@ -6,3 +6,4 @@
 ^\.clang_complete$
 ^README\.Rmd$
 ^codecov\.yml$
+^\.lintr$

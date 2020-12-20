@@ -21,14 +21,6 @@ inline double eddl(_ForwardIt1 edc_start, _ForwardIt1 edc_end,
                             double{0});
 }
 
-template <typename _ForwardIt1, typename _ForwardIt2>
-inline double eddl(_ForwardIt1 edc_start, _ForwardIt1 edc_end,
-                   _ForwardIt2 df_start, const double recovery_rate) {
-  return eddl(edc_start, edc_end, df_start, [recovery_rate](const auto val) {
-    return (1 - recovery_rate) * val;
-  });
-}
-
 template <typename _ForwardIt1, typename _ForwardIt2, typename _ForwardIt3,
           typename _UnaryOp>
 inline double edpl1(_ForwardIt1 edc_start, _ForwardIt1 edc_end,
@@ -51,13 +43,6 @@ inline double edpl1(_ForwardIt1 edc_start, _ForwardIt1 edc_end,
                  std::multiplies<double>{});
   return std::inner_product(++enmid.cbegin(), enmid.cend(), ++df_start,
                             double{0});
-}
-
-template <typename _ForwardIt1, typename _ForwardIt2, typename _ForwardIt3>
-inline double edpl1(_ForwardIt1 edc_start, _ForwardIt1 edc_end,
-                    _ForwardIt2 t_start, _ForwardIt3 df_start) {
-  return edpl1(edc_start, edc_end, t_start, df_start,
-               [](const auto val) { return 1 - val; });
 }
 
 }  // namespace cvalr

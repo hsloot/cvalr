@@ -15,3 +15,20 @@ portfolio_cds_spread <- function(expected_default_counts, times, discount_factor
     .Call(`_cvalr_portfolio_cds_spread`, expected_default_counts, times, discount_factors, recovery_rate)
 }
 
+#' @rdname cdx
+#'
+#' @param upper Upper attachement of the CDO equity tranche
+#' @param spread Constant spread of the CDO equity tranche
+#'
+#' @export
+upfront_payment <- function(expected_default_counts, times, discount_factors, upper, spread, recovery_rate) {
+    .Call(`_cvalr_upfront_payment`, expected_default_counts, times, discount_factors, upper, spread, recovery_rate)
+}
+
+#' @rdname cdx
+#'
+#' @export
+upfront_spread <- function(expected_default_counts, times, discount_factors, upper, recovery_rate) {
+    .Call(`_cvalr_upfront_spread`, expected_default_counts, times, discount_factors, upper, recovery_rate)
+}
+

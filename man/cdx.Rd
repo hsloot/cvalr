@@ -3,12 +3,31 @@
 \name{cdx}
 \alias{cdx}
 \alias{portfolio_cds_spread}
+\alias{upfront_payment}
+\alias{upfront_spread}
 \title{Portfolio CDS spread and CDO methods}
 \usage{
 portfolio_cds_spread(
   expected_default_counts,
   times,
   discount_factors,
+  recovery_rate
+)
+
+upfront_payment(
+  expected_default_counts,
+  times,
+  discount_factors,
+  upper,
+  spread,
+  recovery_rate
+)
+
+upfront_spread(
+  expected_default_counts,
+  times,
+  discount_factors,
+  upper,
   recovery_rate
 )
 }
@@ -21,6 +40,10 @@ at \code{times}}
 \item{discount_factors}{The discount factors.}
 
 \item{recovery_rate}{The recovery rate}
+
+\item{upper}{Upper attachement of the CDO equity tranche}
+
+\item{spread}{Constant spread of the CDO equity tranche}
 }
 \description{
 Portfolio CDS spread and CDO methods
