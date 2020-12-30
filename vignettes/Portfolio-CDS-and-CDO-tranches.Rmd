@@ -1,0 +1,73 @@
+---
+title: "Portfolio CDS and CDO tranches"
+---
+
+## General Assumptions
+
+We consider $d$ entities with default times $\boldsymbol{\tau} = (\tau_1, \ldots, \tau_d)$
+and *average default counting process*
+$$
+  C_t =\frac{1}{d} \sum_{i=1}^{d} 1_{\{ \tau_i \leq t\}} .
+$$
+
+Furthermore, we assume deterministic discount factors $d_t$ and a recovery rate
+$R \in (0, 1)$.
+
+## Portfolio CDS
+
+A *portfolio CDS* is a financial contract between two parties which serves as
+insurance for the buyer against the default of companies from a bond-portfolio.
+The insurance buyer pays a periodic *spread* $s \Delta t N$ and receives the
+*recovered* fraction $(1-R) \Delta L$ in case of default.
+
+If accounting for accrued interest, the expected discounted payment stream of the 
+buyer, also called *expected discounted default leg (EDDL)*, is 
+$$
+  {EDDL}
+    = \sum_{j=1}^{n} d_{t_j} \Delta t_{j-1}\mathbb{E}{\left[ N_{t_j} + \frac{N_{t_{j-1}} - N_{t_j}}{2} \right]} 
+$$
+and the expected payment stream of the seller, also called *expected discounted payment leg (EDPL)*, is 
+$$
+  {EDPL}_{s}
+    = \sum_{j=1}^{n} s d_{t_j} \mathbb{E}{[ \Delta L_{t_{j-1}} ]} ,
+$$
+where $\Delta t_{j-1} = t_{j} - t_{j-1}$, $\Delta L_{t_{j-1}} = L_{t_{j}} - L_{t_{j-1}}$, $L_{t} = (1 - R) C_t$, and $N_{t} = 1 - C_{t} = 1 - L_t / {(1 - R)} $.
+
+The portfolio CDS is set up in the beginning such that 
+$$
+s 
+  = \frac{EDDL}{EDPL_{1}} .
+$$
+
+## CDO tranches
+
+A *(synthetic) CDO tranche* is a financial contract between two parties in which 
+the seller restructures a bond-portfolio into products of various credit quality. 
+The buyer pays a periodic *spread* $s \Delta t N$ and receives a compensation for
+the recovered fraction of the portfolio loss between a lower attachment point $l$ 
+and an upper attachment point $u$.
+
+A *(synthetic) CDO* is a collection of (synthetic) CDO tranches with attachment 
+points 
+$$
+  0 = l_1 < u_1 = l_2 < \ldots < u_{K-1} = l_{K} < u_{K} = 1 .
+$$
+
+If accounting for accrued interest, the expected discounted payment stream of the
+buyer of tranche $k$, also called *expected discounted default leg (EDDL)*, is 
+$$
+  {EDDL}_{k}
+    = \sum_{j=1}^{n} d_{t_j} \Delta t_{j-1} \mathbb{E}{[N_{k, t_j}]} + \frac{ \mathbb{E}{[N_{k, t_{j-1}}]} - \mathbb{E}{[N_{k, t_j}]} }{2}
+$$
+and the expected payment stream of the seller of tranche $k$, also called 
+*expected discounted premium leg (EDPL)*, is
+$$
+  {EDPL}_{k, s}
+    = \sum_{j=1}^{n} s d_{t_j} \mathbb{E}{[\Delta L_{k, t_{j-1}}]} ,
+$$
+where $\Delta t_{j-1} = t_j - t_{j-1}$, $\Delta L_{t_{j-1}} = L_{t_j} - L_{t_{j-1}}$,
+$$
+  L_{k, t}
+    = \min{\{ \max{\{ {(1 - R)} C_t - l_k , 0 \}} , u_k - l_k \}} ,
+$$
+and $N_{k, t} = u_k - l_k - L_{k, t}$. 

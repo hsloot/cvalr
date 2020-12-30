@@ -7,3 +7,8 @@
 ^README\.Rmd$
 ^codecov\.yml$
 ^\.lintr$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^vignettes/articles$
+^vignettes/Portfolio-CDS-and-CDO-tranches\.Rmd$
