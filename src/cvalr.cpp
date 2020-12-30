@@ -6,8 +6,7 @@ using namespace Rcpp;
 
 //' Portfolio CDS spread and CDO methods
 //'
-//' @param expected_default_counts The expected default counts of the portfolio
-//'   at `times`
+//' @param expected_losses The expected losses (not including recovered part)
 //' @param times The times of the payment schedule
 //' @param discount_factors The discount factors.
 //' @param recovery_rate The recovery rate

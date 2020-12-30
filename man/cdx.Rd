@@ -7,35 +7,14 @@
 \alias{upfront_spread}
 \title{Portfolio CDS spread and CDO methods}
 \usage{
-portfolio_cds_spread(
-  expected_default_counts,
-  times,
-  discount_factors,
-  recovery_rate
-)
+portfolio_cds_spread(expected_losses, times, discount_factors, recovery_rate)
 
-upfront_payment(
-  expected_default_counts,
-  times,
-  discount_factors,
-  lower,
-  upper,
-  spread,
-  recovery_rate
-)
+upfront_payment(expected_losses, times, discount_factors, lower, upper, spread)
 
-upfront_spread(
-  expected_default_counts,
-  times,
-  discount_factors,
-  lower,
-  upper,
-  recovery_rate
-)
+upfront_spread(expected_losses, times, discount_factors, lower, upper)
 }
 \arguments{
-\item{expected_default_counts}{The expected default counts of the portfolio
-at \code{times}}
+\item{expected_losses}{The expected losses (not including recovered part)}
 
 \item{times}{The times of the payment schedule}
 
