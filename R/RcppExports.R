@@ -11,8 +11,8 @@
 #'
 #' @name cdx
 #' @export
-portfolio_cds_spread <- function(expected_default_counts, times, discount_factors, recovery_rate) {
-    .Call(`_cvalr_portfolio_cds_spread`, expected_default_counts, times, discount_factors, recovery_rate)
+portfolio_cds_spread <- function(expected_losses, times, discount_factors, recovery_rate) {
+    .Call(`_cvalr_portfolio_cds_spread`, expected_losses, times, discount_factors, recovery_rate)
 }
 
 #' @rdname cdx
@@ -22,14 +22,14 @@ portfolio_cds_spread <- function(expected_default_counts, times, discount_factor
 #' @param spread Constant spread of the CDO tranche
 #'
 #' @export
-upfront_payment <- function(expected_default_counts, times, discount_factors, lower, upper, spread, recovery_rate) {
-    .Call(`_cvalr_upfront_payment`, expected_default_counts, times, discount_factors, lower, upper, spread, recovery_rate)
+upfront_payment <- function(expected_losses, times, discount_factors, lower, upper, spread) {
+    .Call(`_cvalr_upfront_payment`, expected_losses, times, discount_factors, lower, upper, spread)
 }
 
 #' @rdname cdx
 #'
 #' @export
-upfront_spread <- function(expected_default_counts, times, discount_factors, lower, upper, recovery_rate) {
-    .Call(`_cvalr_upfront_spread`, expected_default_counts, times, discount_factors, lower, upper, recovery_rate)
+upfront_spread <- function(expected_losses, times, discount_factors, lower, upper) {
+    .Call(`_cvalr_upfront_spread`, expected_losses, times, discount_factors, lower, upper)
 }
 
