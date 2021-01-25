@@ -10,25 +10,50 @@
 #'
 #' @name cdx
 #' @export
-portfolio_cds_spread <- function(expected_losses, times, discount_factors, recovery_rate) {
-    .Call(`_cvalr_portfolio_cds_spread`, expected_losses, times, discount_factors, recovery_rate)
+portfolio_cds_coupon <- function(expected_losses, times, discount_factors, recovery_rate) {
+    .Call(`_cvalr_portfolio_cds_coupon`, expected_losses, times, discount_factors, recovery_rate)
 }
 
 #' @rdname cdx
 #'
-#' @param lower Lower attachement of the CDO tranche
-#' @param upper Upper attachement of the CDO tranche
-#' @param spread Constant spread of the CDO tranche
+#' @param coupon The periodically paid coupon of the payment leg
+#' @param upfront The upfront payment
 #'
 #' @export
-upfront_payment <- function(expected_losses, times, discount_factors, lower, upper, spread) {
-    .Call(`_cvalr_upfront_payment`, expected_losses, times, discount_factors, lower, upper, spread)
+portfolio_cds_upfront <- function(expected_losses, times, discount_factors, recovery_rate, coupon) {
+    .Call(`_cvalr_portfolio_cds_upfront`, expected_losses, times, discount_factors, recovery_rate, coupon)
+}
+
+#' @rdname cdx
+#'
+#' @param upfront The upfront payment
+#'
+#' @export
+portfolio_cds_equation <- function(expected_losses, times, discount_factors, recovery_rate, coupon, upfront) {
+    .Call(`_cvalr_portfolio_cds_equation`, expected_losses, times, discount_factors, recovery_rate, coupon, upfront)
+}
+
+#' @rdname cdx
+#'
+#' @param lower Lower attachment of the CDO tranche
+#' @param upper Upper attachment of the CDO tranche
+#'
+#' @export
+cdo_upfront <- function(expected_losses, times, discount_factors, lower, upper, coupon) {
+    .Call(`_cvalr_cdo_upfront`, expected_losses, times, discount_factors, lower, upper, coupon)
 }
 
 #' @rdname cdx
 #'
 #' @export
-upfront_spread <- function(expected_losses, times, discount_factors, lower, upper) {
-    .Call(`_cvalr_upfront_spread`, expected_losses, times, discount_factors, lower, upper)
+cdo_coupon <- function(expected_losses, times, discount_factors, lower, upper) {
+    .Call(`_cvalr_cdo_coupon`, expected_losses, times, discount_factors, lower, upper)
+}
+
+#' @rdname cdx
+#'
+#' @export
+cdo_equation <- function(expected_losses, times, discount_factors, lower, upper, coupon, upfront) {
+    .Call(`_cvalr_cdo_equation`, expected_losses, times, discount_factors, lower, upper, coupon, upfront)
 }
 

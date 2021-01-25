@@ -5,9 +5,9 @@
 
 using namespace Rcpp;
 
-// portfolio_cds_spread
-double portfolio_cds_spread(const NumericVector& expected_losses, const NumericVector& times, const NumericVector& discount_factors, const double recovery_rate);
-RcppExport SEXP _cvalr_portfolio_cds_spread(SEXP expected_lossesSEXP, SEXP timesSEXP, SEXP discount_factorsSEXP, SEXP recovery_rateSEXP) {
+// portfolio_cds_coupon
+double portfolio_cds_coupon(const NumericVector& expected_losses, const NumericVector& times, const NumericVector& discount_factors, const double recovery_rate);
+RcppExport SEXP _cvalr_portfolio_cds_coupon(SEXP expected_lossesSEXP, SEXP timesSEXP, SEXP discount_factorsSEXP, SEXP recovery_rateSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -15,13 +15,44 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type discount_factors(discount_factorsSEXP);
     Rcpp::traits::input_parameter< const double >::type recovery_rate(recovery_rateSEXP);
-    rcpp_result_gen = Rcpp::wrap(portfolio_cds_spread(expected_losses, times, discount_factors, recovery_rate));
+    rcpp_result_gen = Rcpp::wrap(portfolio_cds_coupon(expected_losses, times, discount_factors, recovery_rate));
     return rcpp_result_gen;
 END_RCPP
 }
-// upfront_payment
-double upfront_payment(const NumericVector& expected_losses, const NumericVector& times, const NumericVector& discount_factors, const double lower, const double upper, const double spread);
-RcppExport SEXP _cvalr_upfront_payment(SEXP expected_lossesSEXP, SEXP timesSEXP, SEXP discount_factorsSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP spreadSEXP) {
+// portfolio_cds_upfront
+double portfolio_cds_upfront(const NumericVector& expected_losses, const NumericVector& times, const NumericVector& discount_factors, const double recovery_rate, const double coupon);
+RcppExport SEXP _cvalr_portfolio_cds_upfront(SEXP expected_lossesSEXP, SEXP timesSEXP, SEXP discount_factorsSEXP, SEXP recovery_rateSEXP, SEXP couponSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type expected_losses(expected_lossesSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type discount_factors(discount_factorsSEXP);
+    Rcpp::traits::input_parameter< const double >::type recovery_rate(recovery_rateSEXP);
+    Rcpp::traits::input_parameter< const double >::type coupon(couponSEXP);
+    rcpp_result_gen = Rcpp::wrap(portfolio_cds_upfront(expected_losses, times, discount_factors, recovery_rate, coupon));
+    return rcpp_result_gen;
+END_RCPP
+}
+// portfolio_cds_equation
+double portfolio_cds_equation(const NumericVector& expected_losses, const NumericVector& times, const NumericVector& discount_factors, const double recovery_rate, const double coupon, const double upfront);
+RcppExport SEXP _cvalr_portfolio_cds_equation(SEXP expected_lossesSEXP, SEXP timesSEXP, SEXP discount_factorsSEXP, SEXP recovery_rateSEXP, SEXP couponSEXP, SEXP upfrontSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type expected_losses(expected_lossesSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type discount_factors(discount_factorsSEXP);
+    Rcpp::traits::input_parameter< const double >::type recovery_rate(recovery_rateSEXP);
+    Rcpp::traits::input_parameter< const double >::type coupon(couponSEXP);
+    Rcpp::traits::input_parameter< const double >::type upfront(upfrontSEXP);
+    rcpp_result_gen = Rcpp::wrap(portfolio_cds_equation(expected_losses, times, discount_factors, recovery_rate, coupon, upfront));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cdo_upfront
+double cdo_upfront(const NumericVector& expected_losses, const NumericVector& times, const NumericVector& discount_factors, const double lower, const double upper, const double coupon);
+RcppExport SEXP _cvalr_cdo_upfront(SEXP expected_lossesSEXP, SEXP timesSEXP, SEXP discount_factorsSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP couponSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -30,14 +61,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type discount_factors(discount_factorsSEXP);
     Rcpp::traits::input_parameter< const double >::type lower(lowerSEXP);
     Rcpp::traits::input_parameter< const double >::type upper(upperSEXP);
-    Rcpp::traits::input_parameter< const double >::type spread(spreadSEXP);
-    rcpp_result_gen = Rcpp::wrap(upfront_payment(expected_losses, times, discount_factors, lower, upper, spread));
+    Rcpp::traits::input_parameter< const double >::type coupon(couponSEXP);
+    rcpp_result_gen = Rcpp::wrap(cdo_upfront(expected_losses, times, discount_factors, lower, upper, coupon));
     return rcpp_result_gen;
 END_RCPP
 }
-// upfront_spread
-double upfront_spread(const NumericVector& expected_losses, const NumericVector& times, const NumericVector& discount_factors, const double lower, const double upper);
-RcppExport SEXP _cvalr_upfront_spread(SEXP expected_lossesSEXP, SEXP timesSEXP, SEXP discount_factorsSEXP, SEXP lowerSEXP, SEXP upperSEXP) {
+// cdo_coupon
+double cdo_coupon(const NumericVector& expected_losses, const NumericVector& times, const NumericVector& discount_factors, const double lower, const double upper);
+RcppExport SEXP _cvalr_cdo_coupon(SEXP expected_lossesSEXP, SEXP timesSEXP, SEXP discount_factorsSEXP, SEXP lowerSEXP, SEXP upperSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -46,15 +77,35 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type discount_factors(discount_factorsSEXP);
     Rcpp::traits::input_parameter< const double >::type lower(lowerSEXP);
     Rcpp::traits::input_parameter< const double >::type upper(upperSEXP);
-    rcpp_result_gen = Rcpp::wrap(upfront_spread(expected_losses, times, discount_factors, lower, upper));
+    rcpp_result_gen = Rcpp::wrap(cdo_coupon(expected_losses, times, discount_factors, lower, upper));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cdo_equation
+double cdo_equation(const NumericVector& expected_losses, const NumericVector& times, const NumericVector& discount_factors, const double lower, const double upper, const double coupon, const double upfront);
+RcppExport SEXP _cvalr_cdo_equation(SEXP expected_lossesSEXP, SEXP timesSEXP, SEXP discount_factorsSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP couponSEXP, SEXP upfrontSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type expected_losses(expected_lossesSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type discount_factors(discount_factorsSEXP);
+    Rcpp::traits::input_parameter< const double >::type lower(lowerSEXP);
+    Rcpp::traits::input_parameter< const double >::type upper(upperSEXP);
+    Rcpp::traits::input_parameter< const double >::type coupon(couponSEXP);
+    Rcpp::traits::input_parameter< const double >::type upfront(upfrontSEXP);
+    rcpp_result_gen = Rcpp::wrap(cdo_equation(expected_losses, times, discount_factors, lower, upper, coupon, upfront));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_cvalr_portfolio_cds_spread", (DL_FUNC) &_cvalr_portfolio_cds_spread, 4},
-    {"_cvalr_upfront_payment", (DL_FUNC) &_cvalr_upfront_payment, 6},
-    {"_cvalr_upfront_spread", (DL_FUNC) &_cvalr_upfront_spread, 5},
+    {"_cvalr_portfolio_cds_coupon", (DL_FUNC) &_cvalr_portfolio_cds_coupon, 4},
+    {"_cvalr_portfolio_cds_upfront", (DL_FUNC) &_cvalr_portfolio_cds_upfront, 5},
+    {"_cvalr_portfolio_cds_equation", (DL_FUNC) &_cvalr_portfolio_cds_equation, 6},
+    {"_cvalr_cdo_upfront", (DL_FUNC) &_cvalr_cdo_upfront, 6},
+    {"_cvalr_cdo_coupon", (DL_FUNC) &_cvalr_cdo_coupon, 5},
+    {"_cvalr_cdo_equation", (DL_FUNC) &_cvalr_cdo_equation, 7},
     {NULL, NULL, 0}
 };
 
