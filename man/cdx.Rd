@@ -2,16 +2,46 @@
 % Please edit documentation in R/RcppExports.R
 \name{cdx}
 \alias{cdx}
-\alias{portfolio_cds_spread}
-\alias{upfront_payment}
-\alias{upfront_spread}
+\alias{portfolio_cds_coupon}
+\alias{portfolio_cds_upfront}
+\alias{portfolio_cds_equation}
+\alias{cdo_upfront}
+\alias{cdo_coupon}
+\alias{cdo_equation}
 \title{Portfolio CDS spread and CDO methods}
 \usage{
-portfolio_cds_spread(expected_losses, times, discount_factors, recovery_rate)
+portfolio_cds_coupon(expected_losses, times, discount_factors, recovery_rate)
 
-upfront_payment(expected_losses, times, discount_factors, lower, upper, spread)
+portfolio_cds_upfront(
+  expected_losses,
+  times,
+  discount_factors,
+  recovery_rate,
+  coupon
+)
 
-upfront_spread(expected_losses, times, discount_factors, lower, upper)
+portfolio_cds_equation(
+  expected_losses,
+  times,
+  discount_factors,
+  recovery_rate,
+  coupon,
+  upfront
+)
+
+cdo_upfront(expected_losses, times, discount_factors, lower, upper, coupon)
+
+cdo_coupon(expected_losses, times, discount_factors, lower, upper)
+
+cdo_equation(
+  expected_losses,
+  times,
+  discount_factors,
+  lower,
+  upper,
+  coupon,
+  upfront
+)
 }
 \arguments{
 \item{expected_losses}{The expected losses (not including recovered part)}
@@ -22,11 +52,13 @@ upfront_spread(expected_losses, times, discount_factors, lower, upper)
 
 \item{recovery_rate}{The recovery rate}
 
-\item{lower}{Lower attachement of the CDO tranche}
+\item{coupon}{The periodically paid coupon of the payment leg}
 
-\item{upper}{Upper attachement of the CDO tranche}
+\item{upfront}{The upfront payment}
 
-\item{spread}{Constant spread of the CDO tranche}
+\item{lower}{Lower attachment of the CDO tranche}
+
+\item{upper}{Upper attachment of the CDO tranche}
 }
 \description{
 Portfolio CDS spread and CDO methods
