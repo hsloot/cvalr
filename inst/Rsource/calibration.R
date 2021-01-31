@@ -78,9 +78,11 @@ cdo_tranche_expected_loss_gaussian_proxy <- function(
 
 #' @importFrom rmo rexmo_markovian ex_intensities_alpha_stable
 cdo_tranche_expected_loss_exmo_stable_mc <- function(
-    times, lower, upper, recovery_rate, lambda, nu, d = 75, n = 1e3) {
+    times, lower, upper, recovery_rate, lambda, nu, d = 75, n = 1e3, use_seed = NULL) {
+  if (!is.null(use_seed))
+    set.seed(use_seed)
   alpha <- log2(2 - nu)
-  tau <- rexmo_markovian(n, d, ex_intensities_alpha_stable(d, alpha)) / lambda
+  tau <- rmo:::rtest__rexmo_markovian(n, d, ex_intensities_alpha_stable(d, alpha)) / lambda
   sapply(times, function(t) {
     mean(pmin(
       pmax(
