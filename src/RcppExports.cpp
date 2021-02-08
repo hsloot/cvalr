@@ -98,6 +98,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ex_intensities2qmatrix
+NumericMatrix ex_intensities2qmatrix(const NumericVector& ex_intensities);
+RcppExport SEXP _cvalr_ex_intensities2qmatrix(SEXP ex_intensitiesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type ex_intensities(ex_intensitiesSEXP);
+    rcpp_result_gen = Rcpp::wrap(ex_intensities2qmatrix(ex_intensities));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_portfolio_cds_coupon", (DL_FUNC) &_cvalr_portfolio_cds_coupon, 4},
@@ -106,6 +116,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_cdo_upfront", (DL_FUNC) &_cvalr_cdo_upfront, 6},
     {"_cvalr_cdo_coupon", (DL_FUNC) &_cvalr_cdo_coupon, 5},
     {"_cvalr_cdo_equation", (DL_FUNC) &_cvalr_cdo_equation, 7},
+    {"_cvalr_ex_intensities2qmatrix", (DL_FUNC) &_cvalr_ex_intensities2qmatrix, 1},
     {NULL, NULL, 0}
 };
 

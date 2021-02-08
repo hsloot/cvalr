@@ -20,6 +20,10 @@ Suggests:
     mvtnorm
 Config/testthat/edition: 3
 LinkingTo: 
-    Rcpp
+    Rcpp,
+    rmo
 Imports: 
-    Rcpp
+    Rcpp,
+    rmo,
+    expm,
+    methods

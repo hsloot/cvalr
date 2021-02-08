@@ -2,7 +2,8 @@ cds_expected_loss <- function(t, lambda, recovery_rate) {
   sapply(t, function(.t) (1 - recovery_rate) * pexp(.t, rate = lambda))
 }
 
-cdo_tranche_expected_loss_gaussian <- function(t, lambda, rho, lower, upper, recovery_rate) {
+cdo_tranche_expected_loss_gaussian <- function(t, lambda, rho, lower, upper, # nolint
+                                               recovery_rate) {
   sapply(t,
     function(.t, lambda, rho, lower, upper, recovery_rate) {
       corr <- matrix(c(1, rep(-sqrt(1 - rho), 2), 1), 2, 2)
