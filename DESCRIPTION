@@ -16,8 +16,7 @@ RoxygenNote: 7.1.1
 Suggests:
     testthat (>= 3.0.0),
     covr,
-    rmarkdown,
-    mvtnorm
+    rmarkdown
 Config/testthat/edition: 3
 LinkingTo: 
     Rcpp,
@@ -26,4 +25,5 @@ Imports:
     Rcpp,
     rmo,
     expm,
-    methods
+    methods,
+    mvtnorm

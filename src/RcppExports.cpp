@@ -5,6 +5,19 @@
 
 using namespace Rcpp;
 
+// multiply_binomial_coefficient
+double multiply_binomial_coefficient(const double x, const std::size_t n, const std::size_t k);
+RcppExport SEXP _cvalr_multiply_binomial_coefficient(SEXP xSEXP, SEXP nSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const std::size_t >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const std::size_t >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(multiply_binomial_coefficient(x, n, k));
+    return rcpp_result_gen;
+END_RCPP
+}
 // portfolio_cds_coupon
 double portfolio_cds_coupon(const NumericVector& expected_losses, const NumericVector& times, const NumericVector& discount_factors, const double recovery_rate);
 RcppExport SEXP _cvalr_portfolio_cds_coupon(SEXP expected_lossesSEXP, SEXP timesSEXP, SEXP discount_factorsSEXP, SEXP recovery_rateSEXP) {
@@ -110,6 +123,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_cvalr_multiply_binomial_coefficient", (DL_FUNC) &_cvalr_multiply_binomial_coefficient, 3},
     {"_cvalr_portfolio_cds_coupon", (DL_FUNC) &_cvalr_portfolio_cds_coupon, 4},
     {"_cvalr_portfolio_cds_upfront", (DL_FUNC) &_cvalr_portfolio_cds_upfront, 5},
     {"_cvalr_portfolio_cds_equation", (DL_FUNC) &_cvalr_portfolio_cds_equation, 6},

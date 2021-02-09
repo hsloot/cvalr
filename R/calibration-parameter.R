@@ -1,5 +1,5 @@
 #' @importFrom methods setClass setValidity setGeneric setMethod
-#'   setReplaceMethod validObject is as new
+#'   setReplaceMethod validObject is as new callNextMethod
 #' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
 #'   ConstantBernsteinFunction LinearBernsteinFunction
 #'   ExponentialBernsteinFunction PoissonBernsteinFunction
@@ -101,20 +101,35 @@ setGeneric("iAlpha",
     standardGeneric("iAlpha")
   })
 
+#' Probability vector and expected value for calibration parameter
+#'
+#' Calculates the probability vector and expected values of the average
+#' default counting process \eqn{L}.
+#'
+#' @param object The calibration parameter object
+#' @param t Point-in-time
+#'
+#' @docType methods
+#' @export
+setGeneric("probability_vector",
+  function(object, t) {
+    standardGeneric("probability_vector")
+  })
+
 #' Expected loss for calibration parameter
 #'
+
+#' @rdname probability_vector
+#'
+#' @param g Transformation function
+#' @param ... Further arguments to `g`
+#'
+#' @details
 #' Calculates for a function \eqn{g} and the average default counting process
 #' \eqn{L} the expectation
 #' \deqn{
 #'   \mathbb{E}[g(L_t)] .
 #' }
-#'
-#' @param object The calibration parameter object
-#' @param t Point-in-time
-#' @param g Payoff function
-#' @param ... Further arguments to `g`
-#'
-#' @details
 #' For a portfolio CDS choose \eqn{g(x) = (1 - R) x} and for a CDO tranche with
 #' attachment points \eqn{l < u} and choose
 #' \eqn{g(x) = min{\{ \max{\{ (1 - R) x - l, 0 \}}, u - l \}}}, where \eqn{R} is
@@ -122,9 +137,31 @@ setGeneric("iAlpha",
 #'
 #' @docType methods
 #' @export
-setGeneric("expected_loss",
+setGeneric("expected_value",
   function(object, t, g, ...) {
-    standardGeneric("expected_loss")
+    standardGeneric("expected_value")
+  })
+
+#' @rdname probability_vector
+#'
+#' @param recovery_rate The recovery rate of the portfolio CDS/CDO
+#' @param ... Further arguments
+#'
+#' @export
+setGeneric("expected_pcds_loss",
+  function(object, t, recovery_rate, ...) {
+    standardGeneric("expected_pcds_loss")
+  })
+
+#' @rdname probability_vector
+#'
+#' @param lower Lower attachment point of the CDO tranche
+#' @param upper Upper attachment point of the CDO tranche
+#'
+#' @export
+setGeneric("expected_cdo_loss",
+  function(object, t, recovery_rate, lower, upper, ...) {
+    standardGeneric("expected_cdo_loss")
   })
 
 
@@ -182,6 +219,80 @@ setReplaceMethod("setDimension", c("CalibrationParam", "numeric"),
     invisible(object)
   })
 
+#' @rdname probability_vector
+#' @aliases expected_value,CalibrationParam
+#'
+#' @examples
+#' expected_value(CuadrasAugeExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+#'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
+#' expected_value(AlphaStableExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+#'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
+#' expected_value(PoissonExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+#'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
+#' expected_value(ExponentialExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+#'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
+#'
+#' @export
+setMethod("expected_value", "CalibrationParam",
+  function(object, t, g, ...) {
+    mu <- sapply(0:object@dim, function(k) g(k / object@dim, ...))
+
+    as.vector(probability_vector(object, t) %*% mu)
+  })
+
+#' @rdname probability_vector
+#' @aliases expected_pcds_loss,CalibrationParam
+#'
+#' @examples
+#' expected_pcds_loss(CuadrasAugeExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+#' expected_pcds_loss(AlphaStableExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+#' expected_pcds_loss(PoissonExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+#' expected_pcds_loss(ExponentialExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+#'
+#' @export
+setMethod("expected_pcds_loss", "CalibrationParam",
+  function(object, t, recovery_rate, ...) {
+    mu <- sapply(
+      0:object@dim,
+      function(k) {
+        (1 - recovery_rate) * k / object@dim
+      })
+
+    as.vector(probability_vector(object, t) %*% mu)
+  })
+
+#' @rdname probability_vector
+#' @aliases expected_cdo_loss,CalibrationParam
+#'
+#' @examples
+#' expected_cdo_loss(CuadrasAugeExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4, 0.1, 0.2)
+#' expected_cdo_loss(AlphaStableExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4, 0.1, 0.2)
+#' expected_cdo_loss(PoissonExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4, 0.1, 0.2)
+#' expected_cdo_loss(ExponentialExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4, 0.1, 0.2)
+#'
+#' @export
+setMethod("expected_cdo_loss", "CalibrationParam",
+function(object, t, recovery_rate, lower, upper, ...) {
+  mu <- sapply(
+    0:object@dim,
+    function(k) {
+      pmin(pmax((1 - recovery_rate) * k / object@dim - lower, 0), upper - lower)
+    })
+
+  as.vector(probability_vector(object, t) %*% mu)
+})
 
 # #### ExMarkovParam ####
 
@@ -220,8 +331,8 @@ setValidity("ExMarkovParam",
       nrow(object@qmatrix) == ncol(object@qmatrix),
       all(object@qmatrix[lower.tri(object@qmatrix)] == 0),
       all(object@qmatrix[upper.tri(object@qmatrix)] >= 0),
-      all.equal(apply(object@qmatrix, 1, sum),
-                rep(0, nrow(object@qmatrix)), tol = .Machine$double.eps))
+      isTRUE(all.equal(rep(0, nrow(object@qmatrix)), apply(object@qmatrix, 1, sum),
+                tol = .Machine$double.eps^0.5)))
 
     invisible(TRUE)
   })
@@ -234,7 +345,8 @@ setReplaceMethod("setQMatrix", "ExMarkovParam",
   function(object, value) {
     stopifnot(nrow(value) == ncol(value),
       all(value[lower.tri(value)] == 0), all(value[upper.tri(value)] >= 0),
-      all.equal(apply(value, 1, sum), rep(0, nrow(value)), tol = .Machine$double.eps))
+      isTRUE(all.equal(rep(0, nrow(value)), apply(value, 1, sum),
+        tol = .Machine$double.eps^0.5)))
 
     dim <- nrow(value)-1
 
@@ -253,30 +365,24 @@ setMethod("initialize", "ExMarkovParam",
     invisible(.Object)
   })
 
-#' @rdname expected_loss
-#' @aliases expected_loss,ExMarkovParam
+#' @rdname probability_vector
+#' @aliases probability_vector,ExMarkovParam
 #'
 #' @examples
-#' expected_loss(CuadrasAugeExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
-#'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
-#' expected_loss(AlphaStableExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
-#'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
-#' expected_loss(PoissonExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
-#'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
-#' expected_loss(ExponentialExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
-#'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
+#' probability_vector(CuadrasAugeExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+#' probability_vector(AlphaStableExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+#' probability_vector(PoissonExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+#' probability_vector(ExponentialExtMO2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
 #'
 #' @importFrom expm expm
 #' @export
-setMethod("expected_loss", "ExMarkovParam",
-  function(object, t, g, ...) {
-    mu <- sapply(0:object@dim, function(k) g(k / object@dim, ...))
-
-    as.vector(expm(t * object@qmatrix) %*% mu)[[1]]
+setMethod("probability_vector", "ExMarkovParam",
+  function(object, t) {
+    as.vector(expm(t * object@qmatrix)[1, ])
   })
 
 
@@ -529,6 +635,27 @@ setMethod("iTau", "ExtMO2FParam", {
   }
 })
 
+#' @rdname probability_vector
+#'
+#' @param method Choice of method (if available)
+#'
+#' @examples
+#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
+#'   t = 0.25, recovery_rate = 0.4)
+#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
+#'   t = 0.25, recovery_rate = 0.4, method = "fallback")
+#'
+#' @export
+setMethod("expected_pcds_loss", "ExtMO2FParam",
+  function(object, t, recovery_rate, method = c("default", "fallback"), ...) {
+    method <- match.arg(method)
+    if (!isTRUE("default" == method)) {
+      return(callNextMethod(object, t, recovery_rate, ...))
+    } else {
+      return((1 - recovery_rate) * pexp(t, rate = object@lambda))
+    }
+  })
+
 # #### CuadrasAugeExtMO2FParam ####
 
 #' @rdname ExtMO2FParam-class
@@ -763,4 +890,227 @@ setMethod("initialize", signature = "ExponentialExtMO2FParam",
     validObject(.Object)
 
     invisible(.Object)
+  })
+
+# #### Homogeneous Gaussian ####
+
+#' Two-factor extendible Gaussian calibration parameter classes
+#'
+#' Calibration parameter classes with two parameters for the extendible
+#' Gaussian equi-correlation family with exponential margins.
+#'
+#' @slot lambda The marginal rate
+#' @slot nu Model specific parameter (Pearson correlation)
+#'
+#' @details
+#' For all implemented families, the parameter `nu` can be replaced by
+#' *Spearman's Rho* `rho`, *Kendall' Tau* `tau`.
+#' For all implemented families, the possible range for `rho` and `tau`
+#' is from zero to one (boundaries might not be included) and have a
+#' one-to-one mapping to the model-specific parameter `nu`.
+#' The link between the Pearson correlation coefficient and
+#' Spearman's Rho and Kendall's Tau is
+#' \itemize{
+#'   \item \eqn{\rho = 2 \sin(\rho_S \cdot \pi / 6)} and
+#'     \eqn{\rho_S = 6 / \pi \cdot \arcsin(\rho/2)}
+#'   \item \eqn{\rho = \sin(\tau \cdot \pi / 2)} and
+#'     \eqn{\tau = 2 / \pi \cdot \arcsin(\rho)}
+#' }
+#'
+#' @examples
+#' ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+#'
+#' @export ExtGaussian2FParam
+ExtGaussian2FParam <- setClass("ExtGaussian2FParam", # nolint
+  contains = "CalibrationParam",
+  slots = c("lambda", "nu"))
+
+setValidity("ExtGaussian2FParam",
+  function(object) {
+    stopifnot(1L == length(object@lambda), object@lambda > 0,
+      1L == length(object@nu), 0 <= object@nu, object@nu <= 1)
+
+    invisible(TRUE)
+  })
+
+setMethod("getLambda", "ExtGaussian2FParam",
+  function(object) {
+    object@lambda
+  })
+setReplaceMethod("setLambda", "ExtGaussian2FParam",
+  function(object, value) {
+    stopifnot(1L == length(value), value > 0)
+    object@lambda <- value
+
+    invisible(object)
+  })
+
+setMethod("getNu", "ExtGaussian2FParam",
+  function(object) {
+    object@nu
+  })
+setReplaceMethod("setNu", "ExtGaussian2FParam",
+  function(object, value) {
+    stopifnot(1L == length(value), 0 <= value, value <= 1)
+    object@nu <- value
+
+    invisible(object)
+  })
+
+setMethod("iRho", "ExtGaussian2FParam",
+  function(object, value) {
+    2 * sin(value * pi / 6)
+  })
+
+setMethod("iTau", "ExtGaussian2FParam",
+  function(object, value) {
+    sin(value * pi / 2)
+  })
+
+setMethod("getRho", "ExtGaussian2FParam",
+  function(object) {
+    (6 / pi) * asin(getNu(object) / 2)
+  })
+setReplaceMethod("setRho", "ExtGaussian2FParam",
+  function(object, value) {
+    setNu(object) <- iRho(object, value)
+
+    invisible(object)
+  })
+
+setMethod("getTau", "ExtGaussian2FParam",
+  function(object) {
+    (2 / pi) * asin(getNu(object))
+  })
+setReplaceMethod("setTau", "ExtGaussian2FParam",
+  function(object, value) {
+    setNu(object) <- iTau(object, value)
+
+    invisible(object)
+  })
+
+setMethod("initialize", signature = "ExtGaussian2FParam",
+  definition = function(.Object, # nolint
+      dim = 2, lambda = 0.1, nu = 0.5, rho = NULL, tau = NULL) {
+    stopifnot(!missing(nu) || !is.null(rho) || !is.null(tau))
+
+    if (missing(nu)) {
+      if (!is.null(rho)) {
+        nu <- iRho(.Object, rho)
+      } else if (!is.null(tau)) {
+        nu <- iTau(.Object, tau)
+      }
+    }
+
+    setDimension(.Object) <- dim
+    setLambda(.Object) <- lambda
+    setNu(.Object) <- nu
+    validObject(.Object)
+
+    invisible(.Object)
+  })
+
+#' @rdname probability_vector
+#' @aliases probability_vector,ExtGaussian2FParam
+#'
+#' @examples
+#' probability_vector(ExtGaussian2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+#'
+#' @importFrom stats integrate pexp pnorm dnorm qnorm
+#' @export
+setMethod("probability_vector", "ExtGaussian2FParam",
+  function(object, t) {
+    sapply(0:object@dim,
+      function(k) {
+        int_res <- integrate(
+          function(x) {
+            ldp <- pnorm(
+              (qnorm(pexp(t, rate = object@lambda)) - sqrt(object@nu) * x) /
+              (sqrt(1 - object@nu)),
+              log.p=TRUE, lower.tail = TRUE
+            )
+            lsp <- pnorm(
+              (qnorm(pexp(t, rate = object@lambda)) - sqrt(object@nu) * x) /
+              (sqrt(1 - object@nu)),
+              log.p=TRUE, lower.tail = FALSE
+            )
+            sapply(
+              exp(k * ldp + (object@dim-k) * lsp) * dnorm(x),
+              function(v) {
+                multiply_binomial_coefficient(v, object@dim, k)
+              })
+          }, lower = -Inf, upper = Inf, rel.tol = .Machine$double.eps^0.5
+        )
+
+        int_res$value
+      })
+  })
+
+#' @rdname probability_vector
+#' @aliases expected_pcds_loss,ExtGaussian2FParam
+#'
+#' @examples
+#' expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   t = 0.25, recovery_rate = 0.4)
+#' expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   t = 0.25, recovery_rate = 0.4, method = "fallback")
+#'
+#' @export
+setMethod("expected_pcds_loss", "ExtGaussian2FParam",
+  function(object, t, recovery_rate, method = c("default", "fallback"), ...) {
+    method <- match.arg(method)
+    if (!isTRUE("default" == method)) {
+      return(callNextMethod(object, t, recovery_rate, ...))
+    }
+
+    (1 - recovery_rate) * pexp(t, rate = object@lambda)
+  })
+
+#' @rdname probability_vector
+#' @aliases expected_cdo_loss,ExtGaussian2FParam
+#'
+#' @examples
+#' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   t = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
+#' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   t = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "fallback")
+#'
+#' @importFrom mvtnorm pmvnorm
+#' @export
+setMethod("expected_cdo_loss", "ExtGaussian2FParam",
+  function(
+      object, t, recovery_rate, lower, upper,
+      method = c("default", "fallback"), ...) {
+    method <- match.arg(method)
+    if (!isTRUE("default" == method)) {
+      return(callNextMethod(object, t, recovery_rate, lower, upper, ...))
+    }
+
+    stopifnot(
+      1L == length(recovery_rate), 0 <= recovery_rate, recovery_rate < 1,
+      1L == length(lower), 1L == length(upper),
+      0 <= lower, lower < upper, upper <= 1)
+    corr <- matrix(c(1, rep(-sqrt(1 - object@nu), 2), 1), nrow=2, ncol=2)
+    left <- pexp(t, rate = object@lambda)
+    if (lower > 0) {
+      left <- pmvnorm(
+        lower = rep(-Inf, 2),
+        upper = c(
+          -qnorm(pmin(lower / (1 - recovery_rate), 1)),
+          qnorm(pexp(t, rate = object@lambda))
+        ),
+        corr = corr
+      )
+    }
+    right <- pmvnorm(
+      lower = rep(-Inf, 2),
+      upper = c(
+        -qnorm(pmin(upper / (1 - recovery_rate), 1)),
+        qnorm(pexp(t, rate = object@lambda))
+      ),
+      corr = corr
+    )
+
+    (1 - recovery_rate) * as.numeric(left - right)
   })
