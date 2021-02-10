@@ -18,13 +18,25 @@ Suggests:
     covr,
     rmarkdown
 Config/testthat/edition: 3
-LinkingTo: 
+LinkingTo:
     Rcpp,
     rmo
-Imports: 
+Imports:
     Rcpp,
     rmo,
     expm,
     methods,
     mvtnorm,
-    copula
+    copula,
+    checkmate
+Collate:
+    'RcppExports.R'
+    'allClass.R'
+    'allGeneric.R'
+    'allProbability.R'
+    'allExpectation.R'
+    'allGetSet.R'
+    'allInitialize.R'
+    'allMethod.R'
+    'allValidity.R'
+    'cvalr-package.R'

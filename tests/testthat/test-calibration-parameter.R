@@ -44,7 +44,9 @@ test_that("Biv. ExMOParam is initialized correctly", {
 
 test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
   nu <- alpha
-  parm <- CuadrasAugeExtMO2FParam(dim = 2, lambda = lambda, nu)
+  parm <- CuadrasAugeExtMO2FParam(dim = 2)
+  setLambda(parm) <- lambda
+  setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
   expect_equal(getLambda(parm), lambda)
   expect_equal(getNu(parm), nu)
@@ -96,7 +98,9 @@ test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
 
 test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
   nu <- log2(2 - alpha)
-  parm <- AlphaStableExtMO2FParam(dim = 2, lambda = lambda, nu)
+  parm <- AlphaStableExtMO2FParam(dim = 2)
+  setLambda(parm) <- lambda
+  setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
   expect_equal(getLambda(parm), lambda)
   expect_equal(getNu(parm), nu)
@@ -146,7 +150,9 @@ test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
 
 test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
   nu <- -log(1 - sqrt(alpha))
-  parm <- PoissonExtMO2FParam(dim = 2, lambda = lambda, nu)
+  parm <- PoissonExtMO2FParam(dim = 2)
+  setLambda(parm) <- lambda
+  setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
   expect_equal(getLambda(parm), lambda)
   expect_equal(getNu(parm), nu)
@@ -198,7 +204,9 @@ test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
 
 test_that("Biv. ExponentialExtMO2FParam is initialized correctly", {
   nu <- 0.5 * (-3 + sqrt(1 + 8 / alpha))
-  parm <- ExponentialExtMO2FParam(dim = 2, lambda = lambda, nu)
+  parm <- ExponentialExtMO2FParam(dim = 2)
+  setLambda(parm) <- lambda
+  setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
   expect_equal(getLambda(parm), lambda)
   expect_equal(getNu(parm), nu)
