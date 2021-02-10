@@ -21,6 +21,10 @@
 \alias{expected_pcds_loss,ExtGaussian2FParam}
 \alias{expected_cdo_loss,ExtGaussian2FParam-method}
 \alias{expected_cdo_loss,ExtGaussian2FParam}
+\alias{probability_vector,FrankExtArch2FParam-method}
+\alias{probability_vector,FrankExtArch2FParam}
+\alias{expected_pcds_loss,FrankExtArch2FParam-method}
+\alias{expected_pcds_loss,FrankExtArch2FParam}
 \title{Probability vector and expected value for calibration parameter}
 \usage{
 probability_vector(object, t)
@@ -66,6 +70,16 @@ expected_cdo_loss(object, t, recovery_rate, lower, upper, ...)
   method = c("default", "fallback"),
   ...
 )
+
+\S4method{probability_vector}{FrankExtArch2FParam}(object, t)
+
+\S4method{expected_pcds_loss}{FrankExtArch2FParam}(
+  object,
+  t,
+  recovery_rate,
+  method = c("default", "fallback"),
+  ...
+)
 }
 \arguments{
 \item{object}{The calibration parameter object}
@@ -74,7 +88,7 @@ expected_cdo_loss(object, t, recovery_rate, lower, upper, ...)
 
 \item{g}{Transformation function}
 
-\item{...}{Fruther arguments}
+\item{...}{Further arguments}
 
 \item{recovery_rate}{The recovery rate of the portfolio CDS/CDO}
 
@@ -157,5 +171,13 @@ expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
   t = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
 expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
   t = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "fallback")
+
+probability_vector(FrankExtArch2FParam(
+  dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+
+expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+  t = 0.25, recovery_rate = 0.4)
+expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+  t = 0.25, recovery_rate = 0.4, method = "fallback")
 
 }

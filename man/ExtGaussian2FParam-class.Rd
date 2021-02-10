@@ -7,7 +7,7 @@
 \title{Two-factor extendible Gaussian calibration parameter classes}
 \description{
 Calibration parameter classes with two parameters for the extendible
-Gaussian family.
+Gaussian equi-correlation family with exponential margins.
 }
 \details{
 For all implemented families, the parameter \code{nu} can be replaced by

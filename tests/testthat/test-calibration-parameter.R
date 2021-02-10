@@ -318,3 +318,75 @@ test_that("ExtGaussian2FParam is initialized correctly", {
     tolerance = 1e-2
   )
 })
+
+
+test_that("FrankExtArch2FParam is initialized correctly", {
+  parm <- FrankExtArch2FParam(dim = 125L, lambda = lambda, rho = rho)
+  tau <- getTau(parm)
+  nu <- getNu(parm)
+  parm <- FrankExtArch2FParam(dim = 125L, lambda = lambda, nu)
+  parm <- FrankExtArch2FParam(dim = 125L, lambda = lambda, tau = tau)
+  expect_equal(getDimension(parm), 125L)
+  expect_equal(getLambda(parm), lambda)
+  expect_equal(getNu(parm), nu)
+  expect_equal(getRho(parm), rho)
+  expect_equal(getTau(parm), tau)
+
+  setTau(parm) <- tau
+  expect_equal(getDimension(parm), 125L)
+  expect_equal(getLambda(parm), lambda)
+  expect_equal(getNu(parm), nu)
+  expect_equal(getRho(parm), rho)
+  expect_equal(getTau(parm), tau)
+
+  setRho(parm) <- rho
+  expect_equal(getDimension(parm), 125L)
+  expect_equal(getLambda(parm), lambda)
+  expect_equal(getNu(parm), nu)
+  expect_equal(getRho(parm), rho)
+  expect_equal(getTau(parm), tau)
+
+  expect_equal(
+    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0)),
+    pexp(times, rate = lambda),
+    tolerance = 1e-2)
+  expect_equal(
+    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0,
+      method = "fallback")),
+    pexp(times, rate = lambda),
+    tolerance = 1e-2)
+
+  recovery_rate <- 0.4
+  lower <- 0.1
+  upper <- 0.2
+  expect_equal(
+    sapply(
+      times,
+      function(t) {
+        expected_value(parm, t, function(x) {
+          pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
+        })
+      }),
+      sapply(
+        times,
+        function(t) {
+          expected_cdo_loss(parm, t, recovery_rate, lower, upper, method = "default")
+        }),
+    tolerance = 1e-2
+  )
+  expect_equal(
+    sapply(
+      times,
+      function(t) {
+        expected_value(parm, t, function(x) {
+          pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
+        })
+      }),
+      sapply(
+        times,
+        function(t) {
+          expected_cdo_loss(parm, t, recovery_rate, lower, upper, method = "fallback")
+        }),
+    tolerance = 1e-2
+  )
+})

@@ -88,13 +88,13 @@ setGeneric("setAlpha<-",
     standardGeneric("setAlpha<-")
   })
 
-setGeneric("iRho",
+setGeneric("invRho",
   function(object, value) {
-    standardGeneric("iRho")
+    standardGeneric("invRho")
   })
-setGeneric("iTau",
+setGeneric("invTau",
   function(object, value) {
-    standardGeneric("iTau")
+    standardGeneric("invTau")
   })
 setGeneric("iAlpha",
   function(object, value) {
@@ -591,7 +591,7 @@ setReplaceMethod("setRho", "ExtMO2FParam",
   function(object, value) {
     stopifnot(0 <= value, value <= 1)
 
-    setNu(object) <- iRho(object, value)
+    setNu(object) <- invRho(object, value)
 
     invisible(object)
   })
@@ -606,7 +606,7 @@ setReplaceMethod("setTau", "ExtMO2FParam",
   function(object, value) {
     stopifnot(0 <= value, value <= 1)
 
-    setNu(object) <- iTau(object, value)
+    setNu(object) <- invTau(object, value)
 
     invisible(object)
   })
@@ -625,11 +625,11 @@ setReplaceMethod("setAlpha", "ExtMO2FParam",
     invisible(object)
   })
 
-setMethod("iRho", "ExtMO2FParam",
+setMethod("invRho", "ExtMO2FParam",
   function(object, value) {
     iAlpha(object, 4 * value / (3 + value))
   })
-setMethod("iTau", "ExtMO2FParam", {
+setMethod("invTau", "ExtMO2FParam", {
   function(object, value) {
     iAlpha(object, 2 * value / (1 + value))
   }
@@ -692,9 +692,9 @@ setMethod("initialize", signature = "CuadrasAugeExtMO2FParam",
 
     if (missing(nu)) {
       if (!is.null(rho)) {
-        nu <- iRho(.Object, rho)
+        nu <- invRho(.Object, rho)
       } else if (!is.null(tau)) {
-        nu <- iTau(.Object, tau)
+        nu <- invTau(.Object, tau)
       } else if (!is.null(alpha)) {
         nu <- iAlpha(.Object, alpha)
       }
@@ -750,9 +750,9 @@ setMethod("initialize", signature = "AlphaStableExtMO2FParam",
 
     if (missing(nu)) {
       if (!is.null(rho)) {
-        nu <- iRho(.Object, rho)
+        nu <- invRho(.Object, rho)
       } else if (!is.null(tau)) {
-        nu <- iTau(.Object, tau)
+        nu <- invTau(.Object, tau)
       } else if (!is.null(alpha)) {
         nu <- iAlpha(.Object, alpha)
       }
@@ -807,9 +807,9 @@ setMethod("initialize", signature = "PoissonExtMO2FParam",
 
     if (missing(nu)) {
       if (!is.null(rho)) {
-        nu <- iRho(.Object, rho)
+        nu <- invRho(.Object, rho)
       } else if (!is.null(tau)) {
-        nu <- iTau(.Object, tau)
+        nu <- invTau(.Object, tau)
       } else if (!is.null(alpha)) {
         nu <- iAlpha(.Object, alpha)
       }
@@ -869,9 +869,9 @@ setMethod("initialize", signature = "ExponentialExtMO2FParam",
 
     if (missing(nu)) {
       if (!is.null(rho)) {
-        nu <- iRho(.Object, rho)
+        nu <- invRho(.Object, rho)
       } else if (!is.null(tau)) {
-        nu <- iTau(.Object, tau)
+        nu <- invTau(.Object, tau)
       } else if (!is.null(alpha)) {
         nu <- iAlpha(.Object, alpha)
       }
@@ -957,12 +957,12 @@ setReplaceMethod("setNu", "ExtGaussian2FParam",
     invisible(object)
   })
 
-setMethod("iRho", "ExtGaussian2FParam",
+setMethod("invRho", "ExtGaussian2FParam",
   function(object, value) {
     2 * sin(value * pi / 6)
   })
 
-setMethod("iTau", "ExtGaussian2FParam",
+setMethod("invTau", "ExtGaussian2FParam",
   function(object, value) {
     sin(value * pi / 2)
   })
@@ -973,7 +973,7 @@ setMethod("getRho", "ExtGaussian2FParam",
   })
 setReplaceMethod("setRho", "ExtGaussian2FParam",
   function(object, value) {
-    setNu(object) <- iRho(object, value)
+    setNu(object) <- invRho(object, value)
 
     invisible(object)
   })
@@ -984,7 +984,7 @@ setMethod("getTau", "ExtGaussian2FParam",
   })
 setReplaceMethod("setTau", "ExtGaussian2FParam",
   function(object, value) {
-    setNu(object) <- iTau(object, value)
+    setNu(object) <- invTau(object, value)
 
     invisible(object)
   })
@@ -992,13 +992,11 @@ setReplaceMethod("setTau", "ExtGaussian2FParam",
 setMethod("initialize", signature = "ExtGaussian2FParam",
   definition = function(.Object, # nolint
       dim = 2, lambda = 0.1, nu = 0.5, rho = NULL, tau = NULL) {
-    stopifnot(!missing(nu) || !is.null(rho) || !is.null(tau))
-
     if (missing(nu)) {
       if (!is.null(rho)) {
-        nu <- iRho(.Object, rho)
+        nu <- invRho(.Object, rho)
       } else if (!is.null(tau)) {
-        nu <- iTau(.Object, tau)
+        nu <- invTau(.Object, tau)
       }
     }
 
@@ -1113,4 +1111,165 @@ setMethod("expected_cdo_loss", "ExtGaussian2FParam",
     )
 
     (1 - recovery_rate) * as.numeric(left - right)
+  })
+
+
+# #### Two-factor Archimedean ####
+
+#' Two-factor extendible Archimedean calibration parameter classes
+#'
+#' Calibration parameter classes with two parameters for the extendible
+#' Archimedean families with exponential margins.
+#'
+#' @slot lambda The marginal recovery_rate
+#' @slot nu Model specific parameter
+#'
+#' @details
+#' For all implemented families, the parameter `nu` can be replaced by
+#' *Spearman's Rho* `rho`, *Kendall's Tau* `tau`.
+#' For all implemented families, the possible range for `rho` and `tau`
+#' is from zero to one (boundaries might not be included) and have a
+#' one-to-one mapping to the model-specific parameter `nu`.
+#'
+#' @importFrom copula iTau iRho tau rho frankCopula iPsi
+setClass("ExtArch2FParam", # nolint
+  contains = "CalibrationParam",
+  slots = c(lambda = "numeric", nu = "numeric"))
+
+setValidity("ExtArch2FParam",
+  function(object) {
+    stopifnot(1L == length(object@lambda), object@lambda > 0,
+      1L == length(object@nu))
+
+    invisible(TRUE)
+  })
+
+setMethod("getLambda", "ExtArch2FParam",
+  function(object) {
+    object@lambda
+  })
+setReplaceMethod("setLambda", "ExtArch2FParam",
+  function(object, value) {
+    stopifnot(1L == length(value), value > 0)
+    object@lambda <- value
+
+    invisible(object)
+  })
+
+setMethod("getNu", "ExtArch2FParam",
+  function(object) {
+    object@nu
+  })
+setReplaceMethod("setNu", "ExtArch2FParam",
+  function(object, value) {
+    stopifnot(1L == length(value))
+    object@nu <- value
+
+    invisible(object)
+  })
+
+
+#' @rdname ExtArch2FParam-class
+#'
+#' @export FrankExtArch2FParam
+FrankExtArch2FParam <- setClass("FrankExtArch2FParam", # nolint
+  contains = "ExtArch2FParam")
+
+setMethod("invRho", "FrankExtArch2FParam",
+  function(object, value) {
+    copula::iRho(frankCopula(), value)
+  })
+
+setMethod("invTau", "FrankExtArch2FParam",
+  function(object, value) {
+    copula::iTau(frankCopula(), value)
+  })
+
+setMethod("getRho", "FrankExtArch2FParam",
+  function(object) {
+    copula::rho(frankCopula(object@nu))
+  })
+setReplaceMethod("setRho", "FrankExtArch2FParam",
+  function(object, value) {
+    setNu(object) <- invRho(object, value)
+
+    invisible(object)
+  })
+
+setMethod("getTau", "FrankExtArch2FParam",
+  function(object) {
+    copula::tau(frankCopula(object@nu))
+  })
+setReplaceMethod("setTau", "FrankExtArch2FParam",
+  function(object, value) {
+    setNu(object) <- invTau(object, value)
+
+    invisible(object)
+  })
+
+setMethod("initialize", "FrankExtArch2FParam",
+  function(.Object, # nolint
+      dim = 2, lambda = 0.1, nu = 0.5, rho = NULL, tau = NULL) {
+    if (missing(nu)) {
+      if (!is.null(rho)) {
+        nu <- invRho(.Object, rho)
+      } else if (!is.null(tau)) {
+        nu <- invTau(.Object, tau)
+      }
+    }
+
+    setDimension(.Object) <- dim
+    setLambda(.Object) <- lambda
+    setNu(.Object) <- nu
+    validObject(.Object)
+
+    invisible(.Object)
+  })
+
+#' @rdname probability_vector
+#' @aliases probability_vector,FrankExtArch2FParam
+#'
+#' @examples
+#' probability_vector(FrankExtArch2FParam(
+#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+#'
+#' @export
+setMethod("probability_vector", "FrankExtArch2FParam",
+  function(object, t) {
+    tt <- copula::iPsi(frankCopula(object@nu),
+                        pexp(t, rate = object@lambda))
+    dn <- function(m) {
+      pexp(object@nu)^m / (object@nu * m)
+    }
+    n <- max(which(dn(2 ^ (1:10)) > .Machine$double.eps))
+    sapply(0:object@dim,
+      function(k) {
+        multiply_binomial_coefficient(
+          sum(
+            pexp(tt, rate = (1:n), lower.tail = FALSE) ^ k *
+              pexp(tt, rate = (1:n), lower.tail = TRUE) ^ (object@dim - k) *
+              dn((1:n))
+          ),
+          object@dim, k)
+      })
+  })
+
+#' @rdname probability_vector
+#' @aliases expected_pcds_loss,FrankExtArch2FParam
+#'
+#' @examples
+#' expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   t = 0.25, recovery_rate = 0.4)
+#' expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   t = 0.25, recovery_rate = 0.4, method = "fallback")
+#'
+#' @export
+setMethod("expected_pcds_loss", "FrankExtArch2FParam",
+  function(object, t, recovery_rate, method = c("default", "fallback"), ...) {
+    method <- match.arg(method)
+    if (!isTRUE("default" == method)) {
+      return(callNextMethod(object, t, recovery_rate, ...))
+    }
+
+    (1 - recovery_rate) * pexp(t, rate = object@lambda)
   })

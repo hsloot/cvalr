@@ -26,4 +26,5 @@ Imports:
     rmo,
     expm,
     methods,
-    mvtnorm
+    mvtnorm,
+    copula
