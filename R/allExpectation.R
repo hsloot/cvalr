@@ -67,11 +67,12 @@ setGeneric("expected_cdo_loss",
 #' @export
 setMethod("expected_value", "CalibrationParam",
   function(object, t, g, ...) {
-    qassert(t, "N1[0,)")
+    qassert(t, "N+[0,)")
     assert_function(g)
     mu <- sapply(0:object@dim, function(k) g(k / object@dim, ...))
+    pvecs <- t(sapply(t, function(.t) probability_vector(object, .t)))
 
-    as.vector(probability_vector(object, t) %*% mu)
+    as.vector(pvecs %*% mu)
   })
 
 #' @rdname probability_vector
@@ -87,18 +88,15 @@ setMethod("expected_value", "CalibrationParam",
 #' expected_pcds_loss(ExponentialExtMO2FParam(
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
 #'
+#' @importFrom checkmate qassert
 #' @export
 setMethod("expected_pcds_loss", "CalibrationParam",
   function(object, t, recovery_rate, ...) {
-    qassert(t, "N1[0,)")
     qassert(recovery_rate, "N1[0,1]")
-    mu <- sapply(
-      0:object@dim,
+    expected_value(object, t,
       function(k) {
-        (1 - recovery_rate) * k / object@dim
+        (1 - recovery_rate) * k
       })
-
-    as.vector(probability_vector(object, t) %*% mu)
   })
 
 #' @rdname probability_vector
@@ -117,13 +115,13 @@ setMethod("expected_pcds_loss", "CalibrationParam",
 setMethod("expected_pcds_loss", "ExtMO2FParam",
   function(object, t, recovery_rate, method = c("default", "fallback"), ...) {
     method <- match.arg(method)
-    qassert(t, "N1[0,)")
+    qassert(t, "N+[0,)")
     qassert(recovery_rate, "N1[0,1]")
     if (!isTRUE("default" == method)) {
       return(callNextMethod(object, t, recovery_rate, ...))
-    } else {
-      return((1 - recovery_rate) * pexp(t, rate = object@lambda))
     }
+
+    (1 - recovery_rate) * pexp(t, rate = object@lambda)
   })
 
 #' @rdname probability_vector
@@ -141,7 +139,7 @@ setMethod("expected_pcds_loss", "ExtMO2FParam",
 setMethod("expected_pcds_loss", "ExtGaussian2FParam",
   function(object, t, recovery_rate, method = c("default", "fallback"), ...) {
     method <- match.arg(method)
-    qassert(t, "N1[0,)")
+    qassert(t, "N+[0,)")
     qassert(recovery_rate, "N1[0,1]")
     if (!isTRUE("default" == method)) {
       return(callNextMethod(object, t, recovery_rate, ...))
@@ -165,7 +163,7 @@ setMethod("expected_pcds_loss", "ExtGaussian2FParam",
 setMethod("expected_pcds_loss", "FrankExtArch2FParam",
   function(object, t, recovery_rate, method = c("default", "fallback"), ...) {
     method <- match.arg(method)
-    qassert(t, "N1[0,)")
+    qassert(t, "N+[0,)")
     qassert(recovery_rate, "N1[0,1]")
     if (!isTRUE("default" == method)) {
       return(callNextMethod(object, t, recovery_rate, ...))
@@ -191,17 +189,13 @@ setMethod("expected_pcds_loss", "FrankExtArch2FParam",
 #' @export
 setMethod("expected_cdo_loss", "CalibrationParam",
   function(object, t, recovery_rate, lower, upper, ...) {
-    qassert(t, "N1[0,)")
     qassert(recovery_rate, "N1[0,1]")
     qassert(lower, "N1[0,1]")
     assert_numeric(upper, lower = lower, upper = 1)
-    mu <- sapply(
-      0:object@dim,
+    expected_value(object, t,
       function(k) {
-        pmin(pmax((1 - recovery_rate) * k / object@dim - lower, 0), upper - lower)
+        pmin(pmax((1 - recovery_rate) * k - lower, 0), upper - lower)
       })
-
-    as.vector(probability_vector(object, t) %*% mu)
   })
 
 #' @rdname probability_vector
@@ -222,7 +216,7 @@ setMethod("expected_cdo_loss", "ExtGaussian2FParam",
       object, t, recovery_rate, lower, upper,
       method = c("default", "fallback"), ...) {
     method <- match.arg(method)
-    qassert(t, "N1[0,)")
+    qassert(t, "N+[0,)")
     qassert(recovery_rate, "N1[0,1]")
     qassert(lower, "N1[0,1]")
     assert_numeric(upper, lower = lower, upper = 1)
@@ -231,25 +225,27 @@ setMethod("expected_cdo_loss", "ExtGaussian2FParam",
     }
 
     corr <- matrix(c(1, rep(-sqrt(1 - object@nu), 2), 1), nrow=2, ncol=2)
-    left <- pexp(t, rate = object@lambda)
-    if (lower > 0) {
-      left <- pmvnorm(
+    sapply(t, function(.t){
+      left <- pexp(.t, rate = object@lambda)
+      if (lower > 0) {
+        left <- pmvnorm(
+          lower = rep(-Inf, 2),
+          upper = c(
+            -qnorm(pmin(lower / (1 - recovery_rate), 1)),
+            qnorm(pexp(.t, rate = object@lambda))
+          ),
+          corr = corr
+        )
+      }
+      right <- pmvnorm(
         lower = rep(-Inf, 2),
         upper = c(
-          -qnorm(pmin(lower / (1 - recovery_rate), 1)),
-          qnorm(pexp(t, rate = object@lambda))
+          -qnorm(pmin(upper / (1 - recovery_rate), 1)),
+          qnorm(pexp(.t, rate = object@lambda))
         ),
         corr = corr
       )
-    }
-    right <- pmvnorm(
-      lower = rep(-Inf, 2),
-      upper = c(
-        -qnorm(pmin(upper / (1 - recovery_rate), 1)),
-        qnorm(pexp(t, rate = object@lambda))
-      ),
-      corr = corr
-    )
 
-    (1 - recovery_rate) * as.numeric(left - right)
+      (1 - recovery_rate) * as.numeric(left - right)
+    })
   })

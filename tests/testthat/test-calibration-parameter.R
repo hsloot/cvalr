@@ -35,10 +35,7 @@ test_that("Biv. ExMOParam is initialized correctly", {
   expect_equal(getQMatrix(parm), qmatrix)
 
   expect_equal(
-    sapply(times,
-      function(t) {
-        expected_pcds_loss(parm, t, recovery_rate = 0)
-      }),
+    expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda))
 })
 
@@ -88,11 +85,10 @@ test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
   expect_equal(getQMatrix(parm), qmatrix)
 
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0)),
+    expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda))
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0,
-      method = "fallback")),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
     pexp(times, rate = lambda))
 })
 
@@ -140,11 +136,10 @@ test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
   expect_equal(getQMatrix(parm), qmatrix)
 
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0)),
+    expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda))
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0,
-      method = "fallback")),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
     pexp(times, rate = lambda))
 })
 
@@ -194,11 +189,10 @@ test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
   expect_equal(getQMatrix(parm), qmatrix)
 
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0)),
+    expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda))
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0,
-      method = "fallback")),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
     pexp(times, rate = lambda))
 })
 
@@ -248,11 +242,10 @@ test_that("Biv. ExponentialExtMO2FParam is initialized correctly", {
   expect_equal(getQMatrix(parm), qmatrix)
 
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0)),
+    expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda))
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0,
-      method = "fallback")),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
     pexp(times, rate = lambda))
 })
 
@@ -283,12 +276,11 @@ test_that("ExtGaussian2FParam is initialized correctly", {
   expect_equal(getTau(parm), tau)
 
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0)),
+    expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda),
     tolerance = 1e-2)
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0,
-      method = "fallback")),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
     pexp(times, rate = lambda),
     tolerance = 1e-2)
 
@@ -296,33 +288,17 @@ test_that("ExtGaussian2FParam is initialized correctly", {
   lower <- 0.1
   upper <- 0.2
   expect_equal(
-    sapply(
-      times,
-      function(t) {
-        expected_value(parm, t, function(x) {
-          pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
-        })
-      }),
-      sapply(
-        times,
-        function(t) {
-          expected_cdo_loss(parm, t, recovery_rate, lower, upper, method = "default")
-        }),
+    expected_value(parm, times, function(x) {
+      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
+    }),
+    expected_cdo_loss(parm, times, recovery_rate, lower, upper, method = "default"),
     tolerance = 1e-2
   )
   expect_equal(
-    sapply(
-      times,
-      function(t) {
-        expected_value(parm, t, function(x) {
-          pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
-        })
-      }),
-      sapply(
-        times,
-        function(t) {
-          expected_cdo_loss(parm, t, recovery_rate, lower, upper, method = "fallback")
-        }),
+    expected_value(parm, times, function(x) {
+      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
+    }),
+    expected_cdo_loss(parm, times, recovery_rate, lower, upper, method = "fallback"),
     tolerance = 1e-2
   )
 })
@@ -355,12 +331,11 @@ test_that("FrankExtArch2FParam is initialized correctly", {
   expect_equal(getTau(parm), tau)
 
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0)),
+    expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda),
     tolerance = 1e-2)
   expect_equal(
-    sapply(times, function(t) expected_pcds_loss(parm, t, recovery_rate = 0,
-      method = "fallback")),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
     pexp(times, rate = lambda),
     tolerance = 1e-2)
 
@@ -368,33 +343,17 @@ test_that("FrankExtArch2FParam is initialized correctly", {
   lower <- 0.1
   upper <- 0.2
   expect_equal(
-    sapply(
-      times,
-      function(t) {
-        expected_value(parm, t, function(x) {
-          pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
-        })
-      }),
-      sapply(
-        times,
-        function(t) {
-          expected_cdo_loss(parm, t, recovery_rate, lower, upper, method = "default")
-        }),
+    expected_value(parm, times, function(x) {
+      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
+    }),
+    expected_cdo_loss(parm, times, recovery_rate, lower, upper, method = "default"),
     tolerance = 1e-2
   )
   expect_equal(
-    sapply(
-      times,
-      function(t) {
-        expected_value(parm, t, function(x) {
-          pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
-        })
-      }),
-      sapply(
-        times,
-        function(t) {
-          expected_cdo_loss(parm, t, recovery_rate, lower, upper, method = "fallback")
-        }),
+    expected_value(parm, times, function(x) {
+      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
+    }),
+    expected_cdo_loss(parm, times, recovery_rate, lower, upper, method = "fallback"),
     tolerance = 1e-2
   )
 })
