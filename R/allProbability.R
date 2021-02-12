@@ -30,9 +30,11 @@ setGeneric("probability_vector",
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
 #'
 #' @importFrom expm expm
+#' @importFrom checkmate qassert
 #' @export
 setMethod("probability_vector", "ExMarkovParam",
   function(object, t) {
+    qassert(t, "N1[0,)")
     as.vector(expm(t * object@qmatrix)[1, ])
   })
 
@@ -44,9 +46,11 @@ setMethod("probability_vector", "ExMarkovParam",
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
 #'
 #' @importFrom stats integrate pexp pnorm dnorm qnorm
+#' @importFrom checkmate qassert
 #' @export
 setMethod("probability_vector", "ExtGaussian2FParam",
   function(object, t) {
+    qassert(t, "N1[0,)")
     sapply(0:object@dim,
       function(k) {
         int_res <- integrate(
@@ -82,9 +86,11 @@ setMethod("probability_vector", "ExtGaussian2FParam",
 #'
 #' @importFrom stats pexp
 #' @importFrom copula iPsi frankCopula
+#' @importFrom checkmate qassert
 #' @export
 setMethod("probability_vector", "FrankExtArch2FParam",
   function(object, t) {
+    qassert(t, "N1[0,)")
     tt <- copula::iPsi(frankCopula(object@nu),
                         pexp(t, rate = object@lambda))
     dn <- function(m) {

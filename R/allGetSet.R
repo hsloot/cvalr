@@ -1,4 +1,4 @@
-#' @include allClass.R allGeneric.R
+#' @include allClass.R allGeneric.R checkmate.R
 NULL
 
 setMethod("getDimension", "CalibrationParam",
@@ -6,9 +6,10 @@ setMethod("getDimension", "CalibrationParam",
     object@dim
   })
 
+#' @importFrom checkmate qassert
 setReplaceMethod("setDimension", "CalibrationParam",
   function(object, value) {
-    stopifnot(1L == length(value), value %% 1 == 0, value > 0)
+    qassert(value, "X1(0,)")
     object@dim <- as.integer(value)
 
     invisible(object)
@@ -22,10 +23,7 @@ setMethod("getQMatrix", "ExMarkovParam",
 
 setReplaceMethod("setQMatrix", "ExMarkovParam",
   function(object, value) {
-    stopifnot(nrow(value) == ncol(value),
-      all(value[lower.tri(value)] == 0), all(value[upper.tri(value)] >= 0),
-      isTRUE(all.equal(rep(0, nrow(value)), apply(value, 1, sum),
-        tol = .Machine$double.eps^0.5)))
+    assert_qmatrix(value, min.rows=1, min.cols=1)
 
     dim <- nrow(value)-1
     setDimension(object) <- dim
@@ -40,9 +38,11 @@ setMethod("getExIntensities", "ExMOParam",
     object@ex_intensities
   })
 
+#' @importFrom checkmate qassert
 setReplaceMethod("setExIntensities", "ExMOParam",
   function(object, value) {
-    stopifnot(all(value >= 0), any(value > 0))
+    qassert(value, "N+[0,)")
+    qassert(max(value), "N1(0,)")
     setDimension(object) <- length(value)
     object@ex_intensities <- value
     setQMatrix(object) <- ex_intensities2qmatrix(value)
@@ -56,19 +56,22 @@ setMethod("getBernsteinFunction", "ExtMOParam",
     object@bf
   })
 
+#' @importFrom checkmate assert_class
 setReplaceMethod("setBernsteinFunction", "ExtMOParam",
   function(object, value) {
-    stopifnot(is(value, "BernsteinFunction"))
+    assert_class(value, "BernsteinFunction")
     object@bf <- value
     setExIntensities(object) <- rmo:::bf2ex_intensities(object@dim, object@bf)
 
     invisible(object)
   })
 #' @importFrom rmo ScaledBernsteinFunction valueOf
+#' @importFrom checkmate assert check_class
 setReplaceMethod("setBernsteinFunction", "ExtMO2FParam",
   function(object, value) {
-    stopifnot(is(value, "ScaledBernsteinFunction"),
-      isTRUE(all.equal(1, valueOf(value@original, 1, 0L))))
+    assert(combine = "and",
+      check_class(value, "ScaledBernsteinFunction"),
+      check_equal(1, valueOf(value@original, 1, 0L)))
     object@lambda <- value@scale
     object@nu <- invAlpha(object, 2 - valueOf(value@original, 2, 0L))
 
@@ -88,25 +91,27 @@ setMethod("getLambda", "ExtArch2FParam",
   function(object) {
     object@lambda
   })
-
+#' @importFrom checkmate qassert
 setReplaceMethod("setLambda", "ExtMO2FParam",
   function(object, value) {
-    stopifnot(1L == length(value), 0 < value)
+    qassert(value, "N1(0,)")
     setBernsteinFunction(object) <- constructBernsteinFunction(
       object, value, object@nu)
 
     invisible(object)
   })
+#' @importFrom checkmate qassert
 setReplaceMethod("setLambda", "ExtGaussian2FParam",
   function(object, value) {
-    stopifnot(1L == length(value), 0 < value)
+    qassert(value, "N1(0,)")
     object@lambda <- value
 
     invisible(object)
   })
+#' @importFrom checkmate qassert
 setReplaceMethod("setLambda", "ExtArch2FParam",
   function(object, value) {
-    stopifnot(1L == length(value), 0 < value)
+    qassert(value, "N1(0,)")
     object@lambda <- value
 
     invisible(object)
@@ -126,24 +131,27 @@ setMethod("getNu", "ExtArch2FParam",
     object@nu
   })
 
+#' @importFrom checkmate qassert
 setReplaceMethod("setNu", "ExtMO2FParam",
   function(object, value) {
-    stopifnot(1L == length(value))
+    qassert(value, "N1")
     setBernsteinFunction(object) <- constructBernsteinFunction(
       object, object@lambda, value)
 
     invisible(object)
   })
+#' @importFrom checkmate qassert
 setReplaceMethod("setNu", "ExtGaussian2FParam",
   function(object, value) {
-    stopifnot(1L == length(value), 0 <= value, value <= 1)
+    qassert(value, "N1[0,1]")
     object@nu <- value
 
     invisible(object)
   })
+#' @importFrom checkmate qassert
 setReplaceMethod("setNu", "ExtArch2FParam",
   function(object, value) {
-    stopifnot(1L == length(value))
+    qassert(value, "N1")
     object@nu <- value
 
     invisible(object)
@@ -166,23 +174,26 @@ setMethod("getRho", "FrankExtArch2FParam",
     copula::rho(frankCopula(object@nu))
   })
 
+#' @importFrom checkmate qassert
 setReplaceMethod("setRho", "ExtMO2FParam",
   function(object, value) {
-    stopifnot(0 <= value, value <= 1)
+    qassert(value, "N1[0,1]")
     setNu(object) <- invRho(object, value)
 
     invisible(object)
   })
+#' @importFrom checkmate qassert
 setReplaceMethod("setRho", "ExtGaussian2FParam",
   function(object, value) {
-    stopifnot(0 <= value, value <= 1)
+    qassert(value, "N1[0,1]")
     setNu(object) <- invRho(object, value)
 
     invisible(object)
   })
+#' @importFrom checkmate qassert
 setReplaceMethod("setRho", "FrankExtArch2FParam",
   function(object, value) {
-    stopifnot(0 <= value, value <= 1)
+    qassert(value, "N1[0,1]")
     setNu(object) <- invRho(object, value)
 
     invisible(object)
@@ -205,23 +216,26 @@ setMethod("getTau", "FrankExtArch2FParam",
     copula::tau(frankCopula(object@nu))
   })
 
+#' @importFrom checkmate qassert
 setReplaceMethod("setTau", "ExtMO2FParam",
   function(object, value) {
-    stopifnot(0 <= value, value <= 1)
+    qassert(value, "N1[0,1]")
     setNu(object) <- invTau(object, value)
 
     invisible(object)
   })
+#' @importFrom checkmate qassert
 setReplaceMethod("setTau", "ExtGaussian2FParam",
   function(object, value) {
-    stopifnot(0 <= value, value <= 1)
+    qassert(value, "N1[0,1]")
     setNu(object) <- invTau(object, value)
 
     invisible(object)
   })
+#' @importFrom checkmate qassert
 setReplaceMethod("setTau", "FrankExtArch2FParam",
   function(object, value) {
-    stopifnot(0 <= value, value <= 1)
+    qassert(value, "N1[0,1]")
     setNu(object) <- invTau(object, value)
 
     invisible(object)
@@ -233,9 +247,10 @@ setMethod("getAlpha", "ExtMO2FParam",
   function(object) {
     2 - valueOf(object@bf, 2, 0L) / valueOf(object@bf, 1, 0L)
   })
+#' @importFrom checkmate qassert
 setReplaceMethod("setAlpha", "ExtMO2FParam",
   function(object, value) {
-    stopifnot(0 <= value, value <= 1)
+    qassert(value, "N1[0,1]")
     setNu(object) <- invAlpha(object, value)
 
     invisible(object)

@@ -49,47 +49,67 @@ setMethod("constructBernsteinFunction", "ExponentialExtMO2FParam",
   })
 
 
+#' @importFrom checkmate qassert
 setMethod("invRho", "ExtMO2FParam",
   function(object, value) {
+    qassert(value, "N1[0,1]")
     invAlpha(object, 4 * value / (3 + value))
   })
+#' @importFrom checkmate qassert
 setMethod("invRho", "ExtGaussian2FParam",
   function(object, value) {
+    qassert(value, "N1[0,1]")
     2 * sin(value * pi / 6)
   })
 #' @importFrom copula iRho frankCopula
+#' @importFrom checkmate qassert
 setMethod("invRho", "FrankExtArch2FParam",
   function(object, value) {
+    qassert(value, "N1[0,1]")
     copula::iRho(frankCopula(), value)
   })
 
+#' @importFrom checkmate qassert
 setMethod("invTau", "ExtMO2FParam",
   function(object, value) {
+    qassert(value, "N1[0,1]")
     invAlpha(object, 2 * value / (1 + value))
   })
+#' @importFrom checkmate qassert
 setMethod("invTau", "ExtGaussian2FParam",
   function(object, value) {
+    qassert(value, "N1[0,1]")
     sin(value * pi / 2)
   })
 #' @importFrom copula iTau frankCopula
+#' @importFrom checkmate qassert
 setMethod("invTau", "FrankExtArch2FParam",
   function(object, value) {
+    qassert(value, "N1[0,1]")
     copula::iTau(frankCopula(), value)
   })
 
+#' @importFrom checkmate qassert
 setMethod("invAlpha", "CuadrasAugeExtMO2FParam",
   function(object, value) {
+    qassert(value, "N1[0,1]")
     value
   })
+#' @importFrom checkmate qassert
 setMethod("invAlpha", "AlphaStableExtMO2FParam",
   function(object, value) {
+    qassert(value, "N1[0,1]")
     log2(2 - value)
   })
+#' @importFrom checkmate qassert
 setMethod("invAlpha", "PoissonExtMO2FParam",
   function(object, value) {
+    qassert(value, "N1[0,1]")
     -log(1 - sqrt(value))
   })
+#' @importFrom checkmate qassert
 setMethod("invAlpha", "ExponentialExtMO2FParam",
   function(object, value) {
+    qassert(value, "N1[0,1]")
     0.5 * (-3 + sqrt(1 + 8 / value))
   })

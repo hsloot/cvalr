@@ -28,13 +28,15 @@ Imports:
     methods,
     mvtnorm,
     copula,
-    checkmate
+    checkmate,
+    waldo
 Collate:
     'RcppExports.R'
     'allClass.R'
     'allGeneric.R'
     'allProbability.R'
     'allExpectation.R'
+    'checkmate.R'
     'allGetSet.R'
     'allInitialize.R'
     'allMethod.R'

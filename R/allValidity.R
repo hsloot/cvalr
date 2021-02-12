@@ -1,116 +1,122 @@
-#' @include allClass.R allGeneric.R
+#' @include allClass.R allGeneric.R checkmate.R
 NULL
 
+#' @importFrom checkmate qassert
 setValidity("CalibrationParam",
   function(object) {
-    stopifnot(object@dim >= 0L)
+    qassert(object@dim, "I1(0,)")
 
     invisible(TRUE)
   })
 
 setValidity("ExMarkovParam",
   function(object) {
-    stopifnot(object@dim+1 == nrow(object@qmatrix),
-      nrow(object@qmatrix) == ncol(object@qmatrix),
-      all(object@qmatrix[lower.tri(object@qmatrix)] == 0),
-      all(object@qmatrix[upper.tri(object@qmatrix)] >= 0),
-      isTRUE(all.equal(rep(0, nrow(object@qmatrix)), apply(object@qmatrix, 1, sum),
-                tol = .Machine$double.eps^0.5)))
+    assert_qmatrix(object@qmatrix, nrows=object@dim+1, ncols=object@dim+1)
 
     invisible(TRUE)
   })
 
+#' @importFrom checkmate qassert assert_numeric
 setValidity("ExMOParam",
   function(object) {
-    stopifnot(object@dim == length(object@ex_intensities),
-      all(object@ex_intensities >= 0),
-      any(object@ex_intensities > 0))
+    assert_numeric(object@ex_intensities, lower = 0, len = object@dim)
+    qassert(max(object@ex_intensities), "N1(0,)")
 
     invisible(TRUE)
   })
 
+#' @importFrom checkmate assert_class
 setValidity("ExtMOParam",
   function(object) {
-    stopifnot(is(object@bf, "BernsteinFunction"))
+    assert_class(object@bf, "BernsteinFunction")
 
     invisible(TRUE)
   })
 
+#' @importFrom rmo valueOf ScaledBernsteinFunction
+#' @importFrom checkmate assert qassert check_choice check_class
 setValidity("ExtMO2FParam",
   function(object) {
-    stopifnot(1L == length(object@lambda), object@lambda > 0,
-      1L == length(object@nu),
-      is(object@bf, "ScaledBernsteinFunction"))
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N1")
+    assert(combine = "and",
+      check_class(object@bf, "ScaledBernsteinFunction"),
+      check_choice(object@bf@scale, object@lambda),
+      check_equal(1, valueOf(object@bf@original, 1, 0L)),
+      check_equal(
+        object@nu, invAlpha(object, 2 - valueOf(object@bf@original, 2, 0L))))
 
     invisible(TRUE)
   })
 
-#' @importFrom rmo valueOf ScaledBernsteinFunction SumOfBernsteinFunctions
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
 #'   LinearBernsteinFunction ConstantBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class
 setValidity("CuadrasAugeExtMO2FParam",
   function(object) {
-    stopifnot(is(object@bf, "ScaledBernsteinFunction"),
-      isTRUE(all.equal(object@lambda, object@bf@scale)),
-      is(object@bf@original, "SumOfBernsteinFunctions"),
-      is(object@bf@original@first, "LinearBernsteinFunction"),
-      is(object@bf@original@second, "ConstantBernsteinFunction"),
-      isTRUE(all.equal(1, valueOf(object@bf@original, 1, 0L))),
-      isTRUE(all.equal(
-        object@nu, invAlpha(object, 2 - valueOf(object@bf@original, 2, 0L)))))
-  })
-
-  #' @importFrom rmo valueOf ScaledBernsteinFunction SumOfBernsteinFunctions
-  #'   AlphaStableBernsteinFunction
-setValidity("AlphaStableExtMO2FParam",
-  function(object) {
-    stopifnot(is(object@bf, "ScaledBernsteinFunction"),
-      isTRUE(all.equal(object@lambda, object@bf@scale)),
-      is(object@bf@original, "AlphaStableBernsteinFunction"),
-      isTRUE(all.equal(1, valueOf(object@bf@original, 1, 0L))),
-      isTRUE(all.equal(
-        object@nu, invAlpha(object, 2 - valueOf(object@bf@original, 2, 0L)))))
-  })
-
-  #' @importFrom rmo valueOf ScaledBernsteinFunction SumOfBernsteinFunctions
-  #'   LinearBernsteinFunction PoissonBernsteinFunction
-setValidity("PoissonExtMO2FParam",
-  function(object) {
-    stopifnot(is(object@bf, "ScaledBernsteinFunction"),
-      isTRUE(all.equal(object@lambda, object@bf@scale)),
-      is(object@bf@original, "SumOfBernsteinFunctions"),
-      is(object@bf@original@first, "LinearBernsteinFunction"),
-      is(object@bf@original@second, "PoissonBernsteinFunction"),
-      isTRUE(all.equal(1, valueOf(object@bf@original, 1, 0L))),
-      isTRUE(all.equal(
-        object@nu, invAlpha(object, 2 - valueOf(object@bf@original, 2, 0L)))))
-  })
-
-  #' @importFrom rmo valueOf ScaledBernsteinFunction SumOfBernsteinFunctions
-  #'   LinearBernsteinFunction ExponentialBernsteinFunction
-setValidity("ExponentialExtMO2FParam",
-  function(object) {
-    stopifnot(is(object@bf, "ScaledBernsteinFunction"),
-      isTRUE(all.equal(object@lambda, object@bf@scale)),
-      is(object@bf@original, "SumOfBernsteinFunctions"),
-      is(object@bf@original@first, "LinearBernsteinFunction"),
-      is(object@bf@original@second, "ExponentialBernsteinFunction"),
-      isTRUE(all.equal(1, valueOf(object@bf@original, 1, 0L))),
-      isTRUE(all.equal(
-        object@nu, invAlpha(object, 2 - valueOf(object@bf@original, 2, 0L)))))
-  })
-
-setValidity("ExtGaussian2FParam",
-  function(object) {
-    stopifnot(1L == length(object@lambda), object@lambda > 0,
-      1L == length(object@nu), 0 <= object@nu, object@nu <= 1)
+    assert(combine = "and",
+      check_choice(object@bf@scale, object@lambda),
+      check_class(object@bf@original, "SumOfBernsteinFunctions"),
+      check_class(object@bf@original@first, "LinearBernsteinFunction"),
+      check_class(object@bf@original@second, "ConstantBernsteinFunction"))
 
     invisible(TRUE)
   })
 
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
+#'   AlphaStableBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class
+setValidity("AlphaStableExtMO2FParam",
+  function(object) {
+    assert(combine = "and",
+      check_choice(object@bf@scale, object@lambda),
+      check_class(object@bf@original, "AlphaStableBernsteinFunction"))
+
+    invisible(TRUE)
+  })
+
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
+#'   LinearBernsteinFunction PoissonBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class
+setValidity("PoissonExtMO2FParam",
+  function(object) {
+    assert(combine = "and",
+      check_choice(object@bf@scale, object@lambda),
+      check_class(object@bf@original, "SumOfBernsteinFunctions"),
+      check_class(object@bf@original@first, "LinearBernsteinFunction"),
+      check_class(object@bf@original@second, "PoissonBernsteinFunction"))
+
+      invisible(TRUE)
+  })
+
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
+#'   LinearBernsteinFunction ExponentialBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class
+setValidity("ExponentialExtMO2FParam",
+  function(object) {
+    assert(combine = "and",
+      check_choice(object@bf@scale, object@lambda),
+      check_class(object@bf@original, "SumOfBernsteinFunctions"),
+      check_class(object@bf@original@first, "LinearBernsteinFunction"),
+      check_class(object@bf@original@second, "ExponentialBernsteinFunction"))
+
+      invisible(TRUE)
+  })
+
+#' @importFrom checkmate qassert
+setValidity("ExtGaussian2FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N1[0,1]")
+
+    invisible(TRUE)
+  })
+
+#' @importFrom checkmate qassert
 setValidity("ExtArch2FParam",
   function(object) {
-    stopifnot(1L == length(object@lambda), object@lambda > 0,
-      1L == length(object@nu))
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N1")
 
     invisible(TRUE)
   })

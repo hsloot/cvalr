@@ -5,6 +5,10 @@ multiply_binomial_coefficient <- function(x, n, k) {
     .Call(`_cvalr_multiply_binomial_coefficient`, x, n, k)
 }
 
+is_qmatrix <- function(x, tol) {
+    .Call(`_cvalr_is_qmatrix`, x, tol)
+}
+
 #' Portfolio CDS spread and CDO methods
 #'
 #' @param expected_losses The expected losses (not including recovered part)
