@@ -50,6 +50,22 @@ setGeneric("expected_cdo_loss",
   })
 
 #' @rdname expected_value
+#'
+#' @export
+setGeneric("expected_pcds_equation",
+  function(object, times, discount_factors, recovery_rate, coupon, upfront, ...) {
+    standardGeneric("expected_pcds_equation")
+  })
+
+#' @rdname expected_value
+#'
+#' @export
+setGeneric("expected_cdo_equation",
+  function(object, times, discount_factors, recovery_rate, lower, upper, coupon, upfront, ...) {
+    standardGeneric("expected_cdo_equation")
+  })
+
+#' @rdname expected_value
 #' @aliases expected_value,CalibrationParam
 #'
 #' @examples
@@ -252,3 +268,77 @@ setMethod("expected_cdo_loss", "ExtGaussian2FParam",
       (1 - recovery_rate) * as.numeric(left - right)
     })
   })
+
+#' @rdname expected_value
+#' @aliases expected_pcds_equation,CalibrationParam
+#'
+#' @examples
+#' expected_pcds_equation(
+#'   ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+#'   recovery_rate = 0.4, coupon = 0.08, upfront = 0
+#' )
+#' expected_pcds_equation(
+#'   ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+#'   recovery_rate = rep(0.4, 4), coupon = rep(0.08, 4), upfront = rep(0, 4)
+#' )
+#'
+#' @export
+setMethod("expected_pcds_equation", "CalibrationParam",
+function(object, times, discount_factors, recovery_rate, coupon, upfront, ...) {
+  qassert(coupon, "N+")
+  qassert(upfront, "N+")
+  expected_losses <- mapply(
+    expected_pcds_loss,
+    recovery_rate = recovery_rate,
+    MoreArgs = c(list(object = object, times = times), list(...)),
+    SIMPLIFY = FALSE
+  )
+  mapply(
+    portfolio_cds_equation,
+    expected_losses = expected_losses,
+    recovery_rate = recovery_rate,
+    coupon = coupon,
+    upfront = upfront,
+    MoreArgs = list(
+      times = times,
+      discount_factors = discount_factors
+    ))
+})
+
+#' @rdname expected_value
+#' @aliases expected_cdo_equation,CalibrationParam
+#'
+#' @examples
+#' expected_cdo_equation(
+#'   ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+#'   recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35),
+#'   upper = c(0.1, 0.2, 0.35, 1), coupon = 0.08, upfront = 0
+#' )
+#'
+#' @export
+setMethod("expected_cdo_equation", "CalibrationParam",
+function(object, times, discount_factors, recovery_rate, coupon, upfront, ...) {
+  qassert(coupon, "N+")
+  qassert(upfront, "N+")
+  expected_losses <- mapply(
+    expected_cdo_loss,
+    recovery_rate = recovery_rate,
+    lower = lower, upper = upper,
+    MoreArgs = c(list(object = object, times = times), list(...)),
+    SIMPLIFY = FALSE
+  )
+  mapply(
+    cdo_equation,
+    expected_losses = expected_losses,
+    lower = lower,
+    upper = upper,
+    coupon = coupon,
+    upfront = upfront,
+    MoreArgs = list(
+      times = times,
+      discount_factors = discount_factors
+    ))
+})

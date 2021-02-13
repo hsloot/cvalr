@@ -26,6 +26,27 @@ test_that("Biv. ExMarkovParam is initialized correctly", {
         expected_pcds_loss(parm, t, recovery_rate = 0)
         }),
     pexp(times, rate = lambda))
+
+  expect_equal(
+    expected_pcds_equation(parm,
+      times = times, discount_factors = rep_len(1, length(times)),
+      recovery_rate = 0.4, coupon = 0.08, upfront = 0.01),
+    portfolio_cds_equation(
+      expected_losses = expected_pcds_loss(parm, times = times, recovery_rate=0.4),
+      times = times, discount_factors = rep_len(1, length(times)),
+      recovery_rate = 0.4, coupon = 0.08, upfront = 0.01)
+  )
+  expect_equal(
+    expected_cdo_equation(parm,
+      times = times, discount_factors = rep_len(1, length(times)),
+      recovery_rate = 0.4, lower = 0.1, upper = 0.2,
+      coupon = 0.08, upfront = 0.01),
+    cdo_equation(
+      expected_losses = expected_cdo_loss(parm, times = times,
+        recovery_rate = 0.4, lower = 0.1, upper = 0.2),
+      times=times, discount_factors = rep_len(1, length(times)),
+      lower = 0.1, upper = 0.2, coupon = 0.08, upfront = 0.01)
+  )
 })
 
 test_that("Biv. ExMOParam is initialized correctly", {

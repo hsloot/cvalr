@@ -5,6 +5,8 @@
 \alias{expected_value}
 \alias{expected_pcds_loss}
 \alias{expected_cdo_loss}
+\alias{expected_pcds_equation}
+\alias{expected_cdo_equation}
 \alias{expected_value,CalibrationParam-method}
 \alias{expected_value,CalibrationParam}
 \alias{expected_pcds_loss,CalibrationParam-method}
@@ -18,6 +20,10 @@
 \alias{expected_cdo_loss,CalibrationParam}
 \alias{expected_cdo_loss,ExtGaussian2FParam-method}
 \alias{expected_cdo_loss,ExtGaussian2FParam}
+\alias{expected_pcds_equation,CalibrationParam-method}
+\alias{expected_pcds_equation,CalibrationParam}
+\alias{expected_cdo_equation,CalibrationParam-method}
+\alias{expected_cdo_equation,CalibrationParam}
 \title{Expected values for the calibration parameter}
 \usage{
 expected_value(object, times, g, ...)
@@ -25,6 +31,28 @@ expected_value(object, times, g, ...)
 expected_pcds_loss(object, times, recovery_rate, ...)
 
 expected_cdo_loss(object, times, recovery_rate, lower, upper, ...)
+
+expected_pcds_equation(
+  object,
+  times,
+  discount_factors,
+  recovery_rate,
+  coupon,
+  upfront,
+  ...
+)
+
+expected_cdo_equation(
+  object,
+  times,
+  discount_factors,
+  recovery_rate,
+  lower,
+  upper,
+  coupon,
+  upfront,
+  ...
+)
 
 \S4method{expected_value}{CalibrationParam}(object, times, g, ...)
 
@@ -63,6 +91,28 @@ expected_cdo_loss(object, times, recovery_rate, lower, upper, ...)
   lower,
   upper,
   method = c("default", "fallback"),
+  ...
+)
+
+\S4method{expected_pcds_equation}{CalibrationParam}(
+  object,
+  times,
+  discount_factors,
+  recovery_rate,
+  coupon,
+  upfront,
+  ...
+)
+
+\S4method{expected_cdo_equation}{CalibrationParam}(
+  object,
+  times,
+  discount_factors,
+  recovery_rate,
+  lower,
+  upper,
+  coupon,
+  upfront,
   ...
 )
 }
@@ -148,5 +198,23 @@ expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
 expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "fallback")
+
+expected_pcds_equation(
+  ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+  times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+  recovery_rate = 0.4, coupon = 0.08, upfront = 0
+)
+expected_pcds_equation(
+  ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+  times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+  recovery_rate = rep(0.4, 4), coupon = rep(0.08, 4), upfront = rep(0, 4)
+)
+
+expected_cdo_equation(
+  ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+  times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+  recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35),
+  upper = c(0.1, 0.2, 0.35, 1), coupon = 0.08, upfront = 0
+)
 
 }
