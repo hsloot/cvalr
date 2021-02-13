@@ -1,68 +1,67 @@
 #' @include allClass.R allGeneric.R
 NULL
 
-#' Probability vector and expected value for calibration parameter
+#' Probability vector for calibration parameter
 #'
-#' Calculates the probability vector and expected values of the average
-#' default counting process \eqn{L}.
+#' Calculates the probability vector  of the average default counting
+#' process \eqn{L}.
 #'
 #' @param object The calibration parameter object
-#' @param t Point-in-time
+#' @param times Point-in-time
 #'
 #' @docType methods
 #' @export
-setGeneric("probability_vector",
-  function(object, t) {
-    standardGeneric("probability_vector")
+setGeneric("probability_distribution",
+  function(object, times) {
+    standardGeneric("probability_distribution")
   })
 
-#' @rdname probability_vector
-#' @aliases probability_vector,ExMarkovParam
+#' @rdname probability_distribution
+#' @aliases probability_distribution,ExMarkovParam
 #'
 #' @examples
-#' probability_vector(CuadrasAugeExtMO2FParam(
+#' probability_distribution(CuadrasAugeExtMO2FParam(
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
-#' probability_vector(AlphaStableExtMO2FParam(
+#' probability_distribution(AlphaStableExtMO2FParam(
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
-#' probability_vector(PoissonExtMO2FParam(
+#' probability_distribution(PoissonExtMO2FParam(
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
-#' probability_vector(ExponentialExtMO2FParam(
+#' probability_distribution(ExponentialExtMO2FParam(
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
 #'
 #' @importFrom expm expm
 #' @importFrom checkmate qassert
 #' @export
-setMethod("probability_vector", "ExMarkovParam",
-  function(object, t) {
-    qassert(t, "N1[0,)")
-    as.vector(expm(t * object@qmatrix)[1, ])
+setMethod("probability_distribution", "ExMarkovParam",
+  function(object, times) {
+    qassert(times, "N+[0,)")
+    sapply(times, function(t) expm(t * object@qmatrix)[1, ])
   })
 
-#' @rdname probability_vector
-#' @aliases probability_vector,ExtGaussian2FParam
+#' @rdname probability_distribution
+#' @aliases probability_distribution,ExtGaussian2FParam
 #'
 #' @examples
-#' probability_vector(ExtGaussian2FParam(
+#' probability_distribution(ExtGaussian2FParam(
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
 #'
 #' @importFrom stats integrate pexp pnorm dnorm qnorm
 #' @importFrom checkmate qassert
 #' @export
-setMethod("probability_vector", "ExtGaussian2FParam",
-  function(object, t) {
-    qassert(t, "N1[0,)")
-    sapply(0:object@dim,
-      function(k) {
+setMethod("probability_distribution", "ExtGaussian2FParam",
+  function(object, times) {
+    qassert(times, "N+[0,)")
+    times <- qnorm(pexp(times, rate = object@lambda))
+    out <- simplify2array(outer(0:object@dim, times,
+      Vectorize(function(k, t) {
         int_res <- integrate(
           function(x) {
             ldp <- pnorm(
-              (qnorm(pexp(t, rate = object@lambda)) - sqrt(object@nu) * x) /
-              (sqrt(1 - object@nu)),
+              (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
               log.p=TRUE, lower.tail = TRUE
             )
             lsp <- pnorm(
-              (qnorm(pexp(t, rate = object@lambda)) - sqrt(object@nu) * x) /
-              (sqrt(1 - object@nu)),
+              (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
               log.p=TRUE, lower.tail = FALSE
             )
             sapply(
@@ -74,37 +73,47 @@ setMethod("probability_vector", "ExtGaussian2FParam",
         )
 
         int_res$value
-      })
+      })), higher=FALSE)
+
+    if (1L == nrow(out) || 1L == ncol(out))
+      out <- as.vector(out)
+
+    out
   })
 
-#' @rdname probability_vector
-#' @aliases probability_vector,FrankExtArch2FParam
+#' @rdname probability_distribution
+#' @aliases probability_distribution,FrankExtArch2FParam
 #'
 #' @examples
-#' probability_vector(FrankExtArch2FParam(
+#' probability_distribution(FrankExtArch2FParam(
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
 #'
 #' @importFrom stats pexp
 #' @importFrom copula iPsi frankCopula
 #' @importFrom checkmate qassert
 #' @export
-setMethod("probability_vector", "FrankExtArch2FParam",
-  function(object, t) {
-    qassert(t, "N1[0,)")
-    tt <- copula::iPsi(frankCopula(object@nu),
-                        pexp(t, rate = object@lambda))
+setMethod("probability_distribution", "FrankExtArch2FParam",
+  function(object, times) {
+    qassert(times, "N+[0,)")
+    times <- copula::iPsi(frankCopula(object@nu),
+                        pexp(times, rate = object@lambda))
     dn <- function(m) {
       pexp(object@nu)^m / (object@nu * m)
     }
     n <- max(which(dn(2 ^ (1:10)) > .Machine$double.eps))
-    sapply(0:object@dim,
-      function(k) {
+    out <- simplify2array(outer(0:object@dim, times,
+      Vectorize(function(k, t) {
         multiply_binomial_coefficient(
           sum(
-            pexp(tt, rate = (1:n), lower.tail = FALSE) ^ k *
-              pexp(tt, rate = (1:n), lower.tail = TRUE) ^ (object@dim - k) *
-              dn((1:n))
+            pexp(t, rate = (1:n), lower.tail = FALSE) ^ k *
+              pexp(t, rate = (1:n), lower.tail = TRUE) ^ (object@dim - k) *
+              dn(1:n)
           ),
           object@dim, k)
-      })
+      })), higher=FALSE)
+
+    if (1L == nrow(out) || 1L == ncol(out))
+      out <- as.vector(out)
+
+    out
   })

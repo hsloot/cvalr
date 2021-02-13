@@ -1,8 +1,11 @@
 #' @include allClass.R allGeneric.R allProbability.R
 NULL
 
-#' @rdname probability_vector
+#' Expected values for the calibration parameter
 #'
+#' Calculates expected values for the average default counting process \eqn{L}.
+#'
+#' @inheritParams probability_distribution
 #' @param g Transformation function
 #' @param ... Further arguments to `g`
 #'
@@ -20,33 +23,33 @@ NULL
 #' @docType methods
 #' @export
 setGeneric("expected_value",
-  function(object, t, g, ...) {
+  function(object, times, g, ...) {
     standardGeneric("expected_value")
   })
 
-#' @rdname probability_vector
+#' @rdname expected_value
 #'
 #' @param recovery_rate The recovery rate of the portfolio CDS/CDO
 #' @param ... Further arguments
 #'
 #' @export
 setGeneric("expected_pcds_loss",
-  function(object, t, recovery_rate, ...) {
+  function(object, times, recovery_rate, ...) {
     standardGeneric("expected_pcds_loss")
   })
 
-#' @rdname probability_vector
+#' @rdname expected_value
 #'
 #' @param lower Lower attachment point of the CDO tranche
 #' @param upper Upper attachment point of the CDO tranche
 #'
 #' @export
 setGeneric("expected_cdo_loss",
-  function(object, t, recovery_rate, lower, upper, ...) {
+  function(object, times, recovery_rate, lower, upper, ...) {
     standardGeneric("expected_cdo_loss")
   })
 
-#' @rdname probability_vector
+#' @rdname expected_value
 #' @aliases expected_value,CalibrationParam
 #'
 #' @examples
@@ -66,16 +69,15 @@ setGeneric("expected_cdo_loss",
 #' @importFrom checkmate qassert assert_function
 #' @export
 setMethod("expected_value", "CalibrationParam",
-  function(object, t, g, ...) {
-    qassert(t, "N+[0,)")
+  function(object, times, g, ...) {
+    qassert(times, "N+[0,)")
     assert_function(g)
     mu <- sapply(0:object@dim, function(k) g(k / object@dim, ...))
-    pvecs <- t(sapply(t, function(.t) probability_vector(object, .t)))
 
-    as.vector(pvecs %*% mu)
+    as.vector(t(probability_distribution(object, times)) %*% mu)
   })
 
-#' @rdname probability_vector
+#' @rdname expected_value
 #' @aliases expected_pcds_loss,CalibrationParam
 #'
 #' @examples
@@ -91,88 +93,88 @@ setMethod("expected_value", "CalibrationParam",
 #' @importFrom checkmate qassert
 #' @export
 setMethod("expected_pcds_loss", "CalibrationParam",
-  function(object, t, recovery_rate, ...) {
+  function(object, times, recovery_rate, ...) {
     qassert(recovery_rate, "N1[0,1]")
-    expected_value(object, t,
+    expected_value(object, times,
       function(k) {
         (1 - recovery_rate) * k
       })
   })
 
-#' @rdname probability_vector
+#' @rdname expected_value
 #'
 #' @param method Choice of method (if available)
 #'
 #' @examples
 #' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
-#'   t = 0.25, recovery_rate = 0.4)
+#'   times = 0.25, recovery_rate = 0.4)
 #' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
-#'   t = 0.25, recovery_rate = 0.4, method = "fallback")
+#'   times = 0.25, recovery_rate = 0.4, method = "fallback")
 #'
 #' @importFrom stats pexp
 #' @importFrom checkmate qassert
 #' @export
 setMethod("expected_pcds_loss", "ExtMO2FParam",
-  function(object, t, recovery_rate, method = c("default", "fallback"), ...) {
+  function(object, times, recovery_rate, method = c("default", "fallback"), ...) {
     method <- match.arg(method)
-    qassert(t, "N+[0,)")
+    qassert(times, "N+[0,)")
     qassert(recovery_rate, "N1[0,1]")
     if (!isTRUE("default" == method)) {
-      return(callNextMethod(object, t, recovery_rate, ...))
+      return(callNextMethod(object, times, recovery_rate, ...))
     }
 
-    (1 - recovery_rate) * pexp(t, rate = object@lambda)
+    (1 - recovery_rate) * pexp(times, rate = object@lambda)
   })
 
-#' @rdname probability_vector
+#' @rdname expected_value
 #' @aliases expected_pcds_loss,ExtGaussian2FParam
 #'
 #' @examples
 #' expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   t = 0.25, recovery_rate = 0.4)
+#'   times = 0.25, recovery_rate = 0.4)
 #' expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   t = 0.25, recovery_rate = 0.4, method = "fallback")
+#'   times = 0.25, recovery_rate = 0.4, method = "fallback")
 #'
 #' @importFrom stats pexp
 #' @importFrom checkmate qassert
 #' @export
 setMethod("expected_pcds_loss", "ExtGaussian2FParam",
-  function(object, t, recovery_rate, method = c("default", "fallback"), ...) {
+  function(object, times, recovery_rate, method = c("default", "fallback"), ...) {
     method <- match.arg(method)
-    qassert(t, "N+[0,)")
+    qassert(times, "N+[0,)")
     qassert(recovery_rate, "N1[0,1]")
     if (!isTRUE("default" == method)) {
-      return(callNextMethod(object, t, recovery_rate, ...))
+      return(callNextMethod(object, times, recovery_rate, ...))
     }
 
-    (1 - recovery_rate) * pexp(t, rate = object@lambda)
+    (1 - recovery_rate) * pexp(times, rate = object@lambda)
   })
 
-#' @rdname probability_vector
+#' @rdname expected_value
 #' @aliases expected_pcds_loss,FrankExtArch2FParam
 #'
 #' @examples
 #' expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   t = 0.25, recovery_rate = 0.4)
+#'   times = 0.25, recovery_rate = 0.4)
 #' expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   t = 0.25, recovery_rate = 0.4, method = "fallback")
+#'   times = 0.25, recovery_rate = 0.4, method = "fallback")
 #'
 #' @importFrom stats pexp
 #' @importFrom checkmate qassert
 #' @export
 setMethod("expected_pcds_loss", "FrankExtArch2FParam",
-  function(object, t, recovery_rate, method = c("default", "fallback"), ...) {
+  function(object, times, recovery_rate, method = c("default", "fallback"), ...) {
     method <- match.arg(method)
-    qassert(t, "N+[0,)")
+    qassert(times, "N+[0,)")
     qassert(recovery_rate, "N1[0,1]")
     if (!isTRUE("default" == method)) {
-      return(callNextMethod(object, t, recovery_rate, ...))
+      return(callNextMethod(object, times, recovery_rate, ...))
     }
 
-    (1 - recovery_rate) * pexp(t, rate = object@lambda)
+    (1 - recovery_rate) * pexp(times, rate = object@lambda)
   })
 
-#' @rdname probability_vector
+#' @rdname expected_value
 #' @aliases expected_cdo_loss,CalibrationParam
 #'
 #' @examples
@@ -188,24 +190,24 @@ setMethod("expected_pcds_loss", "FrankExtArch2FParam",
 #' @importFrom checkmate qassert assert_numeric
 #' @export
 setMethod("expected_cdo_loss", "CalibrationParam",
-  function(object, t, recovery_rate, lower, upper, ...) {
+  function(object, times, recovery_rate, lower, upper, ...) {
     qassert(recovery_rate, "N1[0,1]")
     qassert(lower, "N1[0,1]")
     assert_numeric(upper, lower = lower, upper = 1)
-    expected_value(object, t,
+    expected_value(object, times,
       function(k) {
         pmin(pmax((1 - recovery_rate) * k - lower, 0), upper - lower)
       })
   })
 
-#' @rdname probability_vector
+#' @rdname expected_value
 #' @aliases expected_cdo_loss,ExtGaussian2FParam
 #'
 #' @examples
 #' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   t = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
+#'   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
 #' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   t = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "fallback")
+#'   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "fallback")
 #'
 #' @importFrom mvtnorm pmvnorm
 #' @importFrom stats pexp qnorm
@@ -213,26 +215,27 @@ setMethod("expected_cdo_loss", "CalibrationParam",
 #' @export
 setMethod("expected_cdo_loss", "ExtGaussian2FParam",
   function(
-      object, t, recovery_rate, lower, upper,
+      object, times, recovery_rate, lower, upper,
       method = c("default", "fallback"), ...) {
     method <- match.arg(method)
-    qassert(t, "N+[0,)")
+    qassert(times, "N+[0,)")
     qassert(recovery_rate, "N1[0,1]")
     qassert(lower, "N1[0,1]")
     assert_numeric(upper, lower = lower, upper = 1)
     if (!isTRUE("default" == method)) {
-      return(callNextMethod(object, t, recovery_rate, lower, upper, ...))
+      return(callNextMethod(object, times, recovery_rate, lower, upper, ...))
     }
 
     corr <- matrix(c(1, rep(-sqrt(1 - object@nu), 2), 1), nrow=2, ncol=2)
-    sapply(t, function(.t){
-      left <- pexp(.t, rate = object@lambda)
+    times <- qnorm(pexp(times, rate = object@lambda))
+    sapply(times, function(t) {
+      left <- pnorm(t)
       if (lower > 0) {
         left <- pmvnorm(
           lower = rep(-Inf, 2),
           upper = c(
             -qnorm(pmin(lower / (1 - recovery_rate), 1)),
-            qnorm(pexp(.t, rate = object@lambda))
+            t
           ),
           corr = corr
         )
@@ -241,7 +244,7 @@ setMethod("expected_cdo_loss", "ExtGaussian2FParam",
         lower = rep(-Inf, 2),
         upper = c(
           -qnorm(pmin(upper / (1 - recovery_rate), 1)),
-          qnorm(pexp(.t, rate = object@lambda))
+          t
         ),
         corr = corr
       )
