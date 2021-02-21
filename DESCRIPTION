@@ -13,23 +13,25 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Suggests:
-    testthat (>= 3.0.0),
-    covr,
-    rmarkdown
-Config/testthat/edition: 3
-LinkingTo:
-    Rcpp,
-    rmo
+Depends:
+    R (>= 3.0.2)
 Imports:
     Rcpp,
-    rmo,
+    rmo (>= 0.5.0),
     expm,
     methods,
     mvtnorm,
     copula,
     checkmate,
     waldo
+LinkingTo:
+    Rcpp,
+    rmo
+Suggests:
+    testthat (>= 3.0.0),
+    covr,
+    rmarkdown
+Config/testthat/edition: 3
 Collate:
     'RcppExports.R'
     'allClass.R'
@@ -40,5 +42,6 @@ Collate:
     'allGetSet.R'
     'allInitialize.R'
     'allMethod.R'
+    'allSimulate.R'
     'allValidity.R'
     'cvalr-package.R'

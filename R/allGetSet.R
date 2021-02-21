@@ -45,7 +45,7 @@ setReplaceMethod("setExIntensities", "ExMOParam",
     qassert(max(value), "N1(0,)")
     setDimension(object) <- length(value)
     object@ex_intensities <- value
-    setQMatrix(object) <- ex_intensities2qmatrix(value)
+    setQMatrix(object) <- rmo:::exi2exqm(value)
 
     invisible(object)
   })
@@ -56,12 +56,13 @@ setMethod("getBernsteinFunction", "ExtMOParam",
     object@bf
   })
 
+#' @importFrom rmo exIntensities
 #' @importFrom checkmate assert_class
 setReplaceMethod("setBernsteinFunction", "ExtMOParam",
   function(object, value) {
     assert_class(value, "BernsteinFunction")
     object@bf <- value
-    setExIntensities(object) <- rmo:::bf2ex_intensities(object@dim, object@bf)
+    setExIntensities(object) <- exIntensities(object@bf, object@dim)
 
     invisible(object)
   })

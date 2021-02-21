@@ -3,11 +3,11 @@ alpha <- 0.4
 
 rho <- 3 * alpha / (4 - alpha)
 tau <- alpha / (2 - alpha)
-ex_intensities <- lambda * c(1 - alpha, alpha)
+ex_intensities <- lambda * c(2 * (1 - alpha), alpha)
 qmatrix <- matrix(
   c(
-    - (2*ex_intensities[[1]]+ex_intensities[[2]]), 2*ex_intensities[[1]], ex_intensities[[2]],
-    0, - (ex_intensities[[1]]+ex_intensities[[2]]), (ex_intensities[[1]]+ex_intensities[[2]]),
+    - (ex_intensities[[1]]+ex_intensities[[2]]), ex_intensities[[1]], ex_intensities[[2]],
+    0, - (0.5 * ex_intensities[[1]] + ex_intensities[[2]]), (0.5 * ex_intensities[[1]] + ex_intensities[[2]]),
     0, 0, 0
   ),
   nrow = 3, ncol = 3, byrow = TRUE

@@ -65,7 +65,3 @@ cdo_equation <- function(expected_losses, times, discount_factors, lower, upper,
     .Call(`_cvalr_cdo_equation`, expected_losses, times, discount_factors, lower, upper, coupon, upfront)
 }
 
-ex_intensities2qmatrix <- function(ex_intensities) {
-    .Call(`_cvalr_ex_intensities2qmatrix`, ex_intensities)
-}
-

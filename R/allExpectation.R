@@ -1,17 +1,16 @@
 #' @include allClass.R allGeneric.R allProbability.R
 NULL
 
-#' Expected values for the calibration parameter
+#' @describeIn CalibrationParam-class
+#'   returns the expected value for the average default count process \eqn{L} at
+#'   a specific time-point.
 #'
-#' Calculates expected values for the average default counting process \eqn{L}.
-#'
-#' @inheritParams probability_distribution
-#' @param g Transformation function
-#' @param ... Further arguments to `g`
+#' @param g Transformation function.
+#' @param ... Pass-through parameter
 #'
 #' @details
-#' Calculates for a function \eqn{g} and the average default counting process
-#' \eqn{L} the expectation
+#' [expected_value()] calculates for a function \eqn{g} and the average default
+#' counting process \eqn{L} the expectation
 #' \deqn{
 #'   \mathbb{E}[g(L_t)] .
 #' }
@@ -20,17 +19,16 @@ NULL
 #' \eqn{g(x) = min{\{ \max{\{ (1 - R) x - l, 0 \}}, u - l \}}}, where \eqn{R} is
 #' the recovery rate.
 #'
-#' @docType methods
 #' @export
 setGeneric("expected_value",
   function(object, times, g, ...) {
     standardGeneric("expected_value")
   })
 
-#' @rdname expected_value
+#' @describeIn CalibrationParam-class
+#'   returns the expected portfolio CDS loss for a specific time-point.
 #'
-#' @param recovery_rate The recovery rate of the portfolio CDS/CDO
-#' @param ... Further arguments
+#' @param recovery_rate The recovery rate of the portfolio CDS/CDO.
 #'
 #' @export
 setGeneric("expected_pcds_loss",
@@ -38,10 +36,11 @@ setGeneric("expected_pcds_loss",
     standardGeneric("expected_pcds_loss")
   })
 
-#' @rdname expected_value
+#' @describeIn CalibrationParam-class
+#'   returns the expected CDO loss for a specific time-point.
 #'
-#' @param lower Lower attachment point of the CDO tranche
-#' @param upper Upper attachment point of the CDO tranche
+#' @param lower Lower attachment point of the CDO tranche.
+#' @param upper Upper attachment point of the CDO tranche.
 #'
 #' @export
 setGeneric("expected_cdo_loss",
@@ -49,7 +48,8 @@ setGeneric("expected_cdo_loss",
     standardGeneric("expected_cdo_loss")
   })
 
-#' @rdname expected_value
+#' @describeIn CalibrationParam-class
+#'   returns the expected portfolio CDS fair-value equation.
 #'
 #' @export
 setGeneric("expected_pcds_equation",
@@ -57,7 +57,8 @@ setGeneric("expected_pcds_equation",
     standardGeneric("expected_pcds_equation")
   })
 
-#' @rdname expected_value
+#' @describeIn CalibrationParam-class
+#'   returns the expected CDO fair-value equation.
 #'
 #' @export
 setGeneric("expected_cdo_equation",
@@ -65,8 +66,8 @@ setGeneric("expected_cdo_equation",
     standardGeneric("expected_cdo_equation")
   })
 
-#' @rdname expected_value
-#' @aliases expected_value,CalibrationParam
+#' @rdname CalibrationParam-class
+#' @aliases expected_value,CalibrationParam-method
 #'
 #' @examples
 #' expected_value(CuadrasAugeExtMO2FParam(
@@ -93,8 +94,8 @@ setMethod("expected_value", "CalibrationParam",
     as.vector(t(probability_distribution(object, times)) %*% mu)
   })
 
-#' @rdname expected_value
-#' @aliases expected_pcds_loss,CalibrationParam
+#' @rdname CalibrationParam-class
+#' @aliases expected_pcds_loss,CalibrationParam-method
 #'
 #' @examples
 #' expected_pcds_loss(CuadrasAugeExtMO2FParam(
@@ -117,8 +118,11 @@ setMethod("expected_pcds_loss", "CalibrationParam",
       })
   })
 
-#' @rdname expected_value
+#' @describeIn ExtMO2FParam-class
+#'   returns the expected portfolio CDS loss for a specific time-point.
+#' @aliases expected_pcds_loss,ExtMO2FParam-method
 #'
+#' @inheritParams probability_distribution
 #' @param method Choice of method (if available)
 #'
 #' @examples
@@ -142,8 +146,11 @@ setMethod("expected_pcds_loss", "ExtMO2FParam",
     (1 - recovery_rate) * pexp(times, rate = object@lambda)
   })
 
-#' @rdname expected_value
-#' @aliases expected_pcds_loss,ExtGaussian2FParam
+#' @describeIn ExtGaussian2FParam-class
+#'   returns the expected portfolio CDS loss for a specific time-point.
+#' @aliases expected_pcds_loss,ExtGaussian2FParam-method
+#'
+#' @inheritParams probability_distribution
 #'
 #' @examples
 #' expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
@@ -166,8 +173,11 @@ setMethod("expected_pcds_loss", "ExtGaussian2FParam",
     (1 - recovery_rate) * pexp(times, rate = object@lambda)
   })
 
-#' @rdname expected_value
-#' @aliases expected_pcds_loss,FrankExtArch2FParam
+#' @describeIn ExtArch2FParam-class
+#'   returns the expected portfolio CDS loss for a specific time-point.
+#' @aliases expected_pcds_loss,FrankExtArch2FParam-method
+#'
+#' @inheritParams probability_distribution
 #'
 #' @examples
 #' expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
@@ -190,8 +200,8 @@ setMethod("expected_pcds_loss", "FrankExtArch2FParam",
     (1 - recovery_rate) * pexp(times, rate = object@lambda)
   })
 
-#' @rdname expected_value
-#' @aliases expected_cdo_loss,CalibrationParam
+#' @rdname CalibrationParam-class
+#' @aliases expected_cdo_loss,CalibrationParam-method
 #'
 #' @examples
 #' expected_cdo_loss(CuadrasAugeExtMO2FParam(
@@ -216,8 +226,11 @@ setMethod("expected_cdo_loss", "CalibrationParam",
       })
   })
 
-#' @rdname expected_value
-#' @aliases expected_cdo_loss,ExtGaussian2FParam
+#' @describeIn ExtGaussian2FParam-class
+#'   returns the expected CDO loss for a specific time-point.
+#' @aliases expected_cdo_loss,ExtGaussian2FParam-method
+#'
+#' @inheritParams probability_distribution
 #'
 #' @examples
 #' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
@@ -269,8 +282,12 @@ setMethod("expected_cdo_loss", "ExtGaussian2FParam",
     })
   })
 
-#' @rdname expected_value
-#' @aliases expected_pcds_equation,CalibrationParam
+#' @rdname CalibrationParam-class
+#' @aliases expected_pcds_equation,CalibrationParam-method
+#'
+#' @param discount_factors Discount factors for `times`
+#' @param coupon Running coupon
+#' @param upfront Upfront payment
 #'
 #' @examples
 #' expected_pcds_equation(
@@ -307,8 +324,8 @@ function(object, times, discount_factors, recovery_rate, coupon, upfront, ...) {
     ))
 })
 
-#' @rdname expected_value
-#' @aliases expected_cdo_equation,CalibrationParam
+#' @rdname CalibrationParam-class
+#' @aliases expected_cdo_equation,CalibrationParam-method
 #'
 #' @examples
 #' expected_cdo_equation(

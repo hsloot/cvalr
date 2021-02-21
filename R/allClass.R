@@ -2,12 +2,12 @@
 #'   setReplaceMethod validObject is as new callNextMethod
 NULL
 
-#' Virtual class `CalibrationParam` for calibration parameters
+#' Virtual super-class for calibration parameters
 #'
-#' A virtual superclass for all calibration parameters for (portfolio) credit
-#' models.
+#' A virtual superclass for all calibration parameters for multivariate
+#' (portfolio) credit models.
 #'
-#' @slot dim The dimension (no of portfolio items)
+#' @slot dim The dimension (number of portfolio items)
 #'
 #' @details
 #' It is assumed that the expected value of the credit derivative
@@ -24,6 +24,9 @@ NULL
 #' @seealso [ExMarkovParam-class] [ExMOParam-class] [ExtMOParam-class]
 #'   [CuadrasAugeExtMO2FParam-class] [AlphaStableExtMO2FParam-class]
 #'   [PoissonExtMO2FParam-class] [ExponentialExtMO2FParam-class]
+#'
+#' @docType class
+#' @export
 setClass("CalibrationParam", # nolint
   contains = "VIRTUAL",
   slots = c(dim = "integer"))
@@ -53,6 +56,7 @@ setClass("CalibrationParam", # nolint
 #'    c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
 #'    nrow = 3, ncol = 3))
 #'
+#' @docType class
 #' @export ExMarkovParam
 ExMarkovParam <- setClass("ExMarkovParam", # nolint
   contains = "CalibrationParam",
@@ -81,6 +85,7 @@ ExMarkovParam <- setClass("ExMarkovParam", # nolint
 #' @examples
 #' ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
 #'
+#' @docType class
 #' @export ExMOParam
 ExMOParam <- setClass("ExMOParam", # nolint
   contains = "ExMarkovParam",
@@ -117,6 +122,7 @@ ExMOParam <- setClass("ExMOParam", # nolint
 #'       second = rmo::LinearBernsteinFunction(scale = 1 - 0.4))
 #'     ))
 #'
+#' @docType class
 #' @export ExtMOParam
 ExtMOParam <- setClass("ExtMOParam", # nolint
   contains = "ExMOParam",
@@ -144,6 +150,9 @@ ExtMOParam <- setClass("ExtMOParam", # nolint
 #'   \item \eqn{\alpha = 4 \rho / (3 + \rho)} and \eqn{\rho = 3 \alpha / (4 - \alpha)}
 #'   \item \eqn{\alpha = 2 \tau / (1 + \tau)} and \eqn{\tau = \alpha / (2 - \alpha)}
 #' }
+#'
+#' @docType class
+#' @export
 setClass("ExtMO2FParam", # nolint
   contains = c("ExtMOParam", "VIRTUAL"),
   slots = c(lambda = "numeric", nu = "numeric"))
@@ -162,6 +171,7 @@ setClass("ExtMO2FParam", # nolint
 #' @examples
 #' CuadrasAugeExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 #'
+#' @docType class
 #' @export CuadrasAugeExtMO2FParam
 CuadrasAugeExtMO2FParam <- setClass("CuadrasAugeExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
@@ -179,6 +189,7 @@ CuadrasAugeExtMO2FParam <- setClass("CuadrasAugeExtMO2FParam", # nolint
 #' @examples
 #' AlphaStableExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 #'
+#' @docType class
 #' @export AlphaStableExtMO2FParam
 AlphaStableExtMO2FParam <- setClass("AlphaStableExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
@@ -197,6 +208,7 @@ AlphaStableExtMO2FParam <- setClass("AlphaStableExtMO2FParam", # nolint
 #' @examples
 #' PoissonExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 #'
+#' @docType class
 #' @export PoissonExtMO2FParam
 PoissonExtMO2FParam <- setClass("PoissonExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
@@ -217,6 +229,7 @@ PoissonExtMO2FParam <- setClass("PoissonExtMO2FParam", # nolint
 #' @examples
 #' ExponentialExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 #'
+#' @docType class
 #' @export ExponentialExtMO2FParam
 ExponentialExtMO2FParam <- setClass("ExponentialExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
@@ -248,6 +261,7 @@ ExponentialExtMO2FParam <- setClass("ExponentialExtMO2FParam", # nolint
 #' @examples
 #' ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 #'
+#' @docType class
 #' @export ExtGaussian2FParam
 ExtGaussian2FParam <- setClass("ExtGaussian2FParam", # nolint
   contains = "CalibrationParam",
@@ -269,6 +283,7 @@ ExtGaussian2FParam <- setClass("ExtGaussian2FParam", # nolint
 #' is from zero to one (boundaries might not be included) and have a
 #' one-to-one mapping to the model-specific parameter `nu`.
 #'
+#' @docType class
 #' @importFrom copula iTau iRho tau rho frankCopula iPsi
 setClass("ExtArch2FParam", # nolint
   contains = "CalibrationParam",

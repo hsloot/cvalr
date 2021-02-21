@@ -1,23 +1,23 @@
 #' @include allClass.R allGeneric.R
 NULL
 
-#' Probability vector for calibration parameter
-#'
-#' Calculates the probability vector  of the average default counting
-#' process \eqn{L}.
+#' @describeIn CalibrationParam-class
+#'   returns the probability vector for the average default count process \eqn{L}.
 #'
 #' @param object The calibration parameter object
 #' @param times Point-in-time
 #'
-#' @docType methods
 #' @export
 setGeneric("probability_distribution",
   function(object, times) {
     standardGeneric("probability_distribution")
   })
 
-#' @rdname probability_distribution
-#' @aliases probability_distribution,ExMarkovParam
+#' @describeIn ExMarkovParam-class
+#'   returns the probability vector for the average default count process \eqn{L}.
+#' @aliases probability_distribution,ExMarkovParam-method
+#'
+#' @inheritParams probability_distribution
 #'
 #' @examples
 #' probability_distribution(CuadrasAugeExtMO2FParam(
@@ -38,8 +38,11 @@ setMethod("probability_distribution", "ExMarkovParam",
     sapply(times, function(t) expm(t * object@qmatrix)[1, ])
   })
 
-#' @rdname probability_distribution
-#' @aliases probability_distribution,ExtGaussian2FParam
+#' @describeIn ExtGaussian2FParam-class
+#'   returns the probability vector for the average default count process \eqn{L}.
+#' @aliases probability_distribution,ExtGaussian2FParam-method
+#'
+#' @inheritParams probability_distribution
 #'
 #' @examples
 #' probability_distribution(ExtGaussian2FParam(
@@ -81,8 +84,11 @@ setMethod("probability_distribution", "ExtGaussian2FParam",
     out
   })
 
-#' @rdname probability_distribution
-#' @aliases probability_distribution,FrankExtArch2FParam
+#' @describeIn ExtArch2FParam-class
+#'   returns the probability vector for the average default count process \eqn{L}.
+#' @aliases probability_distribution,FrankExtArch2FParam-method
+#'
+#' @inheritParams probability_distribution
 #'
 #' @examples
 #' probability_distribution(FrankExtArch2FParam(
