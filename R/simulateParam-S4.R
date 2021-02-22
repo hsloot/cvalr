@@ -1,4 +1,4 @@
-#' @include allClass-S4.R allGeneric-S4.R
+#' @include allClass-S4.R allGeneric-S4.R utils.R
 NULL
 
 #' @describeIn CalibrationParam-class
@@ -46,10 +46,7 @@ setMethod("simulate_param", "ExMarkovParam",
     }
     out <- t(apply(tmp, 1, function(x) sapply(times, function(t) mean(x <= t))))
 
-    if (1L == nrow(out) || 1L == ncol(out))
-      out <- as.vector(out)
-
-    out
+    simplify2vector(out)
   })
 
 #' @describeIn ExMOParam-class
@@ -79,14 +76,11 @@ setMethod("simulate_param", "ExMOParam",
     if (isTRUE("ExMOParam" == method)) {
       tmp <- rexmo_markovian(n_sim, object@dim, object@ex_intensities)
       out <- t(apply(tmp, 1, function(x) sapply(times, function(t) mean(x <= t))))
-
-      if (1L == nrow(out) || 1L == ncol(out))
-        out <- as.vector(out)
     } else {
-      out <- callNextMethod()
+      out <- callNextMethod(object, times, ..., n_sim = n_sim)
     }
 
-    out
+    simplify2vector(out)
   })
 
 #' @describeIn ExtGaussian2FParam-class
@@ -114,10 +108,7 @@ setMethod("simulate_param", "ExtGaussian2FParam",
     )
     out <- t(apply(tmp, 1, function(x) sapply(times, function(t) mean(x <= t))))
 
-    if (1L == nrow(out) || 1L == ncol(out))
-      out <- as.vector(out)
-
-    out
+    simplify2vector(out)
   })
 
 #' @describeIn ExtArch2FParam-class
@@ -145,8 +136,5 @@ setMethod("simulate_param", "FrankExtArch2FParam",
     )
     out <- t(apply(tmp, 1, function(x) sapply(times, function(t) mean(x <= t))))
 
-    if (1L == nrow(out) || 1L == ncol(out))
-      out <- as.vector(out)
-
-    out
+    simplify2vector(out)
   })

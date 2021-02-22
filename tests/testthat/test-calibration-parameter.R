@@ -109,7 +109,7 @@ test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
     expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda))
   expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "CalibrationParam"),
     pexp(times, rate = lambda))
 })
 
@@ -160,7 +160,7 @@ test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
     expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda))
   expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "CalibrationParam"),
     pexp(times, rate = lambda))
 })
 
@@ -213,7 +213,7 @@ test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
     expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda))
   expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "CalibrationParam"),
     pexp(times, rate = lambda))
 })
 
@@ -266,7 +266,7 @@ test_that("Biv. ExponentialExtMO2FParam is initialized correctly", {
     expected_pcds_loss(parm, times, recovery_rate = 0),
     pexp(times, rate = lambda))
   expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "CalibrationParam"),
     pexp(times, rate = lambda))
 })
 
@@ -301,7 +301,7 @@ test_that("ExtGaussian2FParam is initialized correctly", {
     pexp(times, rate = lambda),
     tolerance = 1e-2)
   expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
+    expected_pcds_loss(parm, times, recovery_rate = 0, method = "CalibrationParam"),
     pexp(times, rate = lambda),
     tolerance = 1e-2)
 
@@ -319,7 +319,7 @@ test_that("ExtGaussian2FParam is initialized correctly", {
     expected_value(parm, times, function(x) {
       pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
     }),
-    expected_cdo_loss(parm, times, recovery_rate, lower, upper, method = "fallback"),
+    expected_cdo_loss(parm, times, recovery_rate, lower, upper, method = "CalibrationParam"),
     tolerance = 1e-2
   )
 })

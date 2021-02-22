@@ -6,10 +6,13 @@
 \alias{ExMarkovParam-class}
 \alias{ExMarkovParam}
 \alias{simulate_param,ExMarkovParam-method}
+\alias{probability_distribution,CalibrationParam-method}
 \alias{probability_distribution,ExMarkovParam-method}
 \title{Exchangeable Markovian calibration parameter}
 \usage{
 \S4method{simulate_param}{ExMarkovParam}(object, times, ..., n_sim = 10000)
+
+\S4method{probability_distribution}{CalibrationParam}(object, times, ..., seed = NULL, sim_args = NULL)
 
 \S4method{probability_distribution}{ExMarkovParam}(
   object,
@@ -26,6 +29,11 @@
 \item{...}{Pass-through parameter.}
 
 \item{n_sim}{Number of samples.}
+
+\item{seed}{Numeric number (if not NULL, is used to set the seed prior to
+Monte-Carlo estimation of probability distribution).}
+
+\item{sim_args}{List with pass-through parameters for \code{\link[=simulate_param]{simulate_param()}}.}
 
 \item{method}{Calculation method (either \code{"default"} or the name of the
 class whose implementation should be used).}
@@ -49,6 +57,8 @@ The probability of \eqn{j > i} portfolio items being defaulted at time
 \item \code{simulate_param,ExMarkovParam-method}: simulates the default counting process \eqn{L} and returns a matrix \code{x} with
 \code{nrow(x) == n_sim} and \code{ncol(x) == length(times)} if \code{length(times) > 1L}
 and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+
+\item \code{probability_distribution,CalibrationParam-method}: returns the probability vector for the average default count process \eqn{L}.
 
 \item \code{probability_distribution,ExMarkovParam-method}: returns the probability vector for the average default count process \eqn{L}.
 }}

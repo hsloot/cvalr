@@ -1,4 +1,4 @@
-#' @include allClass-S4.R allGeneric-S4.R simulateParam-S4.R
+#' @include allClass-S4.R allGeneric-S4.R simulateParam-S4.R utils.R
 NULL
 
 #' @describeIn CalibrationParam-class
@@ -46,18 +46,14 @@ setMethod("probability_distribution", "CalibrationParam",
     if (is.matrix(x)) {
       out <- t(sapply((0:object@dim) / object@dim, function(k) {
         apply(x, 2, function(.x) mean(.x == k))
-      }))
-
-      if (1L == nrow(out) || 1L == ncol(out)) {
-        out <- as.vector(out)
-      }
+        }))
     } else {
       out <- sapply((0:object@dim) / object@dim, function(k) {
         mean(x == k)
-      })
+        })
     }
 
-    out
+    simplify2vector(out)
   })
 
 #' @describeIn ExMarkovParam-class
@@ -92,12 +88,9 @@ setMethod("probability_distribution", "ExMarkovParam",
     } else {
       qassert(times, "N+[0,)")
       out <- sapply(times, function(t) expm(t * object@qmatrix)[1, ])
-
-      if (1L == nrow(out) || 1L == ncol(out))
-        out <- as.vector(out)
     }
 
-    out
+    simplify2vector(out)
   })
 
 #' @describeIn ExtGaussian2FParam-class
@@ -153,10 +146,7 @@ setMethod("probability_distribution", "ExtGaussian2FParam",
 
           int_res$value
         }))
-
-      if (1L == nrow(out) || 1L == ncol(out))
-        out <- as.vector(out)
     }
 
-    out
+    simplify2vector(out)
   })

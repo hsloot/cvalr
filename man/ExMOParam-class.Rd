@@ -16,8 +16,16 @@
 )
 }
 \arguments{
+\item{object}{The calibration parameter object.}
+
+\item{times}{Point-in-time.}
+
+\item{...}{Pass-through parameter.}
+
 \item{method}{Simulation method (either \code{"default"} or the name of the
 class whose implementation should be used).}
+
+\item{n_sim}{Number of samples.}
 }
 \description{
 Calibration parameter classfor the general exchangeable model from the
