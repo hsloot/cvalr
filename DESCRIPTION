@@ -37,7 +37,7 @@ Collate:
     'allClass-S4.R'
     'allGeneric-S4.R'
     'simulateParam-S4.R'
-    'allProbability-S4.R'
+    'probabilityDistribution-S4.R'
     'allExpectation-S4.R'
     'checkmate.R'
     'allGetSet-S4.R'

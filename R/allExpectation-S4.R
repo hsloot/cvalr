@@ -1,4 +1,4 @@
-#' @include allClass-S4.R allGeneric-S4.R allProbability-S4.R
+#' @include allClass-S4.R allGeneric-S4.R probabilityDistribution-S4.R
 NULL
 
 #' @describeIn CalibrationParam-class

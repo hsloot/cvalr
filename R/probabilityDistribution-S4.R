@@ -22,25 +22,26 @@ setGeneric("probability_distribution",
     standardGeneric("probability_distribution")
   })
 
-#' @importFrom checkmate qassert assert_number
+#' @importFrom checkmate qassert assert_number assert_list
 #' @export
 setMethod("probability_distribution", "CalibrationParam",
-  function(object, times, ..., n_sim = 1e4, seed = NULL) {
+  function(object, times, ..., seed = NULL, sim_args = NULL) {
     qassert(times, "N+[0,)")
-    qassert(n_sim, "X1(0,)")
     assert_number(seed, lower = 0, finite = TRUE, null.ok = TRUE)
+    assert_list(sim_args, null.ok = TRUE)
     if (!is.null(seed)) {
       set.seed(seed)
     }
-    x <- simulate_param(object, times, n_sim = n_sim)
+    x <- do.call(simulate_param,
+           args = c(list(object = object, times = times), sim_args))
     if (is.matrix(x)) {
       out <- t(sapply((0:object@dim) / object@dim, function(k) {
         apply(x, 2, function(.x) mean(.x == k))
       }))
-      out <- t(apply(x, 1, function(.x) sapply((0:object@dim) / object@dim, function(k) mean(.x == k))))
 
-      if (1L == nrow(out) || 1L == ncol(out))
+      if (1L == nrow(out) || 1L == ncol(out)) {
         out <- as.vector(out)
+      }
     } else {
       out <- sapply((0:object@dim) / object@dim, function(k) {
         mean(x == k)
@@ -55,6 +56,8 @@ setMethod("probability_distribution", "CalibrationParam",
 #' @aliases probability_distribution,ExMarkovParam-method
 #'
 #' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #'
 #' @examples
 #' probability_distribution(CuadrasAugeExtMO2FParam(
@@ -70,9 +73,12 @@ setMethod("probability_distribution", "CalibrationParam",
 #' @importFrom checkmate qassert
 #' @export
 setMethod("probability_distribution", "ExMarkovParam",
-  function(object, times, ..., method = c("default", "fallback")) {
+  function(object, times, ..., method = c("default", "ExMarkovParam", "CalibrationParam")) {
     method <- match.arg(method)
-    if (!isTRUE("default" == method)) {
+    if (isTRUE("default" == method)) {
+      method <- "ExMarkovParam"
+    }
+    if (!isTRUE("ExMarkovParam" == method)) {
       out <- callNextMethod(object, times, ...)
     } else {
       qassert(times, "N+[0,)")
@@ -90,6 +96,8 @@ setMethod("probability_distribution", "ExMarkovParam",
 #' @aliases probability_distribution,ExtGaussian2FParam-method
 #'
 #' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #'
 #' @examples
 #' probability_distribution(ExtGaussian2FParam(
@@ -99,24 +107,32 @@ setMethod("probability_distribution", "ExMarkovParam",
 #' @importFrom checkmate qassert
 #' @export
 setMethod("probability_distribution", "ExtGaussian2FParam",
-  function(object, times, ..., method = c("default", "fallback")) {
+  function(object, times, ..., method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
     method <- match.arg(method)
-    if (!isTRUE("default" == method)) {
+    if (isTRUE("default" == method)) {
+      method <- "ExtGaussian2FParam"
+    }
+    if (!isTRUE("ExtGaussian2FParam" == method)) {
       out <- callNextMethod(object, times, ...)
     } else {
       qassert(times, "N+[0,)")
       times <- qnorm(pexp(times, rate = object@lambda))
-      out <- simplify2array(outer(0:object@dim, times,
+      out <- outer(0:object@dim, times,
         Vectorize(function(k, t) {
+          if (-Inf == t && 0 == k) {
+            return(1)
+          } else if (-Inf == t && 0 < k) {
+            return(0)
+          }
           int_res <- integrate(
             function(x) {
               ldp <- pnorm(
                 (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
-                log.p=TRUE, lower.tail = TRUE
+                log.p = TRUE, lower.tail = TRUE
               )
               lsp <- pnorm(
                 (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
-                log.p=TRUE, lower.tail = FALSE
+                log.p = TRUE, lower.tail = FALSE
               )
               sapply(
                 exp(k * ldp + (object@dim-k) * lsp) * dnorm(x),
@@ -127,7 +143,7 @@ setMethod("probability_distribution", "ExtGaussian2FParam",
           )
 
           int_res$value
-        })), higher=FALSE)
+        }))
 
       if (1L == nrow(out) || 1L == ncol(out))
         out <- as.vector(out)

@@ -7,7 +7,17 @@
 \alias{simulate_param,ExMOParam-method}
 \title{Exchangeable Marshall--Olkin calibration parameter}
 \usage{
-\S4method{simulate_param}{ExMOParam}(object, times, ..., n_sim = 10000)
+\S4method{simulate_param}{ExMOParam}(
+  object,
+  times,
+  ...,
+  method = c("default", "ExMOParam", "ExMarkovParam"),
+  n_sim = 10000
+)
+}
+\arguments{
+\item{method}{Simulation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
 }
 \description{
 Calibration parameter classfor the general exchangeable model from the
