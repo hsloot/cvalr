@@ -1,4 +1,4 @@
-#' @include allClass.R allGeneric.R
+#' @include allClass-S4.R allGeneric-S4.R
 NULL
 
 #' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction

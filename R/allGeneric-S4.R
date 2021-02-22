@@ -1,4 +1,4 @@
-#' @include allClass.R
+#' @include allClass-S4.R
 NULL
 
 setGeneric("getDimension",
