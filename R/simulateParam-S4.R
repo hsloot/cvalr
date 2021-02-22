@@ -9,11 +9,10 @@ NULL
 #' @param object Calibration parameter object.
 #' @param times The times for which the process is supposed to be simulated.
 #' @param ... Pass-through parameter.
-#' @param n_sim Number of samples.
 #'
 #' @export
 setGeneric("simulate_param",
-  function(object, times, ..., n_sim = 1e4) {
+  function(object, times, ...) {
     standardGeneric("simulate_param")
   })
 
@@ -22,6 +21,9 @@ setGeneric("simulate_param",
 #'   `nrow(x) == n_sim` and `ncol(x) == length(times)` if `length(times) > 1L`
 #'   and a vector `x` with `length(x) == n_sim` otherwise.
 #' @aliases simulate_param,ExMarkovParam-method
+#'
+#' @inheritParams simulate_param
+#' @param n_sim Number of samples.
 #'
 #' @examples
 #' simulate_param(ExMarkovParam(), 1e1, seq(0, 5, by = 0.25))
@@ -56,8 +58,10 @@ setMethod("simulate_param", "ExMarkovParam",
 #'   and a vector `x` with `length(x) == n_sim` otherwise.
 #' @aliases simulate_param,ExMOParam-method
 #'
+#' @inheritParams simulate_param
 #' @param method Simulation method (either `"default"` or the name of the
 #'   class whose implementation should be used).
+#' @param n_sim Number of samples.
 #'
 #' @examples
 #' simulate_param(ExMOParam(), 1e1, seq(0, 5, by = 0.25))
@@ -91,6 +95,9 @@ setMethod("simulate_param", "ExMOParam",
 #'   and a vector `x` with `length(x) == n_sim` otherwise.
 #' @aliases simulate_param,ExtGaussian2FParam-method
 #'
+#' @inheritParams simulate_param
+#' @param n_sim Number of samples.
+#'
 #' @examples
 #' simulate_param(ExtGaussian2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25))
 #'
@@ -118,6 +125,9 @@ setMethod("simulate_param", "ExtGaussian2FParam",
 #'   `nrow(x) == n_sim` and `ncol(x) == length(times)` if `length(times) > 1L`
 #'   and a vector `x` with `length(x) == n_sim` otherwise.
 #' @aliases simulate_param,FrankExtArch2FParam-method
+#'
+#' @inheritParams simulate_param
+#' @param n_sim Number of samples.
 #'
 #' @examples
 #' simulate_param(FrankExtArch2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25))

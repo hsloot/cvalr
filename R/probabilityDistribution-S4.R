@@ -22,6 +22,15 @@ setGeneric("probability_distribution",
     standardGeneric("probability_distribution")
   })
 
+#' @describeIn ExMarkovParam-class
+#'   returns the probability vector for the average default count process \eqn{L}.
+#' @aliases probability_distribution,CalibrationParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param seed Numeric number (if not NULL, is used to set the seed prior to
+#'   Monte-Carlo estimation of probability distribution).
+#' @param sim_args List with pass-through parameters for [simulate_param()].
+#'
 #' @importFrom checkmate qassert assert_number assert_list
 #' @export
 setMethod("probability_distribution", "CalibrationParam",
