@@ -356,7 +356,7 @@ test_that("FrankExtArch2FParam is initialized correctly", {
     pexp(times, rate = lambda),
     tolerance = 1e-2)
   expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "fallback"),
+    expected_pcds_loss(parm, times, recovery_rate = 0, pd_args = list(n_sim = 1e4, seed = 1623)),
     pexp(times, rate = lambda),
     tolerance = 1e-2)
 
@@ -365,16 +365,16 @@ test_that("FrankExtArch2FParam is initialized correctly", {
   upper <- 0.2
   expect_equal(
     expected_value(parm, times, function(x) {
-      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
+      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower, pd_args = list(n_sim = 1e4, seed = 1623))
     }),
-    expected_cdo_loss(parm, times, recovery_rate, lower, upper, method = "default"),
+    expected_cdo_loss(parm, times, recovery_rate, lower, upper, pd_args = list(n_sim = 1e4, seed = 1623)),
     tolerance = 1e-2
   )
   expect_equal(
     expected_value(parm, times, function(x) {
-      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
+      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower, pd_args = list(n_sim = 1e4, seed = 1623))
     }),
-    expected_cdo_loss(parm, times, recovery_rate, lower, upper, method = "fallback"),
+    expected_cdo_loss(parm, times, recovery_rate, lower, upper, pd_args = list(n_sim = 1e4, seed = 1623)),
     tolerance = 1e-2
   )
 })

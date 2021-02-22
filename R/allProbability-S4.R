@@ -1,16 +1,53 @@
-#' @include allClass-S4.R allGeneric-S4.R
+#' @include allClass-S4.R allGeneric-S4.R simulateParam-S4.R
 NULL
 
 #' @describeIn CalibrationParam-class
 #'   returns the probability vector for the average default count process \eqn{L}.
 #'
-#' @param object The calibration parameter object
-#' @param times Point-in-time
+#' @param object The calibration parameter object.
+#' @param times Point-in-time.
+#' @param ... Pass-through parameter.
+#'
+#' @section Probability distribution:
+#' The probability vector of the *average default counting process* \eqn{L}
+#' for certain times can be calculated with [probability_distribution()];
+#' i.e. the values
+#' \deqn{
+#'   \mathbb{P}(L_t = k/d) , \quad k \in {\{ 0, \ldots, d \}} , \quad t \geq 0 .
+#' }
 #'
 #' @export
 setGeneric("probability_distribution",
-  function(object, times) {
+  function(object, times, ...) {
     standardGeneric("probability_distribution")
+  })
+
+#' @importFrom checkmate qassert assert_number
+#' @export
+setMethod("probability_distribution", "CalibrationParam",
+  function(object, times, ..., n_sim = 1e4, seed = NULL) {
+    qassert(times, "N+[0,)")
+    qassert(n_sim, "X1(0,)")
+    assert_number(seed, lower = 0, finite = TRUE, null.ok = TRUE)
+    if (!is.null(seed)) {
+      set.seed(seed)
+    }
+    x <- simulate_param(object, times, n_sim = n_sim)
+    if (is.matrix(x)) {
+      out <- t(sapply((0:object@dim) / object@dim, function(k) {
+        apply(x, 2, function(.x) mean(.x == k))
+      }))
+      out <- t(apply(x, 1, function(.x) sapply((0:object@dim) / object@dim, function(k) mean(.x == k))))
+
+      if (1L == nrow(out) || 1L == ncol(out))
+        out <- as.vector(out)
+    } else {
+      out <- sapply((0:object@dim) / object@dim, function(k) {
+        mean(x == k)
+      })
+    }
+
+    out
   })
 
 #' @describeIn ExMarkovParam-class
@@ -33,9 +70,19 @@ setGeneric("probability_distribution",
 #' @importFrom checkmate qassert
 #' @export
 setMethod("probability_distribution", "ExMarkovParam",
-  function(object, times) {
-    qassert(times, "N+[0,)")
-    sapply(times, function(t) expm(t * object@qmatrix)[1, ])
+  function(object, times, ..., method = c("default", "fallback")) {
+    method <- match.arg(method)
+    if (!isTRUE("default" == method)) {
+      out <- callNextMethod(object, times, ...)
+    } else {
+      qassert(times, "N+[0,)")
+      out <- sapply(times, function(t) expm(t * object@qmatrix)[1, ])
+
+      if (1L == nrow(out) || 1L == ncol(out))
+        out <- as.vector(out)
+    }
+
+    out
   })
 
 #' @describeIn ExtGaussian2FParam-class
@@ -52,74 +99,39 @@ setMethod("probability_distribution", "ExMarkovParam",
 #' @importFrom checkmate qassert
 #' @export
 setMethod("probability_distribution", "ExtGaussian2FParam",
-  function(object, times) {
-    qassert(times, "N+[0,)")
-    times <- qnorm(pexp(times, rate = object@lambda))
-    out <- simplify2array(outer(0:object@dim, times,
-      Vectorize(function(k, t) {
-        int_res <- integrate(
-          function(x) {
-            ldp <- pnorm(
-              (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
-              log.p=TRUE, lower.tail = TRUE
-            )
-            lsp <- pnorm(
-              (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
-              log.p=TRUE, lower.tail = FALSE
-            )
-            sapply(
-              exp(k * ldp + (object@dim-k) * lsp) * dnorm(x),
-              function(v) {
-                multiply_binomial_coefficient(v, object@dim, k)
-              })
-          }, lower = -Inf, upper = Inf, rel.tol = .Machine$double.eps^0.5
-        )
+  function(object, times, ..., method = c("default", "fallback")) {
+    method <- match.arg(method)
+    if (!isTRUE("default" == method)) {
+      out <- callNextMethod(object, times, ...)
+    } else {
+      qassert(times, "N+[0,)")
+      times <- qnorm(pexp(times, rate = object@lambda))
+      out <- simplify2array(outer(0:object@dim, times,
+        Vectorize(function(k, t) {
+          int_res <- integrate(
+            function(x) {
+              ldp <- pnorm(
+                (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
+                log.p=TRUE, lower.tail = TRUE
+              )
+              lsp <- pnorm(
+                (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
+                log.p=TRUE, lower.tail = FALSE
+              )
+              sapply(
+                exp(k * ldp + (object@dim-k) * lsp) * dnorm(x),
+                function(v) {
+                  multiply_binomial_coefficient(v, object@dim, k)
+                })
+            }, lower = -Inf, upper = Inf, rel.tol = .Machine$double.eps^0.5
+          )
 
-        int_res$value
-      })), higher=FALSE)
+          int_res$value
+        })), higher=FALSE)
 
-    if (1L == nrow(out) || 1L == ncol(out))
-      out <- as.vector(out)
-
-    out
-  })
-
-#' @describeIn ExtArch2FParam-class
-#'   returns the probability vector for the average default count process \eqn{L}.
-#' @aliases probability_distribution,FrankExtArch2FParam-method
-#'
-#' @inheritParams probability_distribution
-#'
-#' @examples
-#' probability_distribution(FrankExtArch2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
-#'
-#' @importFrom stats pexp
-#' @importFrom copula iPsi frankCopula
-#' @importFrom checkmate qassert
-#' @export
-setMethod("probability_distribution", "FrankExtArch2FParam",
-  function(object, times) {
-    qassert(times, "N+[0,)")
-    times <- copula::iPsi(frankCopula(object@nu),
-                        pexp(times, rate = object@lambda))
-    dn <- function(m) {
-      pexp(object@nu)^m / (object@nu * m)
+      if (1L == nrow(out) || 1L == ncol(out))
+        out <- as.vector(out)
     }
-    n <- max(which(dn(2 ^ (1:10)) > .Machine$double.eps))
-    out <- simplify2array(outer(0:object@dim, times,
-      Vectorize(function(k, t) {
-        multiply_binomial_coefficient(
-          sum(
-            pexp(t, rate = (1:n), lower.tail = FALSE) ^ k *
-              pexp(t, rate = (1:n), lower.tail = TRUE) ^ (object@dim - k) *
-              dn(1:n)
-          ),
-          object@dim, k)
-      })), higher=FALSE)
-
-    if (1L == nrow(out) || 1L == ncol(out))
-      out <- as.vector(out)
 
     out
   })

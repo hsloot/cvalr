@@ -19,19 +19,22 @@
   times,
   recovery_rate,
   method = c("default", "fallback"),
-  ...
+  ...,
+  pd_args = NULL
 )
 }
 \arguments{
-\item{object}{The calibration parameter object}
+\item{object}{The calibration parameter object.}
 
-\item{times}{Point-in-time}
+\item{times}{Point-in-time.}
 
 \item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
 
 \item{method}{Choice of method (if available)}
 
-\item{...}{Pass-through parameter}
+\item{...}{Pass-through parameter.}
+
+\item{pd_args}{Parameter for \code{\link[=probability_distribution]{probability_distribution()}}.}
 }
 \description{
 Calibration parameter classes with two parameters for the extendible

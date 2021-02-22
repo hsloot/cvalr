@@ -1,3 +1,5 @@
+library(checkmate)
+
 cds_expected_loss <- function(t, lambda, recovery_rate) {
   sapply(t, function(.t) (1 - recovery_rate) * pexp(.t, rate = lambda))
 }
