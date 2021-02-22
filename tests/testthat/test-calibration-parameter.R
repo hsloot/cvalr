@@ -365,15 +365,15 @@ test_that("FrankExtArch2FParam is initialized correctly", {
   upper <- 0.2
   expect_equal(
     expected_value(parm, times, function(x) {
-      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower, pd_args = list(n_sim = 1e4, seed = 1623))
-    }),
+      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
+    }, pd_args = list(n_sim = 1e4, seed = 1623)),
     expected_cdo_loss(parm, times, recovery_rate, lower, upper, pd_args = list(n_sim = 1e4, seed = 1623)),
     tolerance = 1e-2
   )
   expect_equal(
     expected_value(parm, times, function(x) {
-      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower, pd_args = list(n_sim = 1e4, seed = 1623))
-    }),
+      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
+    }, pd_args = list(n_sim = 1e4, seed = 1623)),
     expected_cdo_loss(parm, times, recovery_rate, lower, upper, pd_args = list(n_sim = 1e4, seed = 1623)),
     tolerance = 1e-2
   )
