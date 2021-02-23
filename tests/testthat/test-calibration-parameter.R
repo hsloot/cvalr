@@ -36,17 +36,6 @@ test_that("Biv. ExMarkovParam is initialized correctly", {
       times = times, discount_factors = rep_len(1, length(times)),
       recovery_rate = 0.4, coupon = 0.08, upfront = 0.01)
   )
-  expect_equal(
-    expected_cdo_equation(parm,
-      times = times, discount_factors = rep_len(1, length(times)),
-      recovery_rate = 0.4, lower = 0.1, upper = 0.2,
-      coupon = 0.08, upfront = 0.01),
-    cdo_equation(
-      expected_losses = expected_cdo_loss(parm, times = times,
-        recovery_rate = 0.4, lower = 0.1, upper = 0.2),
-      times=times, discount_factors = rep_len(1, length(times)),
-      lower = 0.1, upper = 0.2, coupon = 0.08, upfront = 0.01)
-  )
 })
 
 test_that("Biv. ExMOParam is initialized correctly", {
@@ -54,10 +43,6 @@ test_that("Biv. ExMOParam is initialized correctly", {
   expect_equal(getDimension(parm), 2L)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getQMatrix(parm), qmatrix)
-
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0),
-    pexp(times, rate = lambda))
 })
 
 test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
@@ -104,13 +89,6 @@ test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
   parm <- CuadrasAugeExtMO2FParam(dim = 2, lambda = lambda, alpha = alpha)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getQMatrix(parm), qmatrix)
-
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0),
-    pexp(times, rate = lambda))
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "CalibrationParam"),
-    pexp(times, rate = lambda))
 })
 
 test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
@@ -155,13 +133,6 @@ test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
   parm <- AlphaStableExtMO2FParam(dim = 2, lambda = lambda, alpha = alpha)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getQMatrix(parm), qmatrix)
-
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0),
-    pexp(times, rate = lambda))
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "CalibrationParam"),
-    pexp(times, rate = lambda))
 })
 
 test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
@@ -208,13 +179,6 @@ test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
   parm <- PoissonExtMO2FParam(dim = 2, lambda = lambda, alpha = alpha)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getQMatrix(parm), qmatrix)
-
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0),
-    pexp(times, rate = lambda))
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "CalibrationParam"),
-    pexp(times, rate = lambda))
 })
 
 test_that("Biv. ExponentialExtMO2FParam is initialized correctly", {
@@ -261,13 +225,6 @@ test_that("Biv. ExponentialExtMO2FParam is initialized correctly", {
   parm <- ExponentialExtMO2FParam(dim = 2, lambda = lambda, alpha = alpha)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getQMatrix(parm), qmatrix)
-
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0),
-    pexp(times, rate = lambda))
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "CalibrationParam"),
-    pexp(times, rate = lambda))
 })
 
 test_that("ExtGaussian2FParam is initialized correctly", {
@@ -295,33 +252,6 @@ test_that("ExtGaussian2FParam is initialized correctly", {
   expect_equal(getNu(parm), nu)
   expect_equal(getRho(parm), rho)
   expect_equal(getTau(parm), tau)
-
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0),
-    pexp(times, rate = lambda),
-    tolerance = 1e-2)
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, method = "CalibrationParam"),
-    pexp(times, rate = lambda),
-    tolerance = 1e-2)
-
-  recovery_rate <- 0.4
-  lower <- 0.1
-  upper <- 0.2
-  expect_equal(
-    expected_value(parm, times, function(x) {
-      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
-    }),
-    expected_cdo_loss(parm, times, recovery_rate, lower, upper, method = "default"),
-    tolerance = 1e-2
-  )
-  expect_equal(
-    expected_value(parm, times, function(x) {
-      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
-    }),
-    expected_cdo_loss(parm, times, recovery_rate, lower, upper, method = "CalibrationParam"),
-    tolerance = 1e-2
-  )
 })
 
 
@@ -350,31 +280,4 @@ test_that("FrankExtArch2FParam is initialized correctly", {
   expect_equal(getNu(parm), nu)
   expect_equal(getRho(parm), rho)
   expect_equal(getTau(parm), tau)
-
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0),
-    pexp(times, rate = lambda),
-    tolerance = 1e-2)
-  expect_equal(
-    expected_pcds_loss(parm, times, recovery_rate = 0, pd_args = list(n_sim = 1e4, seed = 1623)),
-    pexp(times, rate = lambda),
-    tolerance = 1e-2)
-
-  recovery_rate <- 0.4
-  lower <- 0.1
-  upper <- 0.2
-  expect_equal(
-    expected_value(parm, times, function(x) {
-      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
-    }, pd_args = list(n_sim = 1e4, seed = 1623)),
-    expected_cdo_loss(parm, times, recovery_rate, lower, upper, pd_args = list(n_sim = 1e4, seed = 1623)),
-    tolerance = 1e-2
-  )
-  expect_equal(
-    expected_value(parm, times, function(x) {
-      pmin(pmax((1 - recovery_rate) * x - lower, 0), upper - lower)
-    }, pd_args = list(n_sim = 1e4, seed = 1623)),
-    expected_cdo_loss(parm, times, recovery_rate, lower, upper, pd_args = list(n_sim = 1e4, seed = 1623)),
-    tolerance = 1e-2
-  )
 })
