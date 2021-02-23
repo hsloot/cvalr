@@ -26,7 +26,7 @@ setGeneric("simulate_param",
 #' @param n_sim Number of samples.
 #'
 #' @examples
-#' simulate_param(ExMarkovParam(), 1e1, seq(0, 5, by = 0.25))
+#' simulate_param(ExMarkovParam(), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 #'
 #' @importFrom stats rexp
 #' @export
@@ -61,7 +61,7 @@ setMethod("simulate_param", "ExMarkovParam",
 #' @param n_sim Number of samples.
 #'
 #' @examples
-#' simulate_param(ExMOParam(), 1e1, seq(0, 5, by = 0.25))
+#' simulate_param(ExMOParam(), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 #'
 #' @importFrom rmo rexmo_markovian
 #' @export
@@ -93,7 +93,7 @@ setMethod("simulate_param", "ExMOParam",
 #' @param n_sim Number of samples.
 #'
 #' @examples
-#' simulate_param(ExtGaussian2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25))
+#' simulate_param(ExtGaussian2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 #'
 #' @importFrom stats qexp
 #' @importFrom copula normalCopula rCopula
@@ -121,7 +121,7 @@ setMethod("simulate_param", "ExtGaussian2FParam",
 #' @param n_sim Number of samples.
 #'
 #' @examples
-#' simulate_param(FrankExtArch2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25))
+#' simulate_param(FrankExtArch2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 #'
 #' @importFrom stats qexp
 #' @importFrom copula rCopula

@@ -25,7 +25,6 @@ NULL
 #'   [CuadrasAugeExtMO2FParam-class] [AlphaStableExtMO2FParam-class]
 #'   [PoissonExtMO2FParam-class] [ExponentialExtMO2FParam-class]
 #'
-#' @docType class
 #' @export
 setClass("CalibrationParam", # nolint
   contains = "VIRTUAL",
@@ -50,13 +49,6 @@ setClass("CalibrationParam", # nolint
 #'     = \delta_{i}^\top \operatorname{e}^{(t-s) Q} \delta_{j} .
 #' }
 #'
-#' @examples
-#' ExMarkovParam(
-#'  qmatrix = matrix(
-#'    c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
-#'    nrow = 3, ncol = 3))
-#'
-#' @docType class
 #' @export ExMarkovParam
 ExMarkovParam <- setClass("ExMarkovParam", # nolint
   contains = "CalibrationParam",
@@ -82,10 +74,6 @@ ExMarkovParam <- setClass("ExMarkovParam", # nolint
 #'     = \sum_{l=0}^{d-i-1} \binom{d-i-1}{l} \lambda_{l+1} .
 #' }
 #'
-#' @examples
-#' ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
-#'
-#' @docType class
 #' @export ExMOParam
 ExMOParam <- setClass("ExMOParam", # nolint
   contains = "ExMarkovParam",
@@ -112,17 +100,6 @@ ExMOParam <- setClass("ExMOParam", # nolint
 #'     = \psi{(i+1)} - \psi{(i)} .
 #' }
 #'
-#' @examples
-#' ExtMOParam(
-#'   dim = 2,
-#'   bf = rmo::ScaledBernsteinFunction(
-#'     scale = 0.05,
-#'     original = rmo::SumOfBernsteinFunctions(
-#'       first = rmo::ConstantBernsteinFunction(constant = 0.4),
-#'       second = rmo::LinearBernsteinFunction(scale = 1 - 0.4))
-#'     ))
-#'
-#' @docType class
 #' @export ExtMOParam
 ExtMOParam <- setClass("ExtMOParam", # nolint
   contains = "ExMOParam",
@@ -151,7 +128,6 @@ ExtMOParam <- setClass("ExtMOParam", # nolint
 #'   \item \eqn{\alpha = 2 \tau / (1 + \tau)} and \eqn{\tau = \alpha / (2 - \alpha)}
 #' }
 #'
-#' @docType class
 #' @export
 setClass("ExtMO2FParam", # nolint
   contains = c("ExtMOParam", "VIRTUAL"),
@@ -168,10 +144,6 @@ setClass("ExtMO2FParam", # nolint
 #'   \item \eqn{\alpha = \nu}
 #' }
 #'
-#' @examples
-#' CuadrasAugeExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-#'
-#' @docType class
 #' @export CuadrasAugeExtMO2FParam
 CuadrasAugeExtMO2FParam <- setClass("CuadrasAugeExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
@@ -186,10 +158,6 @@ CuadrasAugeExtMO2FParam <- setClass("CuadrasAugeExtMO2FParam", # nolint
 #'   \item \eqn{\nu = \log_2(2 - \alpha)} and \eqn{\alpha = 2 - 2^\nu}
 #' }
 #'
-#' @examples
-#' AlphaStableExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-#'
-#' @docType class
 #' @export AlphaStableExtMO2FParam
 AlphaStableExtMO2FParam <- setClass("AlphaStableExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
@@ -205,10 +173,6 @@ AlphaStableExtMO2FParam <- setClass("AlphaStableExtMO2FParam", # nolint
 #'  \item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\eta})}
 #' }
 #'
-#' @examples
-#' PoissonExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-#'
-#' @docType class
 #' @export PoissonExtMO2FParam
 PoissonExtMO2FParam <- setClass("PoissonExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
@@ -226,10 +190,6 @@ PoissonExtMO2FParam <- setClass("PoissonExtMO2FParam", # nolint
 #'     and \eqn{\alpha = 2 / (1 + \nu) - 1 / (2 + \nu)}
 #' }
 #'
-#' @examples
-#' ExponentialExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-#'
-#' @docType class
 #' @export ExponentialExtMO2FParam
 ExponentialExtMO2FParam <- setClass("ExponentialExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
@@ -258,10 +218,6 @@ ExponentialExtMO2FParam <- setClass("ExponentialExtMO2FParam", # nolint
 #'     \eqn{\tau = 2 / \pi \cdot \arcsin(\rho)}
 #' }
 #'
-#' @examples
-#' ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-#'
-#' @docType class
 #' @export ExtGaussian2FParam
 ExtGaussian2FParam <- setClass("ExtGaussian2FParam", # nolint
   contains = "CalibrationParam",
@@ -283,7 +239,6 @@ ExtGaussian2FParam <- setClass("ExtGaussian2FParam", # nolint
 #' is from zero to one (boundaries might not be included) and have a
 #' one-to-one mapping to the model-specific parameter `nu`.
 #'
-#' @docType class
 #' @importFrom copula iTau iRho tau rho frankCopula iPsi
 setClass("ExtArch2FParam", # nolint
   contains = c("CalibrationParam", "VIRTUAL"),
@@ -292,7 +247,35 @@ setClass("ExtArch2FParam", # nolint
 
 #' @rdname ExtArch2FParam-class
 #'
+#' @export ClaytonExtArch2FParam
+ClaytonExtArch2FParam <- setClass("ClaytonExtArch2FParam", # nolint
+  contains = "ExtArch2FParam",
+  slots = c(lambda = "numeric", nu = "numeric", copula = "claytonCopula"))
+
+#' @rdname ExtArch2FParam-class
+#'
 #' @export FrankExtArch2FParam
 FrankExtArch2FParam <- setClass("FrankExtArch2FParam", # nolint
   contains = "ExtArch2FParam",
   slots = c(lambda = "numeric", nu = "numeric", copula = "frankCopula"))
+
+#' @rdname ExtArch2FParam-class
+#'
+#' @export GumbelExtArch2FParam
+GumbelExtArch2FParam <- setClass("GumbelExtArch2FParam", # nolint
+  contains = "ExtArch2FParam",
+  slots = c(lambda = "numeric", nu = "numeric", copula = "gumbelCopula"))
+
+#' @rdname ExtArch2FParam-class
+#'
+#' @export AmhExtArch2FParam
+AmhExtArch2FParam <- setClass("AmhExtArch2FParam", # nolint
+  contains = "ExtArch2FParam",
+  slots = c(lambda = "numeric", nu = "numeric", copula = "amhCopula"))
+
+#' @rdname ExtArch2FParam-class
+#'
+#' @export JoeExtArch2FParam
+JoeExtArch2FParam <- setClass("JoeExtArch2FParam", # nolint
+  contains = "ExtArch2FParam",
+  slots = c(lambda = "numeric", nu = "numeric", copula = "joeCopula"))
