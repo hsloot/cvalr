@@ -19,35 +19,18 @@ test_that("Biv. ExMarkovParam is initialized correctly", {
   parm <- ExMarkovParam(ex_qmatrix = ex_qmatrix)
   expect_equal(getDimension(parm), 2L)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
-
-  expect_equal(
-    sapply(times,
-      function(t) {
-        expected_pcds_loss(parm, t, recovery_rate = 0)
-        }),
-    pexp(times, rate = lambda))
-
-  expect_equal(
-    expected_pcds_equation(parm,
-      times = times, discount_factors = rep_len(1, length(times)),
-      recovery_rate = 0.4, coupon = 0.08, upfront = 0.01),
-    portfolio_cds_equation(
-      expected_losses = expected_pcds_loss(parm, times = times, recovery_rate=0.4),
-      times = times, discount_factors = rep_len(1, length(times)),
-      recovery_rate = 0.4, coupon = 0.08, upfront = 0.01)
-  )
 })
 
 test_that("Biv. ExMOParam is initialized correctly", {
   parm <- ExMOParam(ex_intensities = ex_intensities)
   expect_equal(getDimension(parm), 2L)
-  expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
+  expect_equal(getExIntensities(parm), ex_intensities)
 })
 
 test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
   nu <- alpha
-  parm <- CuadrasAugeExtMO2FParam(dim = 2)
+  parm <- CuadrasAugeExtMO2FParam(dim = 2L)
   setLambda(parm) <- lambda
   setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
@@ -57,16 +40,15 @@ test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
   expect_equal(getTau(parm), tau)
   expect_equal(getAlpha(parm), alpha)
 
+  setAlpha(parm) <- alpha
+  expect_equal(getNu(parm), nu)
+
   setRho(parm) <- rho
   expect_equal(getNu(parm), nu)
 
   setTau(parm) <- tau
   expect_equal(getNu(parm), nu)
 
-  setAlpha(parm) <- alpha
-  expect_equal(getNu(parm), nu)
-
-  setNu(parm) <- nu
   expect_equal(getBernsteinFunction(parm),
     ScaledBernsteinFunction(
       scale = lambda,
@@ -76,12 +58,10 @@ test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  rho <- 3 * alpha / (4 - alpha)
   parm <- CuadrasAugeExtMO2FParam(dim = 2, lambda = lambda, rho = rho)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  tau <- alpha / (2 - alpha)
   parm <- CuadrasAugeExtMO2FParam(dim = 2, lambda = lambda, tau = tau)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
@@ -93,7 +73,7 @@ test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
 
 test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
   nu <- log2(2 - alpha)
-  parm <- AlphaStableExtMO2FParam(dim = 2)
+  parm <- AlphaStableExtMO2FParam(dim = 2L)
   setLambda(parm) <- lambda
   setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
@@ -112,7 +92,6 @@ test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
   setAlpha(parm) <- alpha
   expect_equal(getNu(parm), nu)
 
-  setNu(parm) <- nu
   expect_equal(getBernsteinFunction(parm),
                ScaledBernsteinFunction(
                  scale = lambda,
@@ -120,24 +99,22 @@ test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  rho <- 3 * alpha / (4 - alpha)
-  parm <- AlphaStableExtMO2FParam(dim = 2, lambda = lambda, rho = rho)
+  parm <- AlphaStableExtMO2FParam(dim = 2L, lambda = lambda, rho = rho)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  tau <- alpha / (2 - alpha)
-  parm <- AlphaStableExtMO2FParam(dim = 2, lambda = lambda, tau = tau)
+  parm <- AlphaStableExtMO2FParam(dim = 2L, lambda = lambda, tau = tau)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  parm <- AlphaStableExtMO2FParam(dim = 2, lambda = lambda, alpha = alpha)
+  parm <- AlphaStableExtMO2FParam(dim = 2L, lambda = lambda, alpha = alpha)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 })
 
 test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
   nu <- -log(1 - sqrt(alpha))
-  parm <- PoissonExtMO2FParam(dim = 2)
+  parm <- PoissonExtMO2FParam(dim = 2L)
   setLambda(parm) <- lambda
   setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
@@ -156,7 +133,6 @@ test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
   setAlpha(parm) <- alpha
   expect_equal(getNu(parm), nu)
 
-  setNu(parm) <- nu
   expect_equal(getBernsteinFunction(parm),
                ScaledBernsteinFunction(
                  scale = lambda,
@@ -166,24 +142,22 @@ test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  rho <- 3 * alpha / (4 - alpha)
-  parm <- PoissonExtMO2FParam(dim = 2, lambda = lambda, rho = rho)
+  parm <- PoissonExtMO2FParam(dim = 2L, lambda = lambda, rho = rho)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  tau <- alpha / (2 - alpha)
-  parm <- PoissonExtMO2FParam(dim = 2, lambda = lambda, tau = tau)
+  parm <- PoissonExtMO2FParam(dim = 2L, lambda = lambda, tau = tau)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  parm <- PoissonExtMO2FParam(dim = 2, lambda = lambda, alpha = alpha)
+  parm <- PoissonExtMO2FParam(dim = 2L, lambda = lambda, alpha = alpha)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 })
 
 test_that("Biv. ExponentialExtMO2FParam is initialized correctly", {
   nu <- 0.5 * (-3 + sqrt(1 + 8 / alpha))
-  parm <- ExponentialExtMO2FParam(dim = 2)
+  parm <- ExponentialExtMO2FParam(dim = 2L)
   setLambda(parm) <- lambda
   setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
@@ -202,7 +176,6 @@ test_that("Biv. ExponentialExtMO2FParam is initialized correctly", {
   setAlpha(parm) <- alpha
   expect_equal(getNu(parm), nu)
 
-  setNu(parm) <- nu
   expect_equal(getBernsteinFunction(parm),
                ScaledBernsteinFunction(
                  scale = lambda,
@@ -212,17 +185,15 @@ test_that("Biv. ExponentialExtMO2FParam is initialized correctly", {
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  rho <- 3 * alpha / (4 - alpha)
-  parm <- ExponentialExtMO2FParam(dim = 2, lambda = lambda, rho = rho)
+  parm <- ExponentialExtMO2FParam(dim = 2L, lambda = lambda, rho = rho)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  tau <- alpha / (2 - alpha)
-  parm <- ExponentialExtMO2FParam(dim = 2, lambda = lambda, tau = tau)
+  parm <- ExponentialExtMO2FParam(dim = 2L, lambda = lambda, tau = tau)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
-  parm <- ExponentialExtMO2FParam(dim = 2, lambda = lambda, alpha = alpha)
+  parm <- ExponentialExtMO2FParam(dim = 2L, lambda = lambda, alpha = alpha)
   expect_equal(getExIntensities(parm), ex_intensities)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 })
