@@ -63,10 +63,10 @@ setMethod("invRho", "ExtGaussian2FParam",
   })
 #' @importFrom copula iRho frankCopula
 #' @importFrom checkmate qassert
-setMethod("invRho", "FrankExtArch2FParam",
+setMethod("invRho", "ExtArch2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
-    copula::iRho(frankCopula(), value)
+    copula::iRho(object@copula, value)
   })
 
 #' @importFrom checkmate qassert
@@ -83,10 +83,10 @@ setMethod("invTau", "ExtGaussian2FParam",
   })
 #' @importFrom copula iTau frankCopula
 #' @importFrom checkmate qassert
-setMethod("invTau", "FrankExtArch2FParam",
+setMethod("invTau", "ExtArch2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
-    copula::iTau(frankCopula(), value)
+    copula::iTau(object@copula, value)
   })
 
 #' @importFrom checkmate qassert

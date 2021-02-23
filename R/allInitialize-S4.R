@@ -75,9 +75,13 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
     invisible(.Object)
   })
 
-setMethod("initialize", "FrankExtArch2FParam",
+#' @importFrom copula archmCopula
+setMethod("initialize", "ExtArch2FParam",
   function(.Object, # nolint
-      dim = 2, lambda = 0.1, nu = 0.5, rho = NULL, tau = NULL) {
+      dim = 2, lambda = 0.1, nu = 0.5, rho = NULL, tau = NULL,
+      family = c("clayton", "frank", "amh", "gumbel", "joe")) {
+    family <- match.arg(family)
+    .Object@copula <- archmCopula(family = family)
     if (missing(nu)) {
       if (!is.null(rho)) {
         nu <- invRho(.Object, rho)
@@ -92,4 +96,11 @@ setMethod("initialize", "FrankExtArch2FParam",
     validObject(.Object)
 
     invisible(.Object)
+  })
+
+setMethod("initialize", "FrankExtArch2FParam",
+  function(.Object, # nolint
+      ...) {
+
+    invisible(callNextMethod(.Object, ..., family = "frank"))
   })

@@ -286,12 +286,13 @@ ExtGaussian2FParam <- setClass("ExtGaussian2FParam", # nolint
 #' @docType class
 #' @importFrom copula iTau iRho tau rho frankCopula iPsi
 setClass("ExtArch2FParam", # nolint
-  contains = "CalibrationParam",
-  slots = c(lambda = "numeric", nu = "numeric"))
+  contains = c("CalibrationParam", "VIRTUAL"),
+  slots = c(lambda = "numeric", nu = "numeric", copula = "archmCopula"))
 
 
 #' @rdname ExtArch2FParam-class
 #'
 #' @export FrankExtArch2FParam
 FrankExtArch2FParam <- setClass("FrankExtArch2FParam", # nolint
-  contains = "ExtArch2FParam")
+  contains = "ExtArch2FParam",
+  slots = c(lambda = "numeric", nu = "numeric", copula = "frankCopula"))

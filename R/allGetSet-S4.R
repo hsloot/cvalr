@@ -14,7 +14,15 @@ setReplaceMethod("setDimension", "CalibrationParam",
 
     invisible(object)
   })
+#' @importFrom checkmate qassert
+setReplaceMethod("setDimension", "ExtArch2FParam",
+  function(object, value) {
+    qassert(value, "X1(0,)")
+    object@dim <- as.integer(value)
+    object@copula@dimension <- as.integer(value)
 
+    invisible(object)
+  })
 
 setMethod("getExQMatrix", "ExMarkovParam",
   function(object) {
@@ -149,11 +157,13 @@ setReplaceMethod("setNu", "ExtGaussian2FParam",
 
     invisible(object)
   })
+#' @importFrom copula setTheta
 #' @importFrom checkmate qassert
 setReplaceMethod("setNu", "ExtArch2FParam",
   function(object, value) {
     qassert(value, "N1")
     object@nu <- value
+    object@copula <- setTheta(object@copula, value)
 
     invisible(object)
   })
@@ -170,9 +180,9 @@ setMethod("getRho", "ExtGaussian2FParam",
     (6 / pi) * asin(getNu(object) / 2)
   })
 #' @importFrom copula rho frankCopula
-setMethod("getRho", "FrankExtArch2FParam",
+setMethod("getRho", "ExtArch2FParam",
   function(object) {
-    copula::rho(frankCopula(object@nu))
+    copula::rho(object@copula)
   })
 
 #' @importFrom checkmate qassert
@@ -192,7 +202,7 @@ setReplaceMethod("setRho", "ExtGaussian2FParam",
     invisible(object)
   })
 #' @importFrom checkmate qassert
-setReplaceMethod("setRho", "FrankExtArch2FParam",
+setReplaceMethod("setRho", "ExtArch2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
     setNu(object) <- invRho(object, value)
@@ -212,9 +222,9 @@ setMethod("getTau", "ExtGaussian2FParam",
     (2 / pi) * asin(getNu(object))
   })
 #' @importFrom copula tau frankCopula
-setMethod("getTau", "FrankExtArch2FParam",
+setMethod("getTau", "ExtArch2FParam",
   function(object) {
-    copula::tau(frankCopula(object@nu))
+    copula::tau(object@copula)
   })
 
 #' @importFrom checkmate qassert
@@ -234,7 +244,7 @@ setReplaceMethod("setTau", "ExtGaussian2FParam",
     invisible(object)
   })
 #' @importFrom checkmate qassert
-setReplaceMethod("setTau", "FrankExtArch2FParam",
+setReplaceMethod("setTau", "ExtArch2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
     setNu(object) <- invTau(object, value)

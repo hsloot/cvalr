@@ -115,7 +115,7 @@ setMethod("simulate_param", "ExtGaussian2FParam",
 #'   simulates the default counting process \eqn{L} and returns a matrix `x` with
 #'   `nrow(x) == n_sim` and `ncol(x) == length(times)` if `length(times) > 1L`
 #'   and a vector `x` with `length(x) == n_sim` otherwise.
-#' @aliases simulate_param,FrankExtArch2FParam-method
+#' @aliases simulate_param,ExtArch2FParam-method
 #'
 #' @inheritParams simulate_param
 #' @param n_sim Number of samples.
@@ -124,14 +124,11 @@ setMethod("simulate_param", "ExtGaussian2FParam",
 #' simulate_param(FrankExtArch2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25))
 #'
 #' @importFrom stats qexp
-#' @importFrom copula frankCopula rCopula
-setMethod("simulate_param", "FrankExtArch2FParam",
+#' @importFrom copula rCopula
+setMethod("simulate_param", "ExtArch2FParam",
   function(object, times, ..., n_sim = 1e4) {
     tmp <- qexp(
-      rCopula(
-        n_sim,
-        frankCopula(param = object@nu, dim = object@dim)
-      ),
+      rCopula(n_sim, object@copula),
       rate = object@lambda, lower.tail = FALSE
     )
     out <- dt2adcp(tmp, times)
