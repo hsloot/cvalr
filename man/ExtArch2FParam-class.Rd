@@ -30,6 +30,9 @@
 \item{n_sim}{Number of samples.}
 
 \item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
+
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
 }
 \description{
 Calibration parameter classes with two parameters for the extendible
@@ -65,6 +68,6 @@ simulate_param(FrankExtArch2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25))
 expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4)
 expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-  times = 0.25, recovery_rate = 0.4, method = "fallback")
+  times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 
 }

@@ -103,13 +103,14 @@ setMethod("expected_pcds_loss", "CalibrationParam",
 #' @aliases expected_pcds_loss,ExtMO2FParam-method
 #'
 #' @inheritParams expected_pcds_loss
-#' @param method Choice of method (if available)
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #'
 #' @examples
 #' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
 #'   times = 0.25, recovery_rate = 0.4)
 #' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
-#'   times = 0.25, recovery_rate = 0.4, method = "fallback")
+#'   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 #'
 #' @importFrom stats pexp
 #' @importFrom checkmate qassert
@@ -137,12 +138,14 @@ setMethod("expected_pcds_loss", "ExtMO2FParam",
 #' @aliases expected_pcds_loss,ExtGaussian2FParam-method
 #'
 #' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #'
 #' @examples
 #' expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
 #'   times = 0.25, recovery_rate = 0.4)
 #' expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   times = 0.25, recovery_rate = 0.4, method = "fallback")
+#'   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 #'
 #' @importFrom stats pexp
 #' @importFrom checkmate qassert
@@ -170,12 +173,14 @@ setMethod("expected_pcds_loss", "ExtGaussian2FParam",
 #' @aliases expected_pcds_loss,FrankExtArch2FParam-method
 #'
 #' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #'
 #' @examples
 #' expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
 #'   times = 0.25, recovery_rate = 0.4)
 #' expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   times = 0.25, recovery_rate = 0.4, method = "fallback")
+#'   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 #'
 #' @importFrom stats pexp
 #' @importFrom checkmate qassert
@@ -243,12 +248,14 @@ setMethod("expected_cdo_loss", "CalibrationParam",
 #' @aliases expected_cdo_loss,ExtGaussian2FParam-method
 #'
 #' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #'
 #' @examples
 #' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
 #'   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
 #' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "fallback")
+#'   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam")
 #'
 #' @importFrom mvtnorm pmvnorm
 #' @importFrom stats pexp qnorm

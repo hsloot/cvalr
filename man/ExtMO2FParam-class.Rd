@@ -31,7 +31,8 @@
 
 \item{...}{Pass-through parameter.}
 
-\item{method}{Choice of method (if available)}
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
 }
 \description{
 Calibration parameter classes with two parameters for the extendible
@@ -117,6 +118,6 @@ ExponentialExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
   times = 0.25, recovery_rate = 0.4)
 expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
-  times = 0.25, recovery_rate = 0.4, method = "fallback")
+  times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 
 }

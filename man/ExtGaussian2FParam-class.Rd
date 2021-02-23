@@ -104,12 +104,12 @@ simulate_param(ExtGaussian2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25))
 expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4)
 expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-  times = 0.25, recovery_rate = 0.4, method = "fallback")
+  times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 
 expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
 expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-  times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "fallback")
+  times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam")
 
 probability_distribution(ExtGaussian2FParam(
   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
