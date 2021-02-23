@@ -43,15 +43,10 @@ setMethod("probability_distribution", "CalibrationParam",
     }
     x <- do.call(simulate_param,
            args = c(list(object = object, times = times), sim_args))
-    if (is.matrix(x)) {
-      out <- t(sapply((0:object@dim) / object@dim, function(k) {
-        apply(x, 2, function(.x) mean(.x == k))
-        }))
-    } else {
-      out <- sapply((0:object@dim) / object@dim, function(k) {
-        mean(x == k)
-        })
+    if (!is.matrix(x)) {
+      x <- as.matrix(x, ncol = 1L)
     }
+    out <- adcp2epd(x, object@dim)
 
     simplify2vector(out)
   })

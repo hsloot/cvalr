@@ -44,7 +44,7 @@ setMethod("simulate_param", "ExMarkovParam",
                         prob = object@qmatrix[1+state, (2+state):(object@dim+1)])
       }
     }
-    out <- t(apply(tmp, 1, function(x) sapply(times, function(t) mean(x <= t))))
+    out <- dt2adcp(tmp, times)
 
     simplify2vector(out)
   })
@@ -75,7 +75,7 @@ setMethod("simulate_param", "ExMOParam",
 
     if (isTRUE("ExMOParam" == method)) {
       tmp <- rexmo_markovian(n_sim, object@dim, object@ex_intensities)
-      out <- t(apply(tmp, 1, function(x) sapply(times, function(t) mean(x <= t))))
+      out <- dt2adcp(tmp, times)
     } else {
       out <- callNextMethod(object, times, ..., n_sim = n_sim)
     }
@@ -106,7 +106,7 @@ setMethod("simulate_param", "ExtGaussian2FParam",
       ),
       rate = object@lambda, lower.tail = FALSE
     )
-    out <- t(apply(tmp, 1, function(x) sapply(times, function(t) mean(x <= t))))
+    out <- dt2adcp(tmp, times)
 
     simplify2vector(out)
   })
@@ -134,7 +134,7 @@ setMethod("simulate_param", "FrankExtArch2FParam",
       ),
       rate = object@lambda, lower.tail = FALSE
     )
-    out <- t(apply(tmp, 1, function(x) sapply(times, function(t) mean(x <= t))))
+    out <- dt2adcp(tmp, times)
 
     simplify2vector(out)
   })

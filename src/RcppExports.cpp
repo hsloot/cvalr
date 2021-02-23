@@ -18,6 +18,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dt2adcp
+NumericMatrix dt2adcp(const NumericMatrix& x, const NumericVector& times);
+RcppExport SEXP _cvalr_dt2adcp(SEXP xSEXP, SEXP timesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
+    rcpp_result_gen = Rcpp::wrap(dt2adcp(x, times));
+    return rcpp_result_gen;
+END_RCPP
+}
+// adcp2epd
+NumericMatrix adcp2epd(const NumericMatrix& x, const std::size_t d);
+RcppExport SEXP _cvalr_adcp2epd(SEXP xSEXP, SEXP dSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const std::size_t >::type d(dSEXP);
+    rcpp_result_gen = Rcpp::wrap(adcp2epd(x, d));
+    return rcpp_result_gen;
+END_RCPP
+}
 // is_qmatrix
 bool is_qmatrix(const NumericMatrix& x, const double tol);
 RcppExport SEXP _cvalr_is_qmatrix(SEXP xSEXP, SEXP tolSEXP) {
@@ -125,6 +147,8 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_multiply_binomial_coefficient", (DL_FUNC) &_cvalr_multiply_binomial_coefficient, 3},
+    {"_cvalr_dt2adcp", (DL_FUNC) &_cvalr_dt2adcp, 2},
+    {"_cvalr_adcp2epd", (DL_FUNC) &_cvalr_adcp2epd, 2},
     {"_cvalr_is_qmatrix", (DL_FUNC) &_cvalr_is_qmatrix, 2},
     {"_cvalr_portfolio_cds_coupon", (DL_FUNC) &_cvalr_portfolio_cds_coupon, 4},
     {"_cvalr_portfolio_cds_upfront", (DL_FUNC) &_cvalr_portfolio_cds_upfront, 5},
