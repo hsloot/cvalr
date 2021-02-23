@@ -5,6 +5,10 @@ multiply_binomial_coefficient <- function(x, n, k) {
     .Call(`_cvalr_multiply_binomial_coefficient`, x, n, k)
 }
 
+v_multiply_binomial_coefficient <- function(x, n, k) {
+    .Call(`_cvalr_v_multiply_binomial_coefficient`, x, n, k)
+}
+
 dt2adcp <- function(x, times) {
     .Call(`_cvalr_dt2adcp`, x, times)
 }

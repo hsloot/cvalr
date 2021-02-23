@@ -131,11 +131,8 @@ setMethod("probability_distribution", "ExtGaussian2FParam",
                 (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
                 log.p = TRUE, lower.tail = FALSE
               )
-              sapply(
-                exp(k * ldp + (object@dim-k) * lsp) * dnorm(x),
-                function(v) {
-                  multiply_binomial_coefficient(v, object@dim, k)
-                })
+              v_multiply_binomial_coefficient(
+                exp(k * ldp + (object@dim-k) * lsp) * dnorm(x), object@dim, k)
             }, lower = -Inf, upper = Inf, rel.tol = .Machine$double.eps^0.5
           )
 

@@ -18,6 +18,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// v_multiply_binomial_coefficient
+NumericVector v_multiply_binomial_coefficient(const NumericVector& x, const std::size_t n, const std::size_t k);
+RcppExport SEXP _cvalr_v_multiply_binomial_coefficient(SEXP xSEXP, SEXP nSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const std::size_t >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const std::size_t >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(v_multiply_binomial_coefficient(x, n, k));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dt2adcp
 NumericMatrix dt2adcp(const NumericMatrix& x, const NumericVector& times);
 RcppExport SEXP _cvalr_dt2adcp(SEXP xSEXP, SEXP timesSEXP) {
@@ -147,6 +160,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_multiply_binomial_coefficient", (DL_FUNC) &_cvalr_multiply_binomial_coefficient, 3},
+    {"_cvalr_v_multiply_binomial_coefficient", (DL_FUNC) &_cvalr_v_multiply_binomial_coefficient, 3},
     {"_cvalr_dt2adcp", (DL_FUNC) &_cvalr_dt2adcp, 2},
     {"_cvalr_adcp2epd", (DL_FUNC) &_cvalr_adcp2epd, 2},
     {"_cvalr_is_qmatrix", (DL_FUNC) &_cvalr_is_qmatrix, 2},
