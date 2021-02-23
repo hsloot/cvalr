@@ -1,5 +1,5 @@
-#' @include allClass-S4.R allGeneric-S4.R simulateParam-S4.R
-#'   probabilityDistribution-S4.R
+#' @include allClass-S4.R allGeneric-S4.R simulate_param-S4.R
+#'   probability_pistribution-S4.R
 NULL
 
 #' @describeIn CalibrationParam-class
