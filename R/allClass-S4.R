@@ -60,7 +60,7 @@ setClass("CalibrationParam", # nolint
 #' @export ExMarkovParam
 ExMarkovParam <- setClass("ExMarkovParam", # nolint
   contains = "CalibrationParam",
-  slots = c(qmatrix = "matrix"))
+  slots = c(ex_qmatrix = "matrix"))
 
 #' Exchangeable Marshall--Olkin calibration parameter
 #'

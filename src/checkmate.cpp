@@ -6,7 +6,7 @@ using namespace Rcpp;
 // # nocov start
 
 // [[Rcpp::export(rng=false)]]
-bool is_qmatrix(const NumericMatrix &x, const double tol) {
+bool is_exqmatrix(const NumericMatrix &x, const double tol) {
   if (x.nrow() != x.ncol())
     return false;
   const auto n = static_cast<std::size_t>(x.nrow());

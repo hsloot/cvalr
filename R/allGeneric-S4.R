@@ -10,13 +10,13 @@ setGeneric("setDimension<-",
     standardGeneric("setDimension<-")
   })
 
-setGeneric("getQMatrix",
+setGeneric("getExQMatrix",
   function(object) {
-    standardGeneric("getQMatrix")
+    standardGeneric("getExQMatrix")
   })
-setGeneric("setQMatrix<-",
+setGeneric("setExQMatrix<-",
   function(object, value) {
-    standardGeneric("setQMatrix<-")
+    standardGeneric("setExQMatrix<-")
   })
 
 setGeneric("getExIntensities",

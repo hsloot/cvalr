@@ -15,20 +15,20 @@ assert_equal <- assertEqual
 
 #' @importFrom checkmate check_matrix makeAssertionFunction
 #' @include RcppExports.R
-checkQMatrix <- function(x, ...) { # nolint
+checkExQMatrix <- function(x, ...) { # nolint
   out <- check_matrix(
       x, mode = "numeric", any.missing = FALSE, all.missing = FALSE,
       ...)
   if (!isTRUE(out))
     return(out)
-  if (!isTRUE(is_qmatrix(x, tol = .Machine$double.eps^0.5)))
+  if (!isTRUE(is_exqmatrix(x, tol = .Machine$double.eps^0.5)))
     return("Must be upper triangular Markov intensity matrix")
 
   invisible(TRUE)
 }
 
-check_qmatrix <- checkQMatrix
-assertQMatrix <- checkmate::makeAssertionFunction(checkQMatrix) # nolint
-assert_qmatrix <- assertQMatrix
+check_exqmatrix <- checkExQMatrix
+assertExQMatrix <- checkmate::makeAssertionFunction(checkExQMatrix) # nolint
+assert_exqmatrix <- assertExQMatrix
 
 # nocov end

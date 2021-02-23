@@ -82,7 +82,7 @@ setMethod("probability_distribution", "ExMarkovParam",
       out <- callNextMethod(object, times, ...)
     } else {
       qassert(times, "N+[0,)")
-      out <- sapply(times, function(t) expm(t * object@qmatrix)[1, ])
+      out <- sapply(times, function(t) expm(t * object@ex_qmatrix)[1, ])
     }
 
     simplify2vector(out)

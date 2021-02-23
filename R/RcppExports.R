@@ -17,8 +17,8 @@ adcp2epd <- function(x, d) {
     .Call(`_cvalr_adcp2epd`, x, d)
 }
 
-is_qmatrix <- function(x, tol) {
-    .Call(`_cvalr_is_qmatrix`, x, tol)
+is_exqmatrix <- function(x, tol) {
+    .Call(`_cvalr_is_exqmatrix`, x, tol)
 }
 
 #' Portfolio CDS spread and CDO methods

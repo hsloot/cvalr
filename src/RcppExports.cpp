@@ -53,14 +53,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// is_qmatrix
-bool is_qmatrix(const NumericMatrix& x, const double tol);
-RcppExport SEXP _cvalr_is_qmatrix(SEXP xSEXP, SEXP tolSEXP) {
+// is_exqmatrix
+bool is_exqmatrix(const NumericMatrix& x, const double tol);
+RcppExport SEXP _cvalr_is_exqmatrix(SEXP xSEXP, SEXP tolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
     Rcpp::traits::input_parameter< const double >::type tol(tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(is_qmatrix(x, tol));
+    rcpp_result_gen = Rcpp::wrap(is_exqmatrix(x, tol));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -163,7 +163,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_v_multiply_binomial_coefficient", (DL_FUNC) &_cvalr_v_multiply_binomial_coefficient, 3},
     {"_cvalr_dt2adcp", (DL_FUNC) &_cvalr_dt2adcp, 2},
     {"_cvalr_adcp2epd", (DL_FUNC) &_cvalr_adcp2epd, 2},
-    {"_cvalr_is_qmatrix", (DL_FUNC) &_cvalr_is_qmatrix, 2},
+    {"_cvalr_is_exqmatrix", (DL_FUNC) &_cvalr_is_exqmatrix, 2},
     {"_cvalr_portfolio_cds_coupon", (DL_FUNC) &_cvalr_portfolio_cds_coupon, 4},
     {"_cvalr_portfolio_cds_upfront", (DL_FUNC) &_cvalr_portfolio_cds_upfront, 5},
     {"_cvalr_portfolio_cds_equation", (DL_FUNC) &_cvalr_portfolio_cds_equation, 6},

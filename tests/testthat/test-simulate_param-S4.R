@@ -38,19 +38,19 @@ test_that("`simulate_param` is working correctly for `ExMarkovParam`", {
   expect_equal(x,
     simulate_param(parm, times, method = "ExMarkovParam", n_sim = n_sim))
 
-  sample_naive <- function(n, qmatrix, times) {
-    dim <- nrow(qmatrix) - 1L
+  sample_naive <- function(n, ex_qmatrix, times) {
+    dim <- nrow(ex_qmatrix) - 1L
     tmp <- matrix(nrow = n_sim, ncol = dim)
     for (k in 1:n_sim) {
       state <- 0
       time <- 0
       while (state != dim) {
-        wt <- rexp(1, rate = -qmatrix[1+state, 1+state])
+        wt <- rexp(1, rate = -ex_qmatrix[1+state, 1+state])
         time <- time + wt
         tmp[k, (1+state):dim] <- time
         state <- state +
           sample.int(n = dim-state, size = 1, replace = FALSE,
-            prob = qmatrix[1+state, (2+state):(dim+1)])
+            prob = ex_qmatrix[1+state, (2+state):(dim+1)])
       }
     }
     out <- dt2dct(tmp, times)
@@ -62,7 +62,7 @@ test_that("`simulate_param` is working correctly for `ExMarkovParam`", {
   }
 
   set.seed(seed)
-  expect_equal(x, sample_naive(n_sim, parm@qmatrix, times))
+  expect_equal(x, sample_naive(n_sim, parm@ex_qmatrix, times))
 })
 
 

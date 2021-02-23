@@ -16,18 +16,18 @@ setReplaceMethod("setDimension", "CalibrationParam",
   })
 
 
-setMethod("getQMatrix", "ExMarkovParam",
+setMethod("getExQMatrix", "ExMarkovParam",
   function(object) {
-    object@qmatrix
+    object@ex_qmatrix
   })
 
-setReplaceMethod("setQMatrix", "ExMarkovParam",
+setReplaceMethod("setExQMatrix", "ExMarkovParam",
   function(object, value) {
-    assert_qmatrix(value, min.rows=1, min.cols=1)
+    assert_exqmatrix(value, min.rows = 1L, min.cols = 1L)
 
     dim <- nrow(value)-1
     setDimension(object) <- dim
-    object@qmatrix <- value
+    object@ex_qmatrix <- value
 
     invisible(object)
   })
@@ -45,7 +45,7 @@ setReplaceMethod("setExIntensities", "ExMOParam",
     qassert(max(value), "N1(0,)")
     setDimension(object) <- length(value)
     object@ex_intensities <- value
-    setQMatrix(object) <- rmo:::exi2exqm(value)
+    setExQMatrix(object) <- rmo:::exi2exqm(value)
 
     invisible(object)
   })

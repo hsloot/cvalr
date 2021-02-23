@@ -11,7 +11,8 @@ setValidity("CalibrationParam",
 
 setValidity("ExMarkovParam",
   function(object) {
-    assert_qmatrix(object@qmatrix, nrows=object@dim+1, ncols=object@dim+1)
+    assert_exqmatrix(object@ex_qmatrix,
+      nrows = object@dim+1L, ncols = object@dim + 1L)
 
     invisible(TRUE)
   })

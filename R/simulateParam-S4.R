@@ -37,11 +37,11 @@ setMethod("simulate_param", "ExMarkovParam",
       state <- 0
       time <- 0
       while (state != object@dim) {
-        wt <- rexp(1, rate = -object@qmatrix[1+state, 1+state])
+        wt <- rexp(1, rate = -object@ex_qmatrix[1+state, 1+state])
         time <- time + wt
         tmp[k, (1+state):object@dim] <- time
         state <- state + sample.int(n = object@dim-state, size = 1, replace = FALSE,
-                        prob = object@qmatrix[1+state, (2+state):(object@dim+1)])
+                        prob = object@ex_qmatrix[1+state, (2+state):(object@dim+1)])
       }
     }
     out <- dt2adcp(tmp, times)

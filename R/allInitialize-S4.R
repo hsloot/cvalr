@@ -3,8 +3,8 @@ NULL
 
 setMethod("initialize", "ExMarkovParam",
   function(.Object, # nolint
-      qmatrix = 0.1 * 0.5 * matrix(c(-3, 0, 0, 2, -2, 0, 1, 2, 0), nrow=3, ncol=3)) {
-    setQMatrix(.Object) <- qmatrix
+      ex_qmatrix = 0.1 * 0.5 * matrix(c(-3, 0, 0, 2, -2, 0, 1, 2, 0), nrow=3, ncol=3)) {
+    setExQMatrix(.Object) <- ex_qmatrix
     validObject(.Object)
 
     invisible(.Object)
