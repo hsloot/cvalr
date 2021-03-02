@@ -22,15 +22,36 @@ simulate_param(object, times, ...)
 
 expected_value(object, times, g, ...)
 
-\S4method{expected_value}{CalibrationParam}(object, times, g, ..., pd_args = NULL)
+\S4method{expected_value}{CalibrationParam}(
+  object,
+  times,
+  g,
+  ...,
+  method = c("default", "CalibrationParam"),
+  pd_args = NULL
+)
 
 expected_pcds_loss(object, times, recovery_rate, ...)
 
-\S4method{expected_pcds_loss}{CalibrationParam}(object, times, recovery_rate, ...)
+\S4method{expected_pcds_loss}{CalibrationParam}(
+  object,
+  times,
+  recovery_rate,
+  ...,
+  method = c("default", "CalibrationParam")
+)
 
 expected_cdo_loss(object, times, recovery_rate, lower, upper, ...)
 
-\S4method{expected_cdo_loss}{CalibrationParam}(object, times, recovery_rate, lower, upper, ...)
+\S4method{expected_cdo_loss}{CalibrationParam}(
+  object,
+  times,
+  recovery_rate,
+  lower,
+  upper,
+  ...,
+  method = c("default", "CalibrationParam")
+)
 
 expected_pcds_equation(
   object,
@@ -86,6 +107,9 @@ probability_distribution(object, times, ...)
 \item{...}{Pass-through parameter.}
 
 \item{g}{Transformation function.}
+
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
 
 \item{pd_args}{Parameter for \code{\link[=probability_distribution]{probability_distribution()}}.}
 

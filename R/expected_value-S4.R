@@ -30,6 +30,8 @@ setGeneric("expected_value",
 #' @rdname CalibrationParam-class
 #' @aliases expected_value,CalibrationParam-method
 #'
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #' @param pd_args Parameter for [probability_distribution()].
 #'
 #' @examples
@@ -49,7 +51,9 @@ setGeneric("expected_value",
 #' @importFrom checkmate qassert assert_function assert_list
 #' @export
 setMethod("expected_value", "CalibrationParam",
-  function(object, times, g, ..., pd_args = NULL) {
+  function(object, times, g, ...,
+      method = c("default", "CalibrationParam"), pd_args = NULL) {
+    method <- match.arg(method)
     qassert(times, "N+[0,)")
     assert_function(g)
     assert_list(pd_args, null.ok = TRUE)
@@ -76,6 +80,9 @@ setGeneric("expected_pcds_loss",
 #' @rdname CalibrationParam-class
 #' @aliases expected_pcds_loss,CalibrationParam-method
 #'
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
 #' @examples
 #' expected_pcds_loss(CuadrasAugeExtMO2FParam(
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
@@ -89,7 +96,9 @@ setGeneric("expected_pcds_loss",
 #' @importFrom checkmate qassert
 #' @export
 setMethod("expected_pcds_loss", "CalibrationParam",
-  function(object, times, recovery_rate, ...) {
+  function(object, times, recovery_rate, ...,
+      method = c("default", "CalibrationParam")) {
+    method <- match.arg(method)
     qassert(recovery_rate, "N1[0,1]")
     g <- function(k, recovery_rate) {
       (1 - recovery_rate) * k
@@ -219,6 +228,9 @@ setGeneric("expected_cdo_loss",
 #' @rdname CalibrationParam-class
 #' @aliases expected_cdo_loss,CalibrationParam-method
 #'
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
 #' @examples
 #' expected_cdo_loss(CuadrasAugeExtMO2FParam(
 #'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4, 0.1, 0.2)
@@ -232,7 +244,9 @@ setGeneric("expected_cdo_loss",
 #' @importFrom checkmate qassert assert_numeric
 #' @export
 setMethod("expected_cdo_loss", "CalibrationParam",
-  function(object, times, recovery_rate, lower, upper, ...) {
+  function(object, times, recovery_rate, lower, upper, ...,
+      method = c("default", "CalibrationParam")) {
+    method <- match.arg(method)
     qassert(recovery_rate, "N1[0,1]")
     qassert(lower, "N1[0,1]")
     assert_numeric(upper, lower = lower, upper = 1)

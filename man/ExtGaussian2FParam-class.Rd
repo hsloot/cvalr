@@ -16,7 +16,13 @@
 \usage{
 \S4method{initialize}{ExtGaussian2FParam}(.Object, dim = 2, lambda = 0.1, nu = 0.5, rho = NULL, tau = NULL)
 
-\S4method{simulate_param}{ExtGaussian2FParam}(object, times, ..., n_sim = 10000)
+\S4method{simulate_param}{ExtGaussian2FParam}(
+  object,
+  times,
+  ...,
+  method = c("default", "ExtGaussian2FParam"),
+  n_sim = 10000
+)
 
 \S4method{expected_pcds_loss}{ExtGaussian2FParam}(
   object,
@@ -63,12 +69,12 @@
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
 
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
+
 \item{n_sim}{Number of samples.}
 
 \item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
-
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
 
 \item{lower}{Lower attachment point of the CDO tranche.}
 

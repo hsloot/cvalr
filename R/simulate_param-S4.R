@@ -23,6 +23,8 @@ setGeneric("simulate_param",
 #' @aliases simulate_param,ExMarkovParam-method
 #'
 #' @inheritParams simulate_param
+#' @param method Simulation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #' @param n_sim Number of samples.
 #'
 #' @examples
@@ -31,7 +33,9 @@ setGeneric("simulate_param",
 #' @importFrom stats rexp
 #' @export
 setMethod("simulate_param", "ExMarkovParam",
-  function(object, times, ..., n_sim = 1e4) {
+  function(object, times, ...,
+      method = c("default", "ExMarkovParam"), n_sim = 1e4) {
+    method <- match.arg(method)
     tmp <- matrix(nrow = n_sim, ncol = object@dim)
     for (k in 1:n_sim) {
       state <- 0
@@ -90,6 +94,8 @@ setMethod("simulate_param", "ExMOParam",
 #' @aliases simulate_param,ExtGaussian2FParam-method
 #'
 #' @inheritParams simulate_param
+#' @param method Simulation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #' @param n_sim Number of samples.
 #'
 #' @examples
@@ -98,7 +104,9 @@ setMethod("simulate_param", "ExMOParam",
 #' @importFrom stats qexp
 #' @importFrom copula normalCopula rCopula
 setMethod("simulate_param", "ExtGaussian2FParam",
-  function(object, times, ..., n_sim = 1e4) {
+  function(object, times, ...,
+      method = c("default", "ExtGaussian2FParam"), n_sim = 1e4) {
+    method <- match.arg(method)
     tmp <- qexp(
       rCopula(
         n_sim,
@@ -118,6 +126,8 @@ setMethod("simulate_param", "ExtGaussian2FParam",
 #' @aliases simulate_param,ExtArch2FParam-method
 #'
 #' @inheritParams simulate_param
+#' @param method Simulation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #' @param n_sim Number of samples.
 #'
 #' @examples
@@ -126,7 +136,9 @@ setMethod("simulate_param", "ExtGaussian2FParam",
 #' @importFrom stats qexp
 #' @importFrom copula rCopula
 setMethod("simulate_param", "ExtArch2FParam",
-  function(object, times, ..., n_sim = 1e4) {
+  function(object, times, ...,
+      method = c("default", "ExtArch2fParam"), n_sim = 1e4) {
+    method <- match.arg(method)
     tmp <- qexp(
       rCopula(n_sim, object@copula),
       rate = object@lambda, lower.tail = FALSE

@@ -4,6 +4,7 @@
 \docType{class}
 \name{ExtArch2FParam-class}
 \alias{ExtArch2FParam-class}
+\alias{ExtArch2FParam}
 \alias{ClaytonExtArch2FParam-class}
 \alias{ClaytonExtArch2FParam}
 \alias{FrankExtArch2FParam-class}
@@ -50,7 +51,13 @@
 
 \S4method{initialize}{JoeExtArch2FParam}(.Object, ...)
 
-\S4method{simulate_param}{ExtArch2FParam}(object, times, ..., n_sim = 10000)
+\S4method{simulate_param}{ExtArch2FParam}(
+  object,
+  times,
+  ...,
+  method = c("default", "ExtArch2fParam"),
+  n_sim = 10000
+)
 
 \S4method{expected_pcds_loss}{FrankExtArch2FParam}(
   object,
@@ -82,12 +89,12 @@
 
 \item{times}{Point-in-time.}
 
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
+
 \item{n_sim}{Number of samples.}
 
 \item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
-
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
 }
 \description{
 Calibration parameter classes with two parameters for the extendible

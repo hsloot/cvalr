@@ -17,9 +17,22 @@
   ex_qmatrix = 0.1 * 0.5 * matrix(c(-3, 0, 0, 2, -2, 0, 1, 2, 0), nrow = 3, ncol = 3)
 )
 
-\S4method{simulate_param}{ExMarkovParam}(object, times, ..., n_sim = 10000)
+\S4method{simulate_param}{ExMarkovParam}(
+  object,
+  times,
+  ...,
+  method = c("default", "ExMarkovParam"),
+  n_sim = 10000
+)
 
-\S4method{probability_distribution}{CalibrationParam}(object, times, ..., seed = NULL, sim_args = NULL)
+\S4method{probability_distribution}{CalibrationParam}(
+  object,
+  times,
+  ...,
+  method = c("default", "CalibrationParam"),
+  seed = NULL,
+  sim_args = NULL
+)
 
 \S4method{probability_distribution}{ExMarkovParam}(
   object,
@@ -40,15 +53,15 @@
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
 
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
+
 \item{n_sim}{Number of samples.}
 
 \item{seed}{Numeric number (if not NULL, is used to set the seed prior to
 Monte-Carlo estimation of probability distribution).}
 
 \item{sim_args}{List with pass-through parameters for \code{\link[=simulate_param]{simulate_param()}}.}
-
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
 }
 \description{
 Calibration parameter class for the general exchangeable model with a

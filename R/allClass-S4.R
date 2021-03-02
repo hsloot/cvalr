@@ -240,8 +240,10 @@ ExtGaussian2FParam <- setClass("ExtGaussian2FParam", # nolint
 #' one-to-one mapping to the model-specific parameter `nu`.
 #'
 #' @importFrom copula iTau iRho tau rho frankCopula iPsi
-setClass("ExtArch2FParam", # nolint
-  contains = c("CalibrationParam", "VIRTUAL"),
+#'
+#' @export ExtArch2FParam
+ExtArch2FParam <- setClass("ExtArch2FParam", # nolint
+  contains = "CalibrationParam",
   slots = c(lambda = "numeric", nu = "numeric", copula = "archmCopula"))
 
 

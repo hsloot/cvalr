@@ -27,6 +27,8 @@ setGeneric("probability_distribution",
 #' @aliases probability_distribution,CalibrationParam-method
 #'
 #' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
 #' @param seed Numeric number (if not NULL, is used to set the seed prior to
 #'   Monte-Carlo estimation of probability distribution).
 #' @param sim_args List with pass-through parameters for [simulate_param()].
@@ -34,7 +36,9 @@ setGeneric("probability_distribution",
 #' @importFrom checkmate qassert assert_number assert_list
 #' @export
 setMethod("probability_distribution", "CalibrationParam",
-  function(object, times, ..., seed = NULL, sim_args = NULL) {
+  function(object, times, ...,
+      method = c("default", "CalibrationParam"), seed = NULL, sim_args = NULL) {
+    method <- match.arg(method)
     qassert(times, "N+[0,)")
     assert_number(seed, lower = 0, finite = TRUE, null.ok = TRUE)
     assert_list(sim_args, null.ok = TRUE)
@@ -73,7 +77,8 @@ setMethod("probability_distribution", "CalibrationParam",
 #' @importFrom checkmate qassert
 #' @export
 setMethod("probability_distribution", "ExMarkovParam",
-  function(object, times, ..., method = c("default", "ExMarkovParam", "CalibrationParam")) {
+  function(object, times, ...,
+      method = c("default", "ExMarkovParam", "CalibrationParam")) {
     method <- match.arg(method)
     if (isTRUE("default" == method)) {
       method <- "ExMarkovParam"
@@ -104,7 +109,8 @@ setMethod("probability_distribution", "ExMarkovParam",
 #' @importFrom checkmate qassert
 #' @export
 setMethod("probability_distribution", "ExtGaussian2FParam",
-  function(object, times, ..., method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
+  function(object, times, ...,
+      method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
     method <- match.arg(method)
     if (isTRUE("default" == method)) {
       method <- "ExtGaussian2FParam"
