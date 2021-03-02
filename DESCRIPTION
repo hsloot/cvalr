@@ -46,3 +46,4 @@ Collate:
     'simulate_param-S4.R'
     'expected_value-S4.R'
     'probability_distribution-S4.R'
+Remotes: github::hsloot/rmo
