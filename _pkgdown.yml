@@ -1,0 +1,28 @@
+destination: docs
+
+reference:
+- title: Package
+  desc: ~
+  contents: "`cvalr`"
+
+- title: Calibration parameter classes
+  desc: ~
+  contents:
+  - matches("Param")
+
+- title: Probability distribution function / Expected value
+  desc: ~
+  contents:
+  - matches("^probability_distribution$")
+  - matches("^expected_value$")
+  - matches("^expected_[a-z]+_loss$")
+  - matches("^expected_[a-z]+_equation$")
+
+- title: Credit derivative pricing functions
+  desc: ~
+  contents:
+  - matches("^(portfolio_cds|cdo)_(coupon|upfront|equation)$")
+
+- title: Simulate from calibration parameter
+  desc: ~
+  contents:  matches("^simulate_param$")

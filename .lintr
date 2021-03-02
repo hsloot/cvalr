@@ -2,7 +2,7 @@ linters: with_defaults(
     infix_spaces_linter = NULL,
     line_length_linter = line_length_linter(100)
   )
-exclusions: list("R/RcppExports.R")
+exclusions: list("R/RcppExports.R", "inst/Rsource/calibration.R", "inst/Rsource/isda.R", "inst/Rsource/stochastic_calibration.R")
 exclude: "# nolint"
 exclude_start: "# nolint start"
 exclude_end: "# nolint end"

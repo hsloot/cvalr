@@ -58,7 +58,8 @@ test_that("Portfolio CDS equation is calculated correctly", {
 lower <- 0.03
 upper <- 0.1
 rho <- 0.1
-expected_losses <- cdo_tranche_expected_loss_gaussian(times, lambda, rho, lower, upper, recovery_rate)
+expected_losses <- cdo_tranche_expected_loss_gaussian(
+  times, lambda, rho, lower, upper, recovery_rate)
 expected_nominals <- upper - lower - expected_losses
 
 test_that("CDO upfront payment is calculated correctly", {

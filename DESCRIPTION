@@ -13,13 +13,37 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Depends:
+    R (>= 3.0.2)
+Imports:
+    Rcpp,
+    rmo (>= 0.5.0),
+    expm,
+    methods,
+    mvtnorm,
+    copula,
+    checkmate,
+    waldo
+LinkingTo:
+    Rcpp,
+    rmo
 Suggests:
     testthat (>= 3.0.0),
     covr,
-    rmarkdown,
-    mvtnorm
+    rmarkdown
 Config/testthat/edition: 3
-LinkingTo: 
-    Rcpp
-Imports: 
-    Rcpp
+Collate:
+    'RcppExports.R'
+    'allClass-S4.R'
+    'allGeneric-S4.R'
+    'checkmate.R'
+    'allGetSet-S4.R'
+    'allInitialize-S4.R'
+    'allMethod-S4.R'
+    'allValidity-S4.R'
+    'cvalr-package.R'
+    'utils.R'
+    'simulate_param-S4.R'
+    'expected_value-S4.R'
+    'probability_distribution-S4.R'
+Remotes: github::hsloot/rmo
