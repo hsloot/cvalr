@@ -38,18 +38,19 @@
   nu = 1,
   rho = NULL,
   tau = NULL,
+  survival = TRUE,
   family = c("clayton", "frank", "amh", "gumbel", "joe")
 )
 
-\S4method{initialize}{ClaytonExtArch2FParam}(.Object, ...)
+\S4method{initialize}{ClaytonExtArch2FParam}(.Object, ..., survival = FALSE)
 
-\S4method{initialize}{FrankExtArch2FParam}(.Object, ...)
+\S4method{initialize}{FrankExtArch2FParam}(.Object, ..., survival = TRUE)
 
-\S4method{initialize}{GumbelExtArch2FParam}(.Object, ...)
+\S4method{initialize}{GumbelExtArch2FParam}(.Object, ..., survival = TRUE)
 
-\S4method{initialize}{AmhExtArch2FParam}(.Object, ...)
+\S4method{initialize}{AmhExtArch2FParam}(.Object, ..., survival = TRUE)
 
-\S4method{initialize}{JoeExtArch2FParam}(.Object, ...)
+\S4method{initialize}{JoeExtArch2FParam}(.Object, ..., survival = TRUE)
 
 \S4method{simulate_param}{ExtArch2FParam}(
   object,
@@ -79,6 +80,8 @@
 \item{rho}{Spearman's Rho.}
 
 \item{tau}{Kendall's Tau.}
+
+\item{survival}{Flag if survival copula is specified (default, except for Clayton)}
 
 \item{family}{Name of the Archimedean copula family
 (see \link[copula:archmCopula-class]{copula::archmCopula}).}

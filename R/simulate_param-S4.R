@@ -141,7 +141,7 @@ setMethod("simulate_param", "ExtArch2FParam",
     method <- match.arg(method)
     tmp <- qexp(
       rCopula(n_sim, object@copula),
-      rate = object@lambda, lower.tail = FALSE
+      rate = object@lambda, lower.tail = !object@survival
     )
     out <- dt2adcp(tmp, times)
 

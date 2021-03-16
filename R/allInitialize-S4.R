@@ -154,6 +154,7 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 #' @param nu Dependence parameter (see [copula::archmCopula-class]).
 #' @param rho Spearman's Rho.
 #' @param tau Kendall's Tau.
+#' @param survival Flag if survival copula is specified (default, except for Clayton)
 #' @param family Name of the Archimedean copula family
 #'   (see [copula::archmCopula-class]).
 #'
@@ -165,8 +166,10 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 setMethod("initialize", "ExtArch2FParam",
   function(.Object, # nolint
       dim = 2, lambda = 0.1, nu = 1, rho = NULL, tau = NULL,
+      survival = TRUE,
       family = c("clayton", "frank", "amh", "gumbel", "joe")) {
     family <- match.arg(family)
+    .Object@survival <- survival
     .Object@copula <- archmCopula(family = family)
     if (missing(nu)) {
       if (!is.null(rho)) {
@@ -196,8 +199,8 @@ setMethod("initialize", "ExtArch2FParam",
 #' ClaytonExtArch2FParam(lambda = 8e-2, rho = 4e-1)
 #' ClaytonExtArch2FParam(lambda = 8e-2, tau = 4e-1)
 setMethod("initialize", "ClaytonExtArch2FParam",
-  function(.Object, ...) { # nolint
-    invisible(callNextMethod(.Object, ..., family = "clayton"))
+  function(.Object, ..., survival = FALSE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "clayton"))
   })
 
 #' @describeIn ExtArch2FParam-class Constructor
@@ -212,8 +215,8 @@ setMethod("initialize", "ClaytonExtArch2FParam",
 #' FrankExtArch2FParam(lambda = 8e-2, rho = 4e-1)
 #' FrankExtArch2FParam(lambda = 8e-2, tau = 4e-1)
 setMethod("initialize", "FrankExtArch2FParam",
-  function(.Object, ...) { # nolint
-    invisible(callNextMethod(.Object, ..., family = "frank"))
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "frank"))
   })
 
 #' @describeIn ExtArch2FParam-class Constructor
@@ -228,8 +231,8 @@ setMethod("initialize", "FrankExtArch2FParam",
 #' GumbelExtArch2FParam(lambda = 8e-2, rho = 4e-1)
 #' GumbelExtArch2FParam(lambda = 8e-2, tau = 4e-1)
 setMethod("initialize", "GumbelExtArch2FParam",
-  function(.Object, ...) { # nolint
-    invisible(callNextMethod(.Object, ..., family = "gumbel"))
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "gumbel"))
   })
 
 #' @describeIn ExtArch2FParam-class Constructor
@@ -244,8 +247,8 @@ setMethod("initialize", "GumbelExtArch2FParam",
 #' AmhExtArch2FParam(lambda = 8e-2, rho = 4e-1)
 #' AmhExtArch2FParam(lambda = 8e-2, tau = 4e-1)
 setMethod("initialize", "AmhExtArch2FParam",
-  function(.Object, ...) { # nolint
-    invisible(callNextMethod(.Object, ..., family = "amh"))
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "amh"))
   })
 
 #' @describeIn ExtArch2FParam-class Constructor
@@ -259,6 +262,6 @@ setMethod("initialize", "AmhExtArch2FParam",
 #' JoeExtArch2FParam()
 #' JoeExtArch2FParam(lambda = 8e-2, tau = 4e-1)
 setMethod("initialize", "JoeExtArch2FParam",
-  function(.Object, ...) { # nolint
-    invisible(callNextMethod(.Object, ..., family = "joe"))
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "joe"))
   })

@@ -244,7 +244,8 @@ ExtGaussian2FParam <- setClass("ExtGaussian2FParam", # nolint
 #' @export ExtArch2FParam
 ExtArch2FParam <- setClass("ExtArch2FParam", # nolint
   contains = "CalibrationParam",
-  slots = c(lambda = "numeric", nu = "numeric", copula = "archmCopula"))
+  slots = c(lambda = "numeric", nu = "numeric", survival = "logical",
+    copula = "archmCopula"))
 
 
 #' @rdname ExtArch2FParam-class
@@ -252,7 +253,8 @@ ExtArch2FParam <- setClass("ExtArch2FParam", # nolint
 #' @export ClaytonExtArch2FParam
 ClaytonExtArch2FParam <- setClass("ClaytonExtArch2FParam", # nolint
   contains = "ExtArch2FParam",
-  slots = c(lambda = "numeric", nu = "numeric", copula = "claytonCopula"))
+  slots = c(lambda = "numeric", nu = "numeric", survival = "logical",
+    copula = "claytonCopula"))
 
 #' @rdname ExtArch2FParam-class
 #'
@@ -266,18 +268,21 @@ FrankExtArch2FParam <- setClass("FrankExtArch2FParam", # nolint
 #' @export GumbelExtArch2FParam
 GumbelExtArch2FParam <- setClass("GumbelExtArch2FParam", # nolint
   contains = "ExtArch2FParam",
-  slots = c(lambda = "numeric", nu = "numeric", copula = "gumbelCopula"))
+  slots = c(lambda = "numeric", nu = "numeric", survival = "logical",
+    copula = "gumbelCopula"))
 
 #' @rdname ExtArch2FParam-class
 #'
 #' @export AmhExtArch2FParam
 AmhExtArch2FParam <- setClass("AmhExtArch2FParam", # nolint
   contains = "ExtArch2FParam",
-  slots = c(lambda = "numeric", nu = "numeric", copula = "amhCopula"))
+  slots = c(lambda = "numeric", nu = "numeric", survival = "logical",
+    copula = "amhCopula"))
 
 #' @rdname ExtArch2FParam-class
 #'
 #' @export JoeExtArch2FParam
 JoeExtArch2FParam <- setClass("JoeExtArch2FParam", # nolint
   contains = "ExtArch2FParam",
-  slots = c(lambda = "numeric", nu = "numeric", copula = "joeCopula"))
+  slots = c(lambda = "numeric", nu = "numeric", survival = "logical",
+    copula = "joeCopula"))

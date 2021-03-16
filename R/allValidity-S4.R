@@ -119,6 +119,7 @@ setValidity("ExtArch2FParam",
   function(object) {
     qassert(object@lambda, "N1(0,)")
     qassert(object@nu, "N1")
+    qassert(object@survival, "B1")
     assert_true(object@dim == object@copula@dimension)
     assert_true(object@nu == getTheta(object@copula))
 
