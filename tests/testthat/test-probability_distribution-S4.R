@@ -1,6 +1,6 @@
 times <- seq(0, 5, by = 0.25)
 
-dim = 50L
+dim <- 50L
 lambda <- 8e-2
 rho <- 4e-1
 
@@ -70,7 +70,7 @@ test_that("`probability_distribution` works as expected for `ExMarkovParam`", {
 })
 
 
-test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`", {
+test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`", { # nolint
   parm <- ExtGaussian2FParam(dim = dim, lambda = lambda, rho = rho)
 
   x <- probability_distribution(parm, times)

@@ -17,15 +17,7 @@
 \alias{expected_pcds_loss,ExtMO2FParam-method}
 \title{Two-factor extendible Marshall--Olkin calibration parameter classes}
 \usage{
-\S4method{initialize}{ExtMO2FParam}(
-  .Object,
-  dim = 2,
-  lambda = 0.1,
-  nu = 0.5,
-  rho = NULL,
-  tau = NULL,
-  alpha = NULL
-)
+\S4method{initialize}{ExtMO2FParam}(.Object, dim, lambda, nu, rho = NULL, tau = NULL, alpha = NULL)
 
 \S4method{expected_pcds_loss}{ExtMO2FParam}(
   object,
@@ -141,9 +133,9 @@ CuadrasAugeExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 AlphaStableExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 PoissonExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 ExponentialExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
+expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
   times = 0.25, recovery_rate = 0.4)
-expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
+expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 
 }

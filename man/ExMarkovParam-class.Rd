@@ -12,10 +12,7 @@
 \alias{probability_distribution,ExMarkovParam-method}
 \title{Exchangeable Markovian calibration parameter}
 \usage{
-\S4method{initialize}{ExMarkovParam}(
-  .Object,
-  ex_qmatrix = 0.1 * 0.5 * matrix(c(-3, 0, 0, 2, -2, 0, 1, 2, 0), nrow = 3, ncol = 3)
-)
+\S4method{initialize}{ExMarkovParam}(.Object, ex_qmatrix)
 
 \S4method{simulate_param}{ExMarkovParam}(
   object,
@@ -102,15 +99,19 @@ ExMarkovParam(
  ex_qmatrix = matrix(
    c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
    nrow = 3L, ncol = 3L))
-simulate_param(ExMarkovParam(), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+parm <- ExMarkovParam(
+ ex_qmatrix = matrix(
+   c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
+   nrow = 3L, ncol = 3L))
+simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 
 probability_distribution(CuadrasAugeExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
 probability_distribution(AlphaStableExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
 probability_distribution(PoissonExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
 probability_distribution(ExponentialExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
 
 }

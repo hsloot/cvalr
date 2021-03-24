@@ -14,7 +14,7 @@
 \alias{probability_distribution,ExtGaussian2FParam-method}
 \title{Two-factor extendible Gaussian calibration parameter classes}
 \usage{
-\S4method{initialize}{ExtGaussian2FParam}(.Object, dim = 2, lambda = 0.1, nu = 0.5, rho = NULL, tau = NULL)
+\S4method{initialize}{ExtGaussian2FParam}(.Object, dim, lambda, nu, rho = NULL, tau = NULL)
 
 \S4method{simulate_param}{ExtGaussian2FParam}(
   object,
@@ -124,11 +124,12 @@ and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 
 \examples{
 ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-simulate_param(ExtGaussian2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+parm <- ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 
-expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4)
-expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 
 expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
@@ -137,6 +138,6 @@ expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam")
 
 probability_distribution(ExtGaussian2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
 
 }

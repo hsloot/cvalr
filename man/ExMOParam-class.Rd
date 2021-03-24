@@ -10,7 +10,7 @@
 \alias{simulate_param,ExMOParam-method}
 \title{Exchangeable Marshall--Olkin calibration parameter}
 \usage{
-\S4method{initialize}{ExMOParam}(.Object, ex_intensities = 0.1 * 0.5 * c(1, 1))
+\S4method{initialize}{ExMOParam}(.Object, ex_intensities)
 
 \S4method{simulate_param}{ExMOParam}(
   object,
@@ -72,6 +72,7 @@ and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 
 \examples{
 ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
-simulate_param(ExMOParam(), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+parm <- ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
+simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 
 }
