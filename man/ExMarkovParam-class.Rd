@@ -90,8 +90,8 @@ and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 \section{Slots}{
 
 \describe{
-\item{\code{qmatrix}}{The \eqn{(d+1) \times (d+1)} Markov-generator matrix of the
-default counting process}
+\item{\code{qmatrix}}{The \eqn{(d+1) \times (d+1)} Markov generator matrix of the
+default counting process.}
 }}
 
 \examples{

@@ -125,3 +125,62 @@ setValidity("ExtArch2FParam",
 
     invisible(TRUE)
   })
+
+
+#' @importFrom purrr map_lgl
+#' @importFrom checkmate qassert qtest assert_true
+setValidity("H2ExCalibrationParam",
+  function(object) {
+    assert_true(all(map_lgl(object@partition, ~{
+      qtest(.x, "I+(0,)")
+      })))
+    assert_true(all(1L:object@dim == unlist(object@partition)))
+
+    invisible(TRUE)
+  })
+
+#' @importFrom methods is
+#' @importFrom purrr map_lgl map2_lgl
+#' @importFrom checkmate qassert assert_true
+setValidity("H2ExMarkovParam",
+  function(object) {
+    qassert(object@fraction, "N1(0,1)")
+    assert_true(all(map_lgl(object@models, ~is(.x, getModelName(object)))))
+    assert_true(getDimension(object@models[[1]]) == getDimension(object))
+    assert_true(length(object@models) == length(object@partition) + 1L)
+    assert_true(all(map2_lgl(object@models[-1], object@partition, ~{
+      getDimension(.x) == length(.y)
+      })))
+
+    invisible(TRUE)
+  })
+
+#' @importFrom checkmate qassert
+setValidity("H2ExtMO3FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N2(0,)")
+
+    invisible(TRUE)
+  })
+
+#' @importFrom checkmate qassert
+setValidity("H2ExtGaussian3FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N2(0,)")
+
+    invisible(TRUE)
+  })
+
+#' @importFrom checkmate qassert
+setValidity("H2ExtArch3FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N2(0,)")
+    qassert(object@survival, "B1")
+    assert_true(object@dim == dim(object@copula))
+    assert_true(check_equal(object@nu, c(object@copula@copula@theta, object@copula@childCops[[1]]@copula@theta)))
+
+    invisible(TRUE)
+  })

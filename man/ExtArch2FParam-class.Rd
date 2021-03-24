@@ -39,7 +39,7 @@
   rho = NULL,
   tau = NULL,
   survival = TRUE,
-  family = c("clayton", "frank", "amh", "gumbel", "joe")
+  family = c("Clayton", "Frank", "Amh", "Gumbel", "Joe")
 )
 
 \S4method{initialize}{ClaytonExtArch2FParam}(.Object, ..., survival = FALSE)
@@ -134,14 +134,14 @@ and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 \section{Slots}{
 
 \describe{
-\item{\code{lambda}}{The marginal recovery_rate}
+\item{\code{lambda}}{The marginal rate}
 
 \item{\code{nu}}{Model specific parameter}
 }}
 
 \examples{
-ExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1, family = "gumbel")
-ExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1, family = "amh")
+ExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1, family = "Gumbel")
+ExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1, family = "Amh")
 ClaytonExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
 ClaytonExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
 FrankExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)

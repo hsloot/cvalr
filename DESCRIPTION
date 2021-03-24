@@ -23,7 +23,8 @@ Imports:
     mvtnorm,
     copula,
     checkmate,
-    waldo
+    waldo,
+    purrr
 LinkingTo:
     Rcpp,
     rmo

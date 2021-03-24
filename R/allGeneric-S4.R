@@ -99,3 +99,36 @@ setGeneric("constructBernsteinFunction",
   function(object, ...) {
     standardGeneric("constructBernsteinFunction")
   })
+
+
+setGeneric("getPartition",
+  function(object) {
+    standardGeneric("getPartition")
+  })
+setGeneric("setPartition<-",
+  function(object, value) {
+    standardGeneric("setPartition<-")
+  })
+
+setGeneric("getFraction",
+  function(object) {
+    standardGeneric("getFraction")
+  })
+setGeneric("setFraction<-",
+  function(object, value) {
+    standardGeneric("setFraction<-")
+  })
+
+setGeneric("getModelName",
+  function(object) {
+    standardGeneric("getModelName")
+  })
+
+setGeneric("getModels",
+  function(object) {
+    standardGeneric("getModels")
+  })
+setGeneric("setModels<-",
+  function(object, value) {
+    standardGeneric("setModels<-")
+  })
