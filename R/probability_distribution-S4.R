@@ -65,13 +65,13 @@ setMethod("probability_distribution", "CalibrationParam",
 #'
 #' @examples
 #' probability_distribution(CuadrasAugeExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
 #' probability_distribution(AlphaStableExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
 #' probability_distribution(PoissonExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
 #' probability_distribution(ExponentialExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
 #'
 #' @importFrom expm expm
 #' @importFrom checkmate qassert
@@ -103,7 +103,7 @@ setMethod("probability_distribution", "ExMarkovParam",
 #'
 #' @examples
 #' probability_distribution(ExtGaussian2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3)
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
 #'
 #' @importFrom stats integrate pexp pnorm dnorm qnorm
 #' @importFrom checkmate qassert

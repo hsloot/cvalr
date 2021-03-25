@@ -140,28 +140,23 @@ and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 }}
 
 \examples{
-ExtArch2FParam()
-ExtArch2FParam(lambda = 8e-2, rho = 4e-1, family = "gumbel")
-ExtArch2FParam(lambda = 8e-2, tau = 4e-1, family = "amh")
-ClaytonExtArch2FParam()
-ClaytonExtArch2FParam(lambda = 8e-2, rho = 4e-1)
-ClaytonExtArch2FParam(lambda = 8e-2, tau = 4e-1)
-FrankExtArch2FParam()
-FrankExtArch2FParam(lambda = 8e-2, rho = 4e-1)
-FrankExtArch2FParam(lambda = 8e-2, tau = 4e-1)
-GumbelExtArch2FParam()
-GumbelExtArch2FParam(lambda = 8e-2, rho = 4e-1)
-GumbelExtArch2FParam(lambda = 8e-2, tau = 4e-1)
-AmhExtArch2FParam()
-AmhExtArch2FParam(lambda = 8e-2, rho = 4e-1)
-AmhExtArch2FParam(lambda = 8e-2, tau = 4e-1)
-JoeExtArch2FParam()
-JoeExtArch2FParam(lambda = 8e-2, tau = 4e-1)
-simulate_param(FrankExtArch2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+ExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1, family = "gumbel")
+ExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1, family = "amh")
+ClaytonExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
+ClaytonExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+FrankExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
+FrankExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+GumbelExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
+GumbelExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+AmhExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
+AmhExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+JoeExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+parm <- FrankExtArch2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 
-expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+expected_pcds_loss(FrankExtArch2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4)
-expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+expected_pcds_loss(FrankExtArch2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 
 }

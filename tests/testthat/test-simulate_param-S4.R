@@ -1,6 +1,6 @@
 times <- seq(0, 5, by = 0.25)
 
-dim = 50L
+dim <- 50L
 lambda <- 8e-2
 rho <- 4e-1
 
@@ -9,8 +9,8 @@ n_sim <- 1e2
 
 dt2dct <- function(x, times) {
   out <- matrix(nrow = nrow(x), ncol = length(times))
-  for (k in 1:nrow(out)) {
-    for (j in 1:ncol(out)) {
+  for (k in seq_len(nrow(out))) {
+    for (j in seq_len(ncol(out))) {
       out[k, j] <- mean(x[k, ] <= times[j])
     }
   }

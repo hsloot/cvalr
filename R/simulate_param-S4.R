@@ -28,7 +28,11 @@ setGeneric("simulate_param",
 #' @param n_sim Number of samples.
 #'
 #' @examples
-#' simulate_param(ExMarkovParam(), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+#' parm <- ExMarkovParam(
+#'  ex_qmatrix = matrix(
+#'    c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
+#'    nrow = 3L, ncol = 3L))
+#' simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 #'
 #' @importFrom stats rexp
 #' @export
@@ -65,7 +69,8 @@ setMethod("simulate_param", "ExMarkovParam",
 #' @param n_sim Number of samples.
 #'
 #' @examples
-#' simulate_param(ExMOParam(), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+#' parm <- ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
+#' simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 #'
 #' @importFrom rmo rexmo_markovian
 #' @export
@@ -99,7 +104,8 @@ setMethod("simulate_param", "ExMOParam",
 #' @param n_sim Number of samples.
 #'
 #' @examples
-#' simulate_param(ExtGaussian2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+#' parm <- ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+#' simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 #'
 #' @importFrom stats qexp
 #' @importFrom copula normalCopula rCopula
@@ -131,7 +137,8 @@ setMethod("simulate_param", "ExtGaussian2FParam",
 #' @param n_sim Number of samples.
 #'
 #' @examples
-#' simulate_param(FrankExtArch2FParam(dim = 5), 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+#' parm <- FrankExtArch2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
 #'
 #' @importFrom stats qexp
 #' @importFrom copula rCopula

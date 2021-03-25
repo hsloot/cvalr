@@ -193,26 +193,26 @@ i.e. the values
 
 \examples{
 expected_value(CuadrasAugeExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
 expected_value(AlphaStableExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
 expected_value(PoissonExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
 expected_value(ExponentialExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
 
 expected_pcds_loss(CuadrasAugeExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
 expected_pcds_loss(AlphaStableExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
 expected_pcds_loss(PoissonExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
 expected_pcds_loss(ExponentialExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
 
 expected_cdo_loss(CuadrasAugeExtMO2FParam(
   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4, 0.1, 0.2)

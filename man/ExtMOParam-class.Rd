@@ -8,13 +8,7 @@
 \alias{initialize,ExtMOParam,ANY-method}
 \title{Extendible Marshall--Olkin calibration parameter}
 \usage{
-\S4method{initialize}{ExtMOParam}(
-  .Object,
-  dim = 2L,
-  bf = ScaledBernsteinFunction(scale = 0.05, original = SumOfBernsteinFunctions(first =
-    ConstantBernsteinFunction(constant = 0.5), second = LinearBernsteinFunction(scale =
-    0.5)))
-)
+\S4method{initialize}{ExtMOParam}(.Object, dim, bf)
 }
 \arguments{
 \item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}

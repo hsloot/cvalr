@@ -7,7 +7,8 @@ ex_intensities <- lambda * c(2 * (1 - alpha), alpha)
 ex_qmatrix <- matrix(
   c(
     - (ex_intensities[[1]]+ex_intensities[[2]]), ex_intensities[[1]], ex_intensities[[2]],
-    0, - (0.5 * ex_intensities[[1]] + ex_intensities[[2]]), (0.5 * ex_intensities[[1]] + ex_intensities[[2]]),
+    0, - (0.5 * ex_intensities[[1]] + ex_intensities[[2]]),
+      (0.5 * ex_intensities[[1]] + ex_intensities[[2]]),
     0, 0, 0
   ),
   nrow = 3, ncol = 3, byrow = TRUE
@@ -30,7 +31,7 @@ test_that("Biv. ExMOParam is initialized correctly", {
 
 test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
   nu <- alpha
-  parm <- CuadrasAugeExtMO2FParam(dim = 2L)
+  parm <- CuadrasAugeExtMO2FParam(dim = 2L, lambda = 5e-2, rho = 5e-1)
   setLambda(parm) <- lambda
   setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
@@ -73,7 +74,7 @@ test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
 
 test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
   nu <- log2(2 - alpha)
-  parm <- AlphaStableExtMO2FParam(dim = 2L)
+  parm <- AlphaStableExtMO2FParam(dim = 2L, lambda = 5e-2, rho = 5e-1)
   setLambda(parm) <- lambda
   setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
@@ -114,7 +115,7 @@ test_that("Biv. AlphaStableExtMO2FParam is initialized correctly", {
 
 test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
   nu <- -log(1 - sqrt(alpha))
-  parm <- PoissonExtMO2FParam(dim = 2L)
+  parm <- PoissonExtMO2FParam(dim = 2L, lambda = 5e-2, rho = 5e-1)
   setLambda(parm) <- lambda
   setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)
@@ -157,7 +158,7 @@ test_that("Biv. PoissonExtMO2FParam is initialized correctly", {
 
 test_that("Biv. ExponentialExtMO2FParam is initialized correctly", {
   nu <- 0.5 * (-3 + sqrt(1 + 8 / alpha))
-  parm <- ExponentialExtMO2FParam(dim = 2L)
+  parm <- ExponentialExtMO2FParam(dim = 2L, lambda = 5e-2, rho = 5e-1)
   setLambda(parm) <- lambda
   setNu(parm) <- nu
   expect_equal(getDimension(parm), 2L)

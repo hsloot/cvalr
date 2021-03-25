@@ -36,16 +36,16 @@ setGeneric("expected_value",
 #'
 #' @examples
 #' expected_value(CuadrasAugeExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
 #'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
 #' expected_value(AlphaStableExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
 #'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
 #' expected_value(PoissonExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
 #'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
 #' expected_value(ExponentialExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3,
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
 #'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
 #'
 #' @importFrom checkmate qassert assert_function assert_list
@@ -85,13 +85,13 @@ setGeneric("expected_pcds_loss",
 #'
 #' @examples
 #' expected_pcds_loss(CuadrasAugeExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
 #' expected_pcds_loss(AlphaStableExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
 #' expected_pcds_loss(PoissonExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
 #' expected_pcds_loss(ExponentialExtMO2FParam(
-#'   dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4)
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
 #'
 #' @importFrom checkmate qassert
 #' @export
@@ -116,9 +116,9 @@ setMethod("expected_pcds_loss", "CalibrationParam",
 #'   class whose implementation should be used).
 #'
 #' @examples
-#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
+#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
 #'   times = 0.25, recovery_rate = 0.4)
-#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.4),
+#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
 #'   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 #'
 #' @importFrom stats pexp
@@ -151,9 +151,9 @@ setMethod("expected_pcds_loss", "ExtMO2FParam",
 #'   class whose implementation should be used).
 #'
 #' @examples
-#' expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#' expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
 #'   times = 0.25, recovery_rate = 0.4)
-#' expected_pcds_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#' expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
 #'   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 #'
 #' @importFrom stats pexp
@@ -186,9 +186,9 @@ setMethod("expected_pcds_loss", "ExtGaussian2FParam",
 #'   class whose implementation should be used).
 #'
 #' @examples
-#' expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#' expected_pcds_loss(FrankExtArch2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
 #'   times = 0.25, recovery_rate = 0.4)
-#' expected_pcds_loss(FrankExtArch2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#' expected_pcds_loss(FrankExtArch2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
 #'   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
 #'
 #' @importFrom stats pexp

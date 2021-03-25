@@ -1,6 +1,6 @@
 times <- seq(0, 5, by = 0.25)
 
-dim = 50L
+dim <- 50L
 lambda <- 8e-2
 rho <- 4e-1
 
