@@ -15,8 +15,12 @@ tau <- alpha / (2 - alpha)
 
 alpha0 <- rep_last(c(alpha[[1]], diff(alpha)) / c(fraction, 1 - fraction),
                     n = length(partition))
-rho0 <- purrr::map_dbl(alpha0, ~{ 3 * .x / (4 - .x) })
-tau0 <- purrr::map_dbl(alpha0, ~{ .x / (2 - .x) })
+rho0 <- purrr::map_dbl(alpha0, ~{
+  3 * .x / (4 - .x)
+  })
+tau0 <- purrr::map_dbl(alpha0, ~{
+  .x / (2 - .x)
+  })
 
 ex_qmatrix_models <- purrr::map2(c(length(unlist(partition)), purrr::map_int(partition, length)),
                               alpha0, ~{
@@ -33,8 +37,9 @@ test_that("H2ExMarkovParam is initialized correctly", {
     })
 })
 
-ex_intensities_models <- purrr::map2(c(length(unlist(partition)), purrr::map_int(partition, length)),
-                              alpha0, ~{
+ex_intensities_models <- purrr::map2(
+  c(length(unlist(partition)), purrr::map_int(partition, length)),
+  alpha0, ~{
     as(new("AlphaStableExtMO2FParam", dim = .x, lambda = lambda, alpha = .y), "ExMOParam")
   })
 

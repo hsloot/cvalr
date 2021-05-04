@@ -31,7 +31,7 @@ setGeneric("probability_distribution",
 #'   class whose implementation should be used).
 #' @param seed Numeric number (if not NULL, is used to set the seed prior to
 #'   Monte-Carlo estimation of probability distribution).
-#' @param sim_args List with pass-through parameters for [simulate_param()].
+#' @param sim_args List with pass-through parameters for [simulate_adcp()].
 #'
 #' @importFrom checkmate qassert assert_number assert_list
 #' @export
@@ -45,7 +45,7 @@ setMethod("probability_distribution", "CalibrationParam",
     if (!is.null(seed)) {
       set.seed(seed)
     }
-    x <- do.call(simulate_param,
+    x <- do.call(simulate_adcp,
            args = c(list(object = object, times = times), sim_args))
     if (!is.matrix(x)) {
       x <- as.matrix(x, ncol = 1L)

@@ -180,7 +180,10 @@ setValidity("H2ExtArch3FParam",
     qassert(object@nu, "N2(0,)")
     qassert(object@survival, "B1")
     assert_true(object@dim == dim(object@copula))
-    assert_true(check_equal(object@nu, c(object@copula@copula@theta, object@copula@childCops[[1]]@copula@theta)))
+    assert_true(
+      check_equal(
+        object@nu,
+        c(object@copula@copula@theta, object@copula@childCops[[1]]@copula@theta)))
 
     invisible(TRUE)
   })

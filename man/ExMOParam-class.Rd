@@ -7,14 +7,13 @@
 \alias{ExMOParam}
 \alias{initialize,ExMOParam-method}
 \alias{initialize,ExMOParam,ANY-method}
-\alias{simulate_param,ExMOParam-method}
+\alias{simulate_dt,ExMOParam-method}
 \title{Exchangeable Marshall--Olkin calibration parameter}
 \usage{
 \S4method{initialize}{ExMOParam}(.Object, ex_intensities)
 
-\S4method{simulate_param}{ExMOParam}(
+\S4method{simulate_dt}{ExMOParam}(
   object,
-  times,
   ...,
   method = c("default", "ExMOParam", "ExMarkovParam"),
   n_sim = 10000
@@ -27,8 +26,6 @@
 Marshall-Olkin distribution.}
 
 \item{object}{The calibration parameter object.}
-
-\item{times}{Point-in-time.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
@@ -59,9 +56,9 @@ version of \eqn{t} and
 \itemize{
 \item \code{initialize,ExMOParam-method}: Constructor
 
-\item \code{simulate_param,ExMOParam-method}: simulates the default counting process \eqn{L} and returns a matrix \code{x} with
-\code{nrow(x) == n_sim} and \code{ncol(x) == length(times)} if \code{length(times) > 1L}
-and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_dt,ExMOParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
+\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 }}
 
 \section{Slots}{
@@ -73,6 +70,6 @@ and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 \examples{
 ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
 parm <- ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
-simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+simulate_dt(parm, n_sim = 5e1)
 
 }

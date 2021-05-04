@@ -323,7 +323,7 @@ H2ExMarkovParam <- setClass("H2ExMarkovParam", # nolint
 #' hierarchically-exchangeable model from the Marshall--Olkin class.
 #'
 #' @export H2ExMOParam
-H2ExMOParam <- setClass("H2ExMOParam", #nolint
+H2ExMOParam <- setClass("H2ExMOParam", # nolint
   contains = "H2ExMarkovParam")
 
 

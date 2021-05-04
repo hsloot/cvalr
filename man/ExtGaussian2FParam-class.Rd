@@ -8,7 +8,7 @@
 \alias{ExtGaussian2FParam}
 \alias{initialize,ExtGaussian2FParam-method}
 \alias{initialize,ExtGaussian2FParam,ANY-method}
-\alias{simulate_param,ExtGaussian2FParam-method}
+\alias{simulate_dt,ExtGaussian2FParam-method}
 \alias{expected_pcds_loss,ExtGaussian2FParam-method}
 \alias{expected_cdo_loss,ExtGaussian2FParam-method}
 \alias{probability_distribution,ExtGaussian2FParam-method}
@@ -16,9 +16,8 @@
 \usage{
 \S4method{initialize}{ExtGaussian2FParam}(.Object, dim, lambda, nu, rho = NULL, tau = NULL)
 
-\S4method{simulate_param}{ExtGaussian2FParam}(
+\S4method{simulate_dt}{ExtGaussian2FParam}(
   object,
-  times,
   ...,
   method = c("default", "ExtGaussian2FParam"),
   n_sim = 10000
@@ -64,8 +63,6 @@
 
 \item{object}{The calibration parameter object.}
 
-\item{times}{Point-in-time.}
-
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
 
@@ -73,6 +70,8 @@
 class whose implementation should be used).}
 
 \item{n_sim}{Number of samples.}
+
+\item{times}{Point-in-time.}
 
 \item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
 
@@ -103,9 +102,9 @@ Spearman's Rho and Kendall's Tau is
 \itemize{
 \item \code{initialize,ExtGaussian2FParam-method}: Constructor
 
-\item \code{simulate_param,ExtGaussian2FParam-method}: simulates the default counting process \eqn{L} and returns a matrix \code{x} with
-\code{nrow(x) == n_sim} and \code{ncol(x) == length(times)} if \code{length(times) > 1L}
-and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_dt,ExtGaussian2FParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
+\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 
 \item \code{expected_pcds_loss,ExtGaussian2FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
 
@@ -125,7 +124,7 @@ and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 \examples{
 ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 parm <- ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+simulate_dt(parm, n_sim = 5e1)
 
 expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4)

@@ -269,7 +269,7 @@ setMethod("initialize", "JoeExtArch2FParam",
 #' @importFrom purrr map_lgl map_int reduce
 #' @importFrom checkmate assert_true
 setMethod("initialize", "H2ExMarkovParam",
-  function(.Object, models = NULL, fraction = NULL) {
+  function(.Object, models = NULL, fraction = NULL) { # nolint
     if (!missing(models) && !missing(fraction)) {
       assert_true(all(map_lgl(models, is, class = "CalibrationParam")))
       dims <- map_int(models, getDimension)
@@ -294,8 +294,8 @@ setMethod("initialize", "H2ExMarkovParam",
   })
 
 #' @importFrom purrr imap
-setMethod("initialize", "H2ExtMO3FParam",
-  function(.Object,
+setMethod("initialize", "H2ExtMO3FParam", # nolint
+  function(.Object, # nolint
     partition = list(1L:2L, 3L:5L), lambda = 1e-1, nu = c(0.2, 0.3),
     fraction = 0.5, rho = NULL, tau = NULL, alpha = NULL) {
   if (!missing(partition) && !missing(lambda) &&
@@ -332,7 +332,7 @@ setMethod("initialize", "H2ExtMO3FParam",
 
 #' @importFrom purrr imap
 setMethod("initialize", "H2ExtGaussian3FParam",
-  function(.Object,
+  function(.Object, # nolint
       partition = list(1L:2L, 3L:5L), lambda = 1e-1, nu = c(0.2, 0.3),
       rho = NULL, tau = NULL) {
     if (!missing(partition) && !missing(lambda) &&
@@ -386,7 +386,7 @@ setMethod("initialize", "H2ExtGaussian3FParam",
 #' @importFrom copula archmCopula onacopulaL iRho iTau
 #' @importFrom purrr imap map
 setMethod("initialize", "H2ExtArch3FParam",
-  function(.Object,
+  function(.Object, # nolint
       partition = list(1L:2L, 3L:5L),
       lambda = 1e-1, nu = c(0.2, 0.3), rho = NULL, tau = NULL,
       survival = TRUE,
@@ -412,7 +412,8 @@ setMethod("initialize", "H2ExtArch3FParam",
       .Object@lambda <- lambda
       .Object@nu <- nu
 
-      .Object@copula <- onacopulaL(family = family, list(nu[[1]], c(), map(partition, ~list(nu[[2]], .))))
+      .Object@copula <- onacopulaL(
+        family = family, list(nu[[1]], c(), map(partition, ~list(nu[[2]], .))))
 
       validObject(.Object)
     }

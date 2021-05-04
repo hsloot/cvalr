@@ -4,7 +4,9 @@
 \docType{class}
 \name{CalibrationParam-class}
 \alias{CalibrationParam-class}
-\alias{simulate_param}
+\alias{simulate_adcp}
+\alias{simulate_dt}
+\alias{simulate_adcp,CalibrationParam-method}
 \alias{expected_value}
 \alias{expected_value,CalibrationParam-method}
 \alias{expected_pcds_loss}
@@ -18,7 +20,11 @@
 \alias{probability_distribution}
 \title{Virtual super-class for calibration parameters}
 \usage{
-simulate_param(object, times, ...)
+simulate_adcp(object, times, ...)
+
+simulate_dt(object, ...)
+
+\S4method{simulate_adcp}{CalibrationParam}(object, times, ...)
 
 expected_value(object, times, g, ...)
 
@@ -143,9 +149,17 @@ option with the asset pricing theorem.
 }
 \section{Functions}{
 \itemize{
-\item \code{simulate_param}: simulates the default counting process \eqn{L} and returns a matrix \code{x} with
+\item \code{simulate_adcp}: simulates the default counting process \eqn{L} and returns a matrix \code{x} with
 \code{nrow(x) == n_sim} and \code{ncol(x) == length(times)} if \code{length(times) > 1L}
 and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+
+\item \code{simulate_dt}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
+\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+
+\item \code{simulate_adcp,CalibrationParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
+\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 
 \item \code{expected_value}: returns the expected value for the average default count process \eqn{L} at
 a specific time-point.
@@ -192,6 +206,13 @@ i.e. the values
 }
 
 \examples{
+parm <- ExMarkovParam(
+ ex_qmatrix = matrix(
+   c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
+   nrow = 3L, ncol = 3L))
+simulate_adcp(parm, 1, n_sim = 5e1)
+simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 5e1)
+
 expected_value(CuadrasAugeExtMO2FParam(
   dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
