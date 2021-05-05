@@ -13,7 +13,7 @@ set.seed(1623)
 # and https://stats.stackexchange.com/a/506367
 cor_ext <- function(x, y = NULL, use = "everything", method = "spearman", lambda = 0.95) {
   method <- match.arg(method)
-  n <- if (is.vector(x)) lenght(x) else nrow(x)
+  n <- if (is.vector(x)) length(x) else nrow(x)
   rs <- copula::P2p(cor(x = x, y = y, use = use, method = method))
   copula::p2P(tanh(qnorm(lambda, mean = atanh(rs), sd = sqrt((1 + rs^2) / (n-3)))))
 }
