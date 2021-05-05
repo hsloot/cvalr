@@ -460,13 +460,12 @@ H2ExtGaussian3FParam <- setClass("H2ExtGaussian3FParam", # nolint
 #'
 #' @details
 #' For all implemented families, the parameters `nu` can be replaced by
-#' *Spearman's Rho* `rho`, *Kendall's Tau* `tau`, or the *(lower) tail
-#' dependence coefficient* `alpha`.
-#' For all implemented families, the possible range for `rho`, `tau`, and
-#' `alpha` is between zero and one with the restriction that the global
-#' parameter has to be smaller or equal than the corresponding component
-#' parameter. Additionally, we support only that parameters of the same type are
-#' provided, i.e. `rho`. The parameters have a one-to-one mapping to `nu`.
+#' *Spearman's Rho* `rho` or *Kendall's Tau* `tau`.
+#' For all implemented families, the possible range for `rho` and `tau` is
+#' between zero and one with the restriction that the global parameter has to be
+#' smaller or equal than the corresponding component parameter. Additionally, we
+#' support only that parameters of the same type are provided, i.e. `rho`. The
+#' parameters have a one-to-one mapping to `nu`.
 #'
 #' @export H2ExtArch3FParam
 H2ExtArch3FParam <- setClass("H2ExtArch3FParam", # nolint

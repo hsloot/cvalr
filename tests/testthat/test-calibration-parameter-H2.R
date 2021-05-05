@@ -80,6 +80,16 @@ test_that("CuadrasAugeH2ExtMO3FParam is initialized correctly", {
   expect_equal(getRho(parm), rho)
   expect_equal(getTau(parm), tau)
   expect_equal(getAlpha(parm), alpha)
+
+  expect_equal(nu, getNu(
+    CuadrasAugeH2ExtMO3FParam(partition = partition, fraction = fraction,
+                              lambda = lambda, rho = rho)))
+  expect_equal(nu, getNu(
+    CuadrasAugeH2ExtMO3FParam(partition = partition, fraction = fraction,
+                              lambda = lambda, tau = tau)))
+  expect_equal(nu, getNu(
+    CuadrasAugeH2ExtMO3FParam(partition = partition, fraction = fraction,
+                              lambda = lambda, alpha = alpha)))
 })
 
 test_that("AlphaStableH2ExtMO3FParam is initialized correctly", {
@@ -94,6 +104,16 @@ test_that("AlphaStableH2ExtMO3FParam is initialized correctly", {
   expect_equal(getRho(parm), rho)
   expect_equal(getTau(parm), tau)
   expect_equal(getAlpha(parm), alpha)
+
+  expect_equal(nu, getNu(
+    AlphaStableH2ExtMO3FParam(partition = partition, fraction = fraction,
+                              lambda = lambda, rho = rho)))
+  expect_equal(nu, getNu(
+    AlphaStableH2ExtMO3FParam(partition = partition, fraction = fraction,
+                              lambda = lambda, tau = tau)))
+  expect_equal(nu, getNu(
+    AlphaStableH2ExtMO3FParam(partition = partition, fraction = fraction,
+                              lambda = lambda, alpha = alpha)))
 })
 
 test_that("PoissonH2ExtMO3FParam is initialized correctly", {
@@ -108,6 +128,16 @@ test_that("PoissonH2ExtMO3FParam is initialized correctly", {
   expect_equal(getRho(parm), rho)
   expect_equal(getTau(parm), tau)
   expect_equal(getAlpha(parm), alpha)
+
+  expect_equal(nu, getNu(
+    PoissonH2ExtMO3FParam(partition = partition, fraction = fraction,
+                              lambda = lambda, rho = rho)))
+  expect_equal(nu, getNu(
+    PoissonH2ExtMO3FParam(partition = partition, fraction = fraction,
+                              lambda = lambda, tau = tau)))
+  expect_equal(nu, getNu(
+    PoissonH2ExtMO3FParam(partition = partition, fraction = fraction,
+                              lambda = lambda, alpha = alpha)))
 })
 
 test_that("ExponentialH2ExtMO3FParam is initialized correctly", {
@@ -122,6 +152,16 @@ test_that("ExponentialH2ExtMO3FParam is initialized correctly", {
   expect_equal(getRho(parm), rho)
   expect_equal(getTau(parm), tau)
   expect_equal(getAlpha(parm), alpha)
+
+  expect_equal(nu, getNu(
+    ExponentialH2ExtMO3FParam(partition = partition, fraction = fraction,
+                          lambda = lambda, rho = rho)))
+  expect_equal(nu, getNu(
+    ExponentialH2ExtMO3FParam(partition = partition, fraction = fraction,
+                          lambda = lambda, tau = tau)))
+  expect_equal(nu, getNu(
+    ExponentialH2ExtMO3FParam(partition = partition, fraction = fraction,
+                          lambda = lambda, alpha = alpha)))
 })
 
 test_that("H2ExtGaussian3FParam is initialized correctly", {
@@ -135,6 +175,11 @@ test_that("H2ExtGaussian3FParam is initialized correctly", {
   expect_equal(getNu(parm), nu)
   expect_equal(getRho(parm), rho)
   expect_equal(getTau(parm), tau)
+
+  expect_equal(nu, getNu(
+    H2ExtGaussian3FParam(partition = partition, lambda = lambda, rho = rho)))
+  expect_equal(nu, getNu(
+    H2ExtGaussian3FParam(partition = partition, lambda = lambda, tau = tau)))
 })
 
 test_that("ClaytonH2ExtArch3FParam is initialized correctly", {
@@ -150,6 +195,11 @@ test_that("ClaytonH2ExtArch3FParam is initialized correctly", {
   expect_equal(getNu(parm), nu, tolerance = 1e-2)
   expect_equal(getRho(parm), rho, tolerance = 1e-2)
   expect_equal(getTau(parm), tau, tolerance = 1e-2)
+
+  expect_equal(nu, getNu(
+    ClaytonH2ExtArch3FParam(partition = partition, lambda = lambda, rho = rho)))
+  expect_equal(nu, getNu(
+    ClaytonH2ExtArch3FParam(partition = partition, lambda = lambda, tau = tau)))
 })
 
 test_that("FrankH2ExtArch3FParam is initialized correctly", {
@@ -165,6 +215,11 @@ test_that("FrankH2ExtArch3FParam is initialized correctly", {
   expect_equal(getNu(parm), nu, tolerance = 1e-2)
   expect_equal(getRho(parm), rho, tolerance = 1e-2)
   expect_equal(getTau(parm), tau, tolerance = 1e-2)
+
+  expect_equal(nu, getNu(
+    FrankH2ExtArch3FParam(partition = partition, lambda = lambda, rho = rho)))
+  expect_equal(nu, getNu(
+    FrankH2ExtArch3FParam(partition = partition, lambda = lambda, tau = tau)))
 })
 
 test_that("GumbelH2ExtArch3FParam is initialized correctly", {
@@ -180,6 +235,11 @@ test_that("GumbelH2ExtArch3FParam is initialized correctly", {
   expect_equal(getNu(parm), nu, tolerance = 1e-2)
   expect_equal(getRho(parm), rho, tolerance = 1e-2)
   expect_equal(getTau(parm), tau, tolerance = 1e-2)
+
+  expect_equal(nu, getNu(
+    GumbelH2ExtArch3FParam(partition = partition, lambda = lambda, rho = rho)))
+  expect_equal(nu, getNu(
+    GumbelH2ExtArch3FParam(partition = partition, lambda = lambda, tau = tau)))
 })
 
 test_that("AmhH2ExtArch3FParam is initialized correctly", {
@@ -195,6 +255,11 @@ test_that("AmhH2ExtArch3FParam is initialized correctly", {
   expect_equal(getNu(parm), nu, tolerance = 1e-2)
   expect_equal(getRho(parm), rho, tolerance = 1e-2)
   expect_equal(getTau(parm), tau, tolerance = 1e-2)
+
+  expect_equal(nu, getNu(
+    AmhH2ExtArch3FParam(partition = partition, lambda = lambda, rho = rho)))
+  expect_equal(nu, getNu(
+    AmhH2ExtArch3FParam(partition = partition, lambda = lambda, tau = tau)))
 })
 
 test_that("JoeH2ExtArch3FParam is initialized correctly", {
@@ -209,4 +274,7 @@ test_that("JoeH2ExtArch3FParam is initialized correctly", {
   expect_equal(getLambda(parm), lambda, tolerance = 1e-2)
   expect_equal(getNu(parm), nu, tolerance = 1e-2)
   expect_equal(getTau(parm), tau, tolerance = 1e-2)
+
+  expect_equal(nu, getNu(
+    JoeH2ExtArch3FParam(partition = partition, lambda = lambda, tau = tau)))
 })

@@ -84,13 +84,12 @@ hierarchically-extendible Archimedean families with exponential margins.
 }
 \details{
 For all implemented families, the parameters \code{nu} can be replaced by
-\emph{Spearman's Rho} \code{rho}, \emph{Kendall's Tau} \code{tau}, or the \emph{(lower) tail
-dependence coefficient} \code{alpha}.
-For all implemented families, the possible range for \code{rho}, \code{tau}, and
-\code{alpha} is between zero and one with the restriction that the global
-parameter has to be smaller or equal than the corresponding component
-parameter. Additionally, we support only that parameters of the same type are
-provided, i.e. \code{rho}. The parameters have a one-to-one mapping to \code{nu}.
+\emph{Spearman's Rho} \code{rho} or \emph{Kendall's Tau} \code{tau}.
+For all implemented families, the possible range for \code{rho} and \code{tau} is
+between zero and one with the restriction that the global parameter has to be
+smaller or equal than the corresponding component parameter. Additionally, we
+support only that parameters of the same type are provided, i.e. \code{rho}. The
+parameters have a one-to-one mapping to \code{nu}.
 }
 \section{Functions}{
 \itemize{
