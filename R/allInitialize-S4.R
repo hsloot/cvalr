@@ -301,6 +301,7 @@ setMethod("initialize", "H2ExtMO3FParam", # nolint
   if (!missing(partition) && !missing(lambda) &&
         (!missing(nu) || !missing(rho) || !missing(tau) || !missing(alpha)) &&
         !missing(fraction)) {
+    .Object@fraction <- fraction
     if (missing(nu)) {
       if (!is.null(rho)) {
         nu <- invRho(.Object, rho)
@@ -320,7 +321,6 @@ setMethod("initialize", "H2ExtMO3FParam", # nolint
     .Object@dim <- dim
     .Object@partition <- partition
     .Object@models <- models
-    .Object@fraction <- fraction
     .Object@lambda <- lambda
     .Object@nu <- nu
 

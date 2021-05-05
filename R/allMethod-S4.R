@@ -216,27 +216,35 @@ setMethod("invTau", "H2ExtArch3FParam",
     copula::iTau(object@copula@copula, value)
   })
 
+#' @include utils.R
 #' @importFrom checkmate qassert
 setMethod("invAlpha", "CuadrasAugeH2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2[0,1]")
-    value
+    adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
   })
+#' @include utils.R
 #' @importFrom checkmate qassert
 setMethod("invAlpha", "AlphaStableH2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2[0,1]")
+    value <- adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
     log2(2 - value)
+
   })
+#' @include utils.R
 #' @importFrom checkmate qassert
 setMethod("invAlpha", "PoissonH2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2[0,1]")
+    value <- adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
     -log(1 - sqrt(value))
   })
+#' @include utils.R
 #' @importFrom checkmate qassert
 setMethod("invAlpha", "ExponentialH2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2[0,1]")
+    value <- adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
     0.5 * (-3 + sqrt(1 + 8 / value))
   })

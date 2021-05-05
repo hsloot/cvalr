@@ -6,3 +6,8 @@ simplify2vector <- function(x) {
 
   x
 }
+
+#' @keywords internal
+adjacent_differences <- function(x) {
+  c(x[[1]], diff(x))
+}
