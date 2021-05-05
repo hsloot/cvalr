@@ -1,4 +1,4 @@
-# cvalr 0.0.1
+## cvalr 0.1
 
-* Added a `NEWS.md` file to track changes to the package.
-* Add method to calculate portfolio CDS spread
+- Calibration parameter classes (extendible and H2-extendible)
+- Auxiliary methods for portfolio CDS and CDO pricing

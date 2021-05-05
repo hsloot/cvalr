@@ -1,6 +1,6 @@
 Package: cvalr
 Title: Credit Derivative Valuation in R
-Version: 0.0.0.9000
+Version: 0.1
 Authors@R:
     person(given = "Henrik",
            family = "Sloot",
@@ -47,4 +47,6 @@ Collate:
     'simulate_param-S4.R'
     'expected_value-S4.R'
     'probability_distribution-S4.R'
+URL: https://github.com/hsloot/cvalr
+BugReports: https://github.com/hsloot/cvalr/issues
 Remotes: github::hsloot/rmo
