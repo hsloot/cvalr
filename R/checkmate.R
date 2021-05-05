@@ -13,6 +13,7 @@ check_equal <- checkEqual
 assertEqual <- checkmate::makeAssertionFunction(checkEqual) # nolint
 assert_equal <- assertEqual
 
+
 #' @importFrom checkmate check_matrix makeAssertionFunction
 #' @include RcppExports.R
 checkExQMatrix <- function(x, ...) { # nolint
@@ -30,5 +31,24 @@ checkExQMatrix <- function(x, ...) { # nolint
 check_exqmatrix <- checkExQMatrix
 assertExQMatrix <- checkmate::makeAssertionFunction(checkExQMatrix) # nolint
 assert_exqmatrix <- assertExQMatrix
+
+
+#' @importFrom purrr map_lgl
+#' @importFrom checkmate test_integerish
+checkPartition <- function(x) { # nolint
+  if (!isTRUE(all(map_lgl(x, test_integerish)))) {
+    return("Not a (sorted) partition: non-integer elements")
+  } else if (!isTRUE(all(1L == diff(unlist(x))))) {
+    return("Not a partition: adjacent element increase > 1")
+  } else if (!isTRUE(1L == min(unlist(x)))) {
+    return("Not a partition: minimum value not 1")
+  }
+
+  invisible(TRUE)
+}
+
+check_partition <- checkPartition
+assertPartition <- checkmate::makeAssertionFunction(checkPartition) # nolint
+assert_partition <- assertPartition
 
 # nocov end

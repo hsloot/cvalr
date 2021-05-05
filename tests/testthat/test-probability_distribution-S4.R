@@ -25,7 +25,7 @@ test_that("`probability_distribution` works as expected for `CalibrationParam`",
       method = "CalibrationParam", sim_args = list(n_sim = n_sim)))
 
   pd_naive <- function(object, times, n_sim) {
-    x <- simulate_param(object, times, n_sim = n_sim)
+    x <- simulate_adcp(object, times, n_sim = n_sim)
     if (!is.matrix(x)) {
       x <- as.matrix(x, ncol = 1L)
     }

@@ -23,7 +23,8 @@ Imports:
     mvtnorm,
     copula,
     checkmate,
-    waldo
+    waldo,
+    purrr
 LinkingTo:
     Rcpp,
     rmo
@@ -39,10 +40,10 @@ Collate:
     'checkmate.R'
     'allGetSet-S4.R'
     'allInitialize-S4.R'
+    'utils.R'
     'allMethod-S4.R'
     'allValidity-S4.R'
     'cvalr-package.R'
-    'utils.R'
     'simulate_param-S4.R'
     'expected_value-S4.R'
     'probability_distribution-S4.R'

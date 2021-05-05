@@ -25,4 +25,4 @@ reference:
 
 - title: Simulate from calibration parameter
   desc: ~
-  contents:  matches("^simulate_param$")
+  contents:  matches("^simulate_(dt|adcp)$")

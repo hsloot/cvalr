@@ -18,11 +18,11 @@ dt2dct <- function(x, times) {
   out
 }
 
-test_that("`simulate_param` is working correctly for `ExMarkovParam`", {
+test_that("`simulate_adcp` is working correctly for `ExMarkovParam`", {
   parm <- AlphaStableExtMO2FParam(dim = dim, lambda = lambda, rho = rho)
 
   set.seed(seed)
-  x <- simulate_param(as(parm, "ExMarkovParam"), times, n_sim = n_sim)
+  x <- simulate_adcp(as(parm, "ExMarkovParam"), times, n_sim = n_sim)
   expect_matrix(x,
     mode = "numeric", any.missing = FALSE, nrows = n_sim, ncols = length(times))
   expect_integerish(x * parm@dim,
@@ -36,7 +36,7 @@ test_that("`simulate_param` is working correctly for `ExMarkovParam`", {
 
   set.seed(seed)
   expect_equal(x,
-    simulate_param(parm, times, method = "ExMarkovParam", n_sim = n_sim))
+    simulate_adcp(parm, times, method = "ExMarkovParam", n_sim = n_sim))
 
   sample_naive <- function(n, ex_qmatrix, times) {
     dim <- nrow(ex_qmatrix) - 1L
@@ -66,11 +66,11 @@ test_that("`simulate_param` is working correctly for `ExMarkovParam`", {
 })
 
 
-test_that("`simulate_param` is working correctly for `ExMOParam`", {
+test_that("`simulate_adcp` is working correctly for `ExMOParam`", {
   parm <- AlphaStableExtMO2FParam(dim = dim, lambda = lambda, rho = rho)
 
   set.seed(seed)
-  x <- simulate_param(parm, times, n_sim = n_sim)
+  x <- simulate_adcp(parm, times, n_sim = n_sim)
   expect_matrix(x,
                 mode = "numeric", any.missing = FALSE, nrows = n_sim, ncols = length(times))
   expect_integerish(x * parm@dim,
@@ -98,11 +98,11 @@ test_that("`simulate_param` is working correctly for `ExMOParam`", {
 })
 
 
-test_that("`simulate_param` is working correctly for `ExtGaussian2FParam`", {
+test_that("`simulate_adcp` is working correctly for `ExtGaussian2FParam`", {
   parm <- ExtGaussian2FParam(dim = dim, lambda = lambda, rho = rho)
 
   set.seed(seed)
-  x <- simulate_param(parm, times, n_sim = n_sim)
+  x <- simulate_adcp(parm, times, n_sim = n_sim)
   expect_matrix(x,
                 mode = "numeric", any.missing = FALSE, nrows = n_sim, ncols = length(times))
   expect_integerish(x * parm@dim,
@@ -131,11 +131,11 @@ test_that("`simulate_param` is working correctly for `ExtGaussian2FParam`", {
 })
 
 
-test_that("`simulate_param` is working correctly for `FrankExtArch2FParam`", {
+test_that("`simulate_adcp` is working correctly for `FrankExtArch2FParam`", {
   parm <- FrankExtArch2FParam(dim = dim, lambda = lambda, rho = rho)
 
   set.seed(seed)
-  x <- simulate_param(parm, times, n_sim = n_sim)
+  x <- simulate_adcp(parm, times, n_sim = n_sim)
   expect_matrix(x,
                 mode = "numeric", any.missing = FALSE, nrows = n_sim, ncols = length(times))
   expect_integerish(x * parm@dim,

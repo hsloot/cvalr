@@ -61,7 +61,7 @@ Marshall--Olkin family.
 \details{
 For all implemented families, the parameter \code{nu} can be replaced by
 \emph{Spearman's Rho} \code{rho}, \emph{Kendall' Tau} \code{tau} or the
-\emph{(lower) tail dependen coefficient} \code{alpha}.
+\emph{(lower) tail dependence coefficient} \code{alpha}.
 For all implemented families, the possible range for \code{rho}, \code{tau}, and
 \code{alpha} is from zero to one (boundaries might not be included) and have a
 one-to-one mapping to the model-specific parameter \code{nu}.

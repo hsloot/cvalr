@@ -27,7 +27,7 @@
 \alias{initialize,AmhExtArch2FParam,ANY-method}
 \alias{initialize,JoeExtArch2FParam-method}
 \alias{initialize,JoeExtArch2FParam,ANY-method}
-\alias{simulate_param,ExtArch2FParam-method}
+\alias{simulate_dt,ExtArch2FParam-method}
 \alias{expected_pcds_loss,FrankExtArch2FParam-method}
 \title{Two-factor extendible Archimedean calibration parameter classes}
 \usage{
@@ -39,7 +39,7 @@
   rho = NULL,
   tau = NULL,
   survival = TRUE,
-  family = c("clayton", "frank", "amh", "gumbel", "joe")
+  family = c("Clayton", "Frank", "Amh", "Gumbel", "Joe")
 )
 
 \S4method{initialize}{ClaytonExtArch2FParam}(.Object, ..., survival = FALSE)
@@ -52,9 +52,8 @@
 
 \S4method{initialize}{JoeExtArch2FParam}(.Object, ..., survival = TRUE)
 
-\S4method{simulate_param}{ExtArch2FParam}(
+\S4method{simulate_dt}{ExtArch2FParam}(
   object,
-  times,
   ...,
   method = c("default", "ExtArch2fParam"),
   n_sim = 10000
@@ -90,12 +89,12 @@
 
 \item{object}{The calibration parameter object.}
 
-\item{times}{Point-in-time.}
-
 \item{method}{Calculation method (either \code{"default"} or the name of the
 class whose implementation should be used).}
 
 \item{n_sim}{Number of samples.}
+
+\item{times}{Point-in-time.}
 
 \item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
 }
@@ -124,9 +123,9 @@ one-to-one mapping to the model-specific parameter \code{nu}.
 
 \item \code{initialize,JoeExtArch2FParam-method}: Constructor
 
-\item \code{simulate_param,ExtArch2FParam-method}: simulates the default counting process \eqn{L} and returns a matrix \code{x} with
-\code{nrow(x) == n_sim} and \code{ncol(x) == length(times)} if \code{length(times) > 1L}
-and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_dt,ExtArch2FParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
+\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 
 \item \code{expected_pcds_loss,FrankExtArch2FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
 }}
@@ -134,14 +133,14 @@ and a vector \code{x} with \code{length(x) == n_sim} otherwise.
 \section{Slots}{
 
 \describe{
-\item{\code{lambda}}{The marginal recovery_rate}
+\item{\code{lambda}}{The marginal rate}
 
 \item{\code{nu}}{Model specific parameter}
 }}
 
 \examples{
-ExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1, family = "gumbel")
-ExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1, family = "amh")
+ExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1, family = "Gumbel")
+ExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1, family = "Amh")
 ClaytonExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
 ClaytonExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
 FrankExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
@@ -152,7 +151,7 @@ AmhExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
 AmhExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
 JoeExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
 parm <- FrankExtArch2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
-simulate_param(parm, 1e1, seq(0, 5, by = 0.25), n_sim = 5e1)
+simulate_dt(parm, n_sim = 5e1)
 
 expected_pcds_loss(FrankExtArch2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
   times = 0.25, recovery_rate = 0.4)
