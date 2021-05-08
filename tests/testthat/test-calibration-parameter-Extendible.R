@@ -16,12 +16,6 @@ ex_qmatrix <- matrix(
 
 times <- seq(0.25, 1, by = 0.25)
 
-test_that("Biv. ExMarkovParam is initialized correctly", {
-  parm <- ExMarkovParam(ex_qmatrix = ex_qmatrix)
-  expect_equal(getDimension(parm), 2L)
-  expect_equal(getExQMatrix(parm), ex_qmatrix)
-})
-
 test_that("Biv. ExMOParam is initialized correctly", {
   parm <- ExMOParam(ex_intensities = ex_intensities)
   expect_equal(getDimension(parm), 2L)

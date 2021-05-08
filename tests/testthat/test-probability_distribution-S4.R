@@ -45,31 +45,6 @@ test_that("`probability_distribution` works as expected for `CalibrationParam`",
 })
 
 
-test_that("`probability_distribution` works as expected for `ExMarkovParam`", {
-  parm <- AlphaStableExtMO2FParam(dim = dim, lambda = lambda, rho = rho)
-
-  x <- probability_distribution(parm, times)
-  expect_matrix(x,
-    mode = "numeric", any.missing = FALSE, nrows = dim+1, ncols = length(times))
-  expect_numeric(x,
-    any.missing = FALSE, lower = 0, upper = 1)
-  expect_equal(as.vector(apply(x, 2, sum)), rep(1, ncol(x)))
-
-  pd_naive <- function(ex_qmatrix, times) {
-    out <- sapply(times, function(t) expm(t * ex_qmatrix)[1, ])
-
-    if (1L == nrow(out) || 1L == ncol(out)) {
-      out <- as.vector(out)
-    }
-
-    out
-  }
-
-  set.seed(seed)
-  expect_equal(x, pd_naive(parm@ex_qmatrix, times))
-})
-
-
 test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`", { # nolint
   parm <- ExtGaussian2FParam(dim = dim, lambda = lambda, rho = rho)
 

@@ -18,53 +18,6 @@ dt2dct <- function(x, times) {
   out
 }
 
-test_that("`simulate_adcp` is working correctly for `ExMarkovParam`", {
-  parm <- AlphaStableExtMO2FParam(dim = dim, lambda = lambda, rho = rho)
-
-  set.seed(seed)
-  x <- simulate_adcp(as(parm, "ExMarkovParam"), times, n_sim = n_sim)
-  expect_matrix(x,
-    mode = "numeric", any.missing = FALSE, nrows = n_sim, ncols = length(times))
-  expect_integerish(x * parm@dim,
-                any.missing = FALSE,
-                lower = 0, upper = parm@dim)
-  expect_matrix(x,
-                mode = "numeric", any.missing = FALSE,
-                nrows = n_sim, ncols = length(times))
-  expect_integerish(t(apply(x * parm@dim, 1, diff)),
-    any.missing = FALSE, lower = 0, upper = parm@dim)
-
-  set.seed(seed)
-  expect_equal(x,
-    simulate_adcp(parm, times, method = "ExMarkovParam", n_sim = n_sim))
-
-  sample_naive <- function(n, ex_qmatrix, times) {
-    dim <- nrow(ex_qmatrix) - 1L
-    tmp <- matrix(nrow = n_sim, ncol = dim)
-    for (k in 1:n_sim) {
-      state <- 0
-      time <- 0
-      while (state != dim) {
-        wt <- rexp(1, rate = -ex_qmatrix[1+state, 1+state])
-        time <- time + wt
-        tmp[k, (1+state):dim] <- time
-        state <- state +
-          sample.int(n = dim-state, size = 1, replace = FALSE,
-            prob = ex_qmatrix[1+state, (2+state):(dim+1)])
-      }
-    }
-    out <- dt2dct(tmp, times)
-
-    if (1L == nrow(out) || 1L == ncol(out))
-      out <- as.vector(out)
-
-    out
-  }
-
-  set.seed(seed)
-  expect_equal(x, sample_naive(n_sim, parm@ex_qmatrix, times))
-})
-
 
 test_that("`simulate_adcp` is working correctly for `ExMOParam`", {
   parm <- AlphaStableExtMO2FParam(dim = dim, lambda = lambda, rho = rho)
