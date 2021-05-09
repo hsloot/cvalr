@@ -10,7 +10,6 @@ test_that("`ExMarkovParam`-class is correctly initialized", {
   parm <- ExMarkovParam()
   expect_s4_class(parm, "ExMarkovParam")
 
-  setDimension(parm) <- d
   setExQMatrix(parm) <- ex_qmatrix
   expect_true(isTRUE(validObject(parm)))
   expect_equal(getDimension(parm), d)
@@ -51,7 +50,8 @@ test_that("`simulate_dt` works as expected for `ExMarkovParam`-class", {
   # n is 1, d is larger than 1
   set.seed(1623)
   x <- simulate_dt(parm, n_sim = 1L)
-  expect_equal(length(x), d)
+  expect_numeric(
+    x, lower = 0, finite = TRUE, any.missing = FALSE, len = d)
 
   set.seed(1623)
   y <- rfn(1L, ex_qmatrix)
@@ -62,8 +62,10 @@ test_that("`simulate_dt` works as expected for `ExMarkovParam`-class", {
 
   set.seed(1623)
   x <- simulate_dt(parm, n_sim = n)
-  expect_equal(ncol(x), d)
-  expect_equal(nrow(x), n)
+  expect_matrix(
+    x, mode = "numeric", any.missing = FALSE, nrows = n, ncols = d)
+  expect_numeric(
+    x, lower = 0, finite = TRUE)
 
   set.seed(1623)
   y <- rfn(n, ex_qmatrix)

@@ -19,38 +19,6 @@ dt2dct <- function(x, times) {
 }
 
 
-test_that("`simulate_adcp` is working correctly for `ExMOParam`", {
-  parm <- AlphaStableExtMO2FParam(dim = dim, lambda = lambda, rho = rho)
-
-  set.seed(seed)
-  x <- simulate_adcp(parm, times, n_sim = n_sim)
-  expect_matrix(x,
-                mode = "numeric", any.missing = FALSE, nrows = n_sim, ncols = length(times))
-  expect_integerish(x * parm@dim,
-                    any.missing = FALSE,
-                    lower = 0, upper = parm@dim)
-  expect_matrix(x,
-                mode = "numeric", any.missing = FALSE,
-                nrows = n_sim, ncols = length(times))
-  expect_integerish(t(apply(x * parm@dim, 1, diff)),
-                    any.missing = FALSE, lower = 0, upper = parm@dim)
-
-  sample_naive <- function(n, ex_intensities, times) {
-    dim <- length(ex_intensities)
-    tmp <- rmo::rexmo_markovian(n_sim, dim, ex_intensities)
-    out <- dt2dct(tmp, times)
-
-    if (1L == nrow(out) || 1L == ncol(out))
-      out <- as.vector(out)
-
-    out
-  }
-
-  set.seed(seed)
-  expect_equal(x, sample_naive(n_sim, parm@ex_intensities, times))
-})
-
-
 test_that("`simulate_adcp` is working correctly for `ExtGaussian2FParam`", {
   parm <- ExtGaussian2FParam(dim = dim, lambda = lambda, rho = rho)
 

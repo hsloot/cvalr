@@ -16,13 +16,6 @@ ex_qmatrix <- matrix(
 
 times <- seq(0.25, 1, by = 0.25)
 
-test_that("Biv. ExMOParam is initialized correctly", {
-  parm <- ExMOParam(ex_intensities = ex_intensities)
-  expect_equal(getDimension(parm), 2L)
-  expect_equal(getExQMatrix(parm), ex_qmatrix)
-  expect_equal(getExIntensities(parm), ex_intensities)
-})
-
 test_that("Biv. CuadrasAugeExtMO2FParam is initialized correctly", {
   nu <- alpha
   parm <- CuadrasAugeExtMO2FParam(dim = 2L, lambda = 5e-2, rho = 5e-1)
