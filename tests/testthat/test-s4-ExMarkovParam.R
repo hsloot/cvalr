@@ -2,8 +2,9 @@ d <- 5L
 lambda <- 8e-2
 alpha <- 4e-1
 
+nu <- log2(2 - alpha)
 bf <- ScaledBernsteinFunction(
-  scale = lambda, original = AlphaStableBernsteinFunction(alpha = log2(2 - alpha)))
+  scale = lambda, original = AlphaStableBernsteinFunction(alpha = nu))
 ex_qmatrix <- rmo::exQMatrix(bf, d = d)
 
 test_that("`ExMarkovParam`-class is correctly initialized", {
@@ -11,7 +12,7 @@ test_that("`ExMarkovParam`-class is correctly initialized", {
   expect_s4_class(parm, "ExMarkovParam")
 
   setExQMatrix(parm) <- ex_qmatrix
-  expect_true(isTRUE(validObject(parm)))
+  expect_true(validObject(parm))
   expect_equal(getDimension(parm), d)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 

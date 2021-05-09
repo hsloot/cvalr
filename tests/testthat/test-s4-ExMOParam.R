@@ -2,8 +2,9 @@ d <- 5L
 lambda <- 8e-2
 alpha <- 4e-1
 
+nu <- log2(2 - alpha)
 bf <- ScaledBernsteinFunction(
-  scale = lambda, original = AlphaStableBernsteinFunction(alpha = log2(2 - alpha)))
+  scale = lambda, original = AlphaStableBernsteinFunction(alpha = nu))
 ex_qmatrix <- rmo::exQMatrix(bf, d)
 ex_intensities <- rmo::exIntensities(bf, d = d)
 
@@ -12,7 +13,7 @@ test_that("`ExMOParam`-class is correctly initialized", {
   expect_s4_class(parm, "ExMOParam")
 
   setExIntensities(parm) <- ex_intensities
-  expect_true(isTRUE(validObject(parm)))
+  expect_true(validObject(parm))
   expect_equal(getDimension(parm), d)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
   expect_equal(getExIntensities(parm), ex_intensities)
