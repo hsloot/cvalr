@@ -69,15 +69,6 @@ test_that("`expected_pcds_loss` works as intended for `ExtMO2FParam", {
   expect_equal(x, (1 - recovery_rate) * pexp(times, rate = parm@lambda))
 })
 
-test_that("`expected_pcds_loss` works as intended for `ExtGaussian2FParam", {
-  parm <- ExtGaussian2FParam(dim = dim, lambda = lambda, rho = rho)
-
-  x <- expected_pcds_loss(parm, times, recovery_rate = recovery_rate)
-  expect_numeric(x, any.missing = FALSE, lower = 0, upper = 1,
-    len = length(times), sorted = TRUE)
-  expect_equal(x, (1 - recovery_rate) * pexp(times, rate = parm@lambda))
-})
-
 test_that("`expected_pcds_loss` works as intended for `ExtArch2FParam", {
   parm <- FrankExtArch2FParam(dim = dim, lambda = lambda, rho = rho)
 
@@ -102,41 +93,6 @@ test_that("`expected_cdo_loss` works as intended for `CalibrationParam`", {
     recovery_rate = recovery_rate, lower = lower, upper = upper)
   probs <- probability_distribution(parm, times)
   expect_equal(x, as.vector(t(probs) %*% mu))
-})
-
-test_that("`expected_cdo_loss` works as intended for `ExtGaussian2FParam`", {
-  parm <- ExtGaussian2FParam(dim = dim, lambda = lambda, rho = rho)
-
-  x <- expected_cdo_loss(parm, times, recovery_rate = recovery_rate,
-    lower = lower, upper = upper, method = "default")
-  expect_numeric(x, any.missing = FALSE, lower = 0, upper = 1,
-    len = length(times), sorted = TRUE)
-
-  exp_naive <- function(object, times,
-      recovery_rate, lower, upper) {
-    corr <- matrix(c(1, rep(-sqrt(1 - object@nu), 2L), 1), nrow = 2L, ncol = 2L)
-    out <- numeric(length(times))
-    qtimes <- qnorm(pexp(times, rate = object@lambda))
-    for (i in seq_along(qtimes)) {
-      left <- pnorm(qtimes[i])
-      if (0 < lower) {
-        left <- pmvnorm(
-          lower = rep(-Inf, 2),
-          upper = c(-qnorm(pmin(lower / (1 - recovery_rate), 1)), qtimes[i]),
-          corr = corr)
-      }
-      right <- pmvnorm(
-        lower = rep(-Inf, 2),
-        upper = c(-qnorm(pmin(upper / (1 - recovery_rate), 1)), qtimes[i]),
-        corr = corr)
-
-        out[i] <- (1 - recovery_rate) * as.double(left - right)
-    }
-
-    out
-  }
-  expect_equal(x,
-    exp_naive(parm, times, recovery_rate, lower, upper))
 })
 
 test_that("`expected_pcds_equation` works as expected for `CalibrationParam`", {

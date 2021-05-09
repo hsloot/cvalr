@@ -18,40 +18,6 @@ dt2dct <- function(x, times) {
   out
 }
 
-
-test_that("`simulate_adcp` is working correctly for `ExtGaussian2FParam`", {
-  parm <- ExtGaussian2FParam(dim = dim, lambda = lambda, rho = rho)
-
-  set.seed(seed)
-  x <- simulate_adcp(parm, times, n_sim = n_sim)
-  expect_matrix(x,
-                mode = "numeric", any.missing = FALSE, nrows = n_sim, ncols = length(times))
-  expect_integerish(x * parm@dim,
-                    any.missing = FALSE,
-                    lower = 0, upper = parm@dim)
-  expect_matrix(x,
-                mode = "numeric", any.missing = FALSE,
-                nrows = n_sim, ncols = length(times))
-  expect_integerish(t(apply(x * parm@dim, 1, diff)),
-                    any.missing = FALSE, lower = 0, upper = parm@dim)
-
-  sample_naive <- function(n, dim, lambda, nu, times) {
-    tmp <- stats::qexp(
-      copula::rCopula(n_sim, normalCopula(nu, dim = dim, dispstr = "ex")),
-      rate = lambda, lower.tail = FALSE)
-    out <- dt2dct(tmp, times)
-
-    if (1L == nrow(out) || 1L == ncol(out))
-      out <- as.vector(out)
-
-    out
-  }
-
-  set.seed(seed)
-  expect_equal(x, sample_naive(n_sim, parm@dim, parm@lambda, parm@nu, times))
-})
-
-
 test_that("`simulate_adcp` is working correctly for `FrankExtArch2FParam`", {
   parm <- FrankExtArch2FParam(dim = dim, lambda = lambda, rho = rho)
 
