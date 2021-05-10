@@ -28,14 +28,7 @@ g_cdo <- function(k, recovery_rate, lower, upper) {
   pmin(pmax((1 - recovery_rate) * k - lower, 0), upper - lower)
 }
 
-test_that("`expected_pcds_loss` works as intended for `ExtMO2FParam", {
-  parm <- AlphaStableExtMO2FParam(dim = dim, lambda = lambda, rho = rho)
 
-  x <- expected_pcds_loss(parm, times, recovery_rate = recovery_rate)
-  expect_numeric(x, any.missing = FALSE, lower = 0, upper = 1,
-    len = length(times), sorted = TRUE)
-  expect_equal(x, (1 - recovery_rate) * pexp(times, rate = parm@lambda))
-})
 
 test_that("`expected_pcds_loss` works as intended for `ExtArch2FParam", {
   parm <- FrankExtArch2FParam(dim = dim, lambda = lambda, rho = rho)
