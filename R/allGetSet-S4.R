@@ -137,6 +137,45 @@ setReplaceMethod("setLambda", "ExtArch2FParam",
 
     invisible(object)
   })
+#' @include checkmate.R
+#' @importFrom purrr map
+#' @importFrom checkmate qassert
+setReplaceMethod("setLambda", "H2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    assert_partition(object@partition)
+    object@lambda <- value
+    if (0L == length(object@models)) {
+      models <- map(object@partition, ~{
+        new(getModelName(object), length(.x), value, alpha = 0.5)
+      })
+      models <- c(list(new(getModelName(object), getDimension(object), value, alpha = 0.5)), models)
+      setModels(object) <- models
+    } else {
+      object@models <- map(object@models, ~{
+        setLambda(.x) <- value
+        .x
+      })
+    }
+
+    invisible(object)
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setLambda", "H2ExtGaussian3FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    object@lambda <- value
+
+    invisible(object)
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setLambda", "H2ExtArch3FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    object@lambda <- value
+
+    invisible(object)
+  })
 
 
 setMethod("getNu", "ExtMO2FParam",
@@ -191,6 +230,36 @@ setReplaceMethod("setNu", "ExtArch2FParam",
 
     invisible(object)
   })
+#' @importFrom purrr map imap
+#' @importFrom checkmate qassert
+setReplaceMethod("setNu", "H2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "N2")
+    assert_partition(object@partition)
+    object@nu <- value
+    if (0L == length(object@models)) {
+      models <- map(object@partition, ~{
+        new(getModelName(object), length(.x), 1, value[[2]])
+      })
+      models <- c(list(new(getModelName(object), getDimension(object), 1, value[[1]])), models)
+      setModels(object) <- models
+    } else {
+      object@models <- imap(object@models, ~{
+        setNu(.x) <- ifelse(1L == .y, value[[1]], value[[2]])
+        .x
+      })
+    }
+
+    invisible(object)
+  })
+#' @importFrom checkmate assert_numeric
+setReplaceMethod("setNu", "H2ExtGaussian3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, sorted = TRUE)
+    object@nu <- value
+
+    invisible(object)
+  })
 #' @importFrom copula onacopulaL
 #' @importFrom purrr map
 #' @importFrom checkmate qassert
@@ -200,7 +269,7 @@ setReplaceMethod("setNu", "H2ExtArch3FParam",
     object@nu <- value
     object@copula <- onacopulaL(
       family = object@family,
-      nacList = list(value[[1]], map(object@partition, ~list(list(value[[2]], .)))))
+      nacList = list(value[[1]], c(), map(object@partition, ~list(value[[2]], .))))
 
     invisible(object)
   })
@@ -363,10 +432,11 @@ setMethod("getPartition", "H2ExCalibrationParam",
     object@partition
   })
 #' @include checkmate.R
+#' @importFrom purrr map
 setReplaceMethod("setPartition", "H2ExCalibrationParam",
   function(object, value) {
     assert_partition(value)
-    object@partition <- value
+    object@partition <- map(value, as.integer)
     setDimension(object) <- length(unlist(value))
 
     invisible(object)
@@ -379,7 +449,7 @@ setMethod("getFraction", "H2ExMarkovParam",
 #' @importFrom checkmate qassert
 setReplaceMethod("setFraction", "H2ExMarkovParam",
   function(object, value) {
-    qassert("N1[0,1]", value)
+    qassert(value, "N1[0,1]")
     object@fraction <- value
 
     invisible(object)
@@ -389,14 +459,14 @@ setMethod("getModels", "H2ExMarkovParam",
   function(object) {
     object@models
   })
-#' @importFrom purrr map_lgl map_int pmap
+#' @importFrom purrr map_lgl map_int map2
 #' @importFrom checkmate test_class
 setReplaceMethod("setModels", "H2ExMarkovParam",
   function(object, value) {
     assert_true(all(map_lgl(value, test_class, classes = getModelName(object))))
-    dims <- getDimension(value)
+    dims <- map_int(value, getDimension)
     assert_true(dims[[1]] == sum(dims[-1]))
-    partition <- pmap(
+    partition <- map2(
       dims[-1], cumsum(c(0, dims[2:(length(dims)-1)])), ~{
         .y + 1:.x
       })
