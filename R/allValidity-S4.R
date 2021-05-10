@@ -127,14 +127,12 @@ setValidity("ExtArch2FParam",
   })
 
 
+#' @include checkmate.R
 #' @importFrom purrr map_lgl
 #' @importFrom checkmate qassert qtest assert_true
 setValidity("H2ExCalibrationParam",
   function(object) {
-    assert_true(all(map_lgl(object@partition, ~{
-      qtest(.x, "I+(0,)")
-      })))
-    assert_true(all(1L:object@dim == unlist(object@partition)))
+    assert_partition(object@partition)
 
     invisible(TRUE)
   })

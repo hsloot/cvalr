@@ -90,6 +90,8 @@ setMethod("simulate_dt", "ExMarkovParam",
         state <- state + sample.int(n = object@dim-state, size = 1, replace = FALSE,
                         prob = object@ex_qmatrix[1+state, (2+state):(object@dim+1)])
       }
+      perm <- sample.int(n = object@dim, size = object@dim, replace = FALSE)
+      out[k, perm] <- out[k, perm]
     }
 
     simplify2vector(out)
