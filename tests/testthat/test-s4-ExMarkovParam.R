@@ -40,7 +40,7 @@ test_that("`simulate_dt` works as expected for `ExMarkovParam`-class", {
       perm <- sample.int(n = d, size = d, replace = FALSE)
       out[k, perm] <- out[k, perm]
     }
-    if (isTRUE(nrow(out) <= 2L || ncol(out) <= 2L)) out <- as.vector(out)
+    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
 
     out
   }
@@ -82,7 +82,7 @@ test_that("`probability_distribution` works as expected for `ExMarkovParam`", {
         t(expm(.x * ex_qmatrix)[1L, , drop = FALSE])
       }) %>%
       purrr::reduce(cbind)
-    if (isTRUE(nrow(out) <= 2L || ncol(out) <= 2L)) out <- as.vector(out)
+    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
 
     out
   }

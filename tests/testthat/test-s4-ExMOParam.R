@@ -30,7 +30,7 @@ test_that("`simulate_dt` works as expected for `ExMOParam`", {
       ex_intensities, lower = 0, upper = Inf, finite = TRUE, any.missing = FALSE)
     d <- length(ex_intensities)
     out <- rmo::rexmo_markovian(n, d, ex_intensities)
-    if (isTRUE(nrow(out) <= 2L || ncol(out) <= 2L)) out <- as.vector(out)
+    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
 
     out
   }

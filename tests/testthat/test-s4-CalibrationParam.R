@@ -22,7 +22,7 @@ test_that("`probability_distribution` works as expected for `CalibrationParam`",
         mean(.x == .y)
       })
     }))
-    if (isTRUE(nrow(out) <= 2L || ncol(out) <= 2L)) out <- as.vector(out)
+    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
 
     out
   }

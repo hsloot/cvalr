@@ -36,7 +36,7 @@ test_that("`simulate_dt` works as expected for `ExtGaussian2FParam`", {
     cop <- copula::normalCopula(param = nu, dim = d, dispstr = "ex")
     out <- stats::qexp(
       copula::rCopula(n, cop), rate = lambda, lower.tail = FALSE)
-    if (isTRUE(nrow(out) <= 2L || ncol(out) <= 2L)) out <- as.vector(out)
+    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
 
     out
   }
@@ -96,7 +96,7 @@ test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`
         }
       }
     }
-    if (isTRUE(nrow(out) <= 2L || ncol(out) <= 2L)) out <- as.vector(out)
+    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
 
     out
   }
