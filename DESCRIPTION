@@ -36,13 +36,16 @@ Suggests:
 Config/testthat/edition: 3
 Collate:
     'RcppExports.R'
-    'utils.R'
     'checkmate.R'
+    'cvalr-package.R'
+    'utils.R'
     's4-CalibrationParam.R'
     's4-ExMarkovParam.R'
     's4-ExMOParam.R'
     's4-ExtMOParam.R'
     's4-ExtMO2FParam.R'
+    's4-ExtArch2FParam.R'
+    's4-ExtGaussian2FParam.R'
     's4-H2ExCalibrationParam.R'
     's4-H2ExMarkovParam.R'
     's4-H2ExMOParam.R'
@@ -50,10 +53,6 @@ Collate:
     's4-H2ExtMO3FParam.R'
     's4-H2ExtArch3FParam.R'
     's4-H2ExtGaussian3FParam.R'
-    's4-ExtArch2FParam.R'
-    's4-ExtGaussian2FParam.R'
-    'allClass-S4.R'
-    'cvalr-package.R'
 URL: https://github.com/hsloot/cvalr
 BugReports: https://github.com/hsloot/cvalr/issues
 Remotes: github::hsloot/rmo
