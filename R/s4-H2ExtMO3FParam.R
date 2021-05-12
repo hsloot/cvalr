@@ -1,0 +1,87 @@
+#' @include s4-H2ExtMOParam.R
+NULL
+
+#' Two-factor H2-extendible Marshall--Olkin calibration parameter classes
+#'
+#' Calibration parameter class with three parameters for the general 2-level
+#' hierarchically-etendiblew model from the Marshall--Olkin class.
+#'
+#' @slot lambda The marginal rate
+#' @slot nu Model-specific dependence parameters for the global- and the
+#'   component-models.
+#'
+#' @details
+#' For all implemented families, the parameters `nu`can be replaced by
+#' *Spearman's Rho* `rho`, *Kendall's Tau* `tau`, or the *(lower) tail
+#' dependence coefficient* `alpha`.
+#' For all implemented families, the possible range for `rho`, `tau`, and
+#' `alpha`, is between zero and one with the restriction that the global
+#' parameter has to be smaller or equal than the corresponding component
+#' parameter. Additionally, we support only that parameters of the same type are
+#' provided, i.e. `rho`. The parameters have a one-to-one mapping to `nu`.
+#'
+#' @export
+setClass("H2ExtMO3FParam", # nolint
+  contains = c("H2ExtMOParam", "VIRTUAL"),
+  slots = c(lambda = "numeric", nu = "numeric"))
+
+
+#' @rdname H2ExtMO3FParam-class
+#'
+#' @section Cuadras-Augé calibration parameter class:
+#' Corresponds to a Lévy subordinators which are a convex combination of
+#' a pure-killing subordinator and a pure-drift subordinator.
+#' \itemize{
+#'   \item \eqn{\psi(x) = \nu + (1 - \nu) x}
+#'   \item \eqn{\alpha = \nu}
+#' }
+#'
+#' @export CuadrasAugeH2ExtMO3FParam
+CuadrasAugeH2ExtMO3FParam <- setClass("CuadrasAugeH2ExtMO3FParam", # nolint
+  contains = "H2ExtMO3FParam")
+
+
+#' @rdname H2ExtMO3FParam-class
+#'
+#' @section Alpha-stable calibration parameter class:
+#' Corresponds to \eqn{\alpha}-stable subordinators.
+#' \itemize{
+#'   \item \eqn{\psi(x) = x^\nu}
+#'   \item \eqn{\nu = \log_2(2 - \alpha)} and \eqn{\alpha = 2 - 2^\nu}
+#' }
+#'
+#' @export AlphaStableH2ExtMO3FParam
+AlphaStableH2ExtMO3FParam <- setClass("AlphaStableH2ExtMO3FParam", # nolint
+  contains = "H2ExtMO3FParam")
+
+
+#' @rdname H2ExtMO3FParam-class
+#'
+#' @section Poisson calibration parameter class:
+#' Corresponds to Lévy subordinators which are a convex combination of
+#' Poisson subordinators with jump size `nu` and pure-drift subordinators.
+#' \itemize{
+#'   \item \eqn{\psi(x) = \operatorname{e}^{-\nu}x + (1 - \operatorname{e}^{-x \nu})}
+#'  \item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\eta})}
+#' }
+#'
+#' @export PoissonH2ExtMO3FParam
+PoissonH2ExtMO3FParam <- setClass("PoissonH2ExtMO3FParam", # nolint
+  contains = "H2ExtMO3FParam")
+
+
+#' @rdname H2ExtMO3FParam-class
+#'
+#' @section Exponential calibration parameter class:
+#' Corresponds to Lévy subordinator which is a convex combination of
+#' Exponential-jump compound Poisson processes with rate `nu` and unit-intensity
+#' and a pure-drift subordinators.
+#' \itemize{
+#'   \item \eqn{\psi(x) = (1 - 1 / (1 + \nu))x + 1 / (x + \nu)}
+#'   \item \eqn{\nu = 0.5 \cdot (-3 + \sqrt{1 + 8 / \alpha})}
+#'     and \eqn{\alpha = 2 / (1 + \nu) - 1 / (2 + \nu)}
+#' }
+#'
+#' @export ExponentialH2ExtMO3FParam
+ExponentialH2ExtMO3FParam <- setClass("ExponentialH2ExtMO3FParam", # nolint
+  contains = "H2ExtMO3FParam")

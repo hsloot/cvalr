@@ -1,0 +1,25 @@
+#' @include s4-CalibrationParam.R
+NULL
+
+#' Exchangeable Markovian calibration parameter
+#'
+#' Calibration parameter class for the general exchangeable model with a
+#' Markovian *default counting process*.
+#'
+#' @slot qmatrix The \eqn{(d+1) \times (d+1)} Markov generator matrix of the
+#'   default counting process.
+#'
+#' @details
+#' The probability of \eqn{j > i} portfolio items being defaulted at time
+#' \eqn{t > s} conditioned on \eqn{i} portfolio items being defaulted at time
+#' \eqn{s} is
+#'
+#' \deqn{
+#'   \mathbb{P}(Z_t = j \mid Z_s = i)
+#'     = \delta_{i}^\top \operatorname{e}^{(t-s) Q} \delta_{j} .
+#' }
+#'
+#' @export ExMarkovParam
+ExMarkovParam <- setClass("ExMarkovParam", # nolint
+  contains = "CalibrationParam",
+  slots = c(ex_qmatrix = "matrix"))

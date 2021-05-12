@@ -1,0 +1,27 @@
+#' @include s4-ExMOParam.R
+NULL
+
+#' Extendible Marshall--Olkin calibration parameter
+#'
+#' Calibration parameter class for the general extendible model from the
+#' Marshall-Olkin class.
+#'
+#' @slot bf Bernstein function (see details)
+#'
+#' @details
+#' The joint survival function of all portfolio items is assumed to be
+#' \deqn{
+#'   P(\tau > t)
+#'     = \exp{(- a_{0} t_{[1]} - \cdots - a_{d-1} t_{[d]})} ,
+#' }
+#' for \eqn{t_{[1]} \geq \cdots \geq t_{[d]}} begin the descendingly ordered
+#' version of \eqn{t} and
+#' \deqn{
+#'   a_{i}
+#'     = \psi{(i+1)} - \psi{(i)} .
+#' }
+#'
+#' @export ExtMOParam
+ExtMOParam <- setClass("ExtMOParam", # nolint
+  contains = "ExMOParam",
+  slots = c(bf = "BernsteinFunction"))
