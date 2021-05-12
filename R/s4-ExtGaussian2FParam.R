@@ -1,0 +1,334 @@
+#' @include s4-CalibrationParam.R s4-ExtMO2FParam.R checkmate.R
+NULL
+
+#' Two-factor extendible Gaussian calibration parameter classes
+#'
+#' Calibration parameter classes with two parameters for the extendible
+#' Gaussian equi-correlation family with exponential margins.
+#'
+#' @slot lambda The marginal rate
+#' @slot nu Model specific parameter (Pearson correlation)
+#'
+#' @details
+#' For all implemented families, the parameter `nu` can be replaced by
+#' *Spearman's Rho* `rho`, *Kendall' Tau* `tau`.
+#' For all implemented families, the possible range for `rho` and `tau`
+#' is from zero to one (boundaries might not be included) and have a
+#' one-to-one mapping to the model-specific parameter `nu`.
+#' The link between the Pearson correlation coefficient and
+#' Spearman's Rho and Kendall's Tau is
+#' \itemize{
+#'   \item \eqn{\rho = 2 \sin(\rho_S \cdot \pi / 6)} and
+#'     \eqn{\rho_S = 6 / \pi \cdot \arcsin(\rho/2)}
+#'   \item \eqn{\rho = \sin(\tau \cdot \pi / 2)} and
+#'     \eqn{\tau = 2 / \pi \cdot \arcsin(\rho)}
+#' }
+#'
+#' @export ExtGaussian2FParam
+ExtGaussian2FParam <- setClass("ExtGaussian2FParam", # nolint
+  contains = "CalibrationParam",
+  slots = c("lambda", "nu"))
+
+
+setMethod("getLambda", "ExtGaussian2FParam",
+  function(object) {
+    object@lambda
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setLambda", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    object@lambda <- value
+
+    invisible(object)
+  })
+
+setMethod("getNu", "ExtGaussian2FParam",
+  function(object) {
+    object@nu
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setNu", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    object@nu <- value
+
+    invisible(object)
+  })
+
+setMethod("getRho", "ExtGaussian2FParam",
+  function(object) {
+    (6 / pi) * asin(getNu(object) / 2)
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setRho", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    setNu(object) <- invRho(object, value)
+
+    invisible(object)
+  })
+
+setMethod("getTau", "ExtGaussian2FParam",
+  function(object) {
+    (2 / pi) * asin(getNu(object))
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setTau", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    setNu(object) <- invTau(object, value)
+
+    invisible(object)
+  })
+
+
+#' @importFrom checkmate qassert
+setValidity("ExtGaussian2FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N1[0,1]")
+
+    invisible(TRUE)
+  })
+
+
+#' @describeIn ExtGaussian2FParam-class Constructor
+#' @aliases initialize,ExtGaussian2FParam-method
+#' @aliases initialize,ExtGaussian2FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param dim Dimension.
+#' @param lambda Marginal intensity.
+#' @param nu Dependence parameter.
+#' @param rho Spearman's Rho.
+#' @param tau Kendall's Tau.
+#'
+#' @examples
+#' ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+setMethod("initialize", signature = "ExtGaussian2FParam",
+  definition = function(.Object, # nolint
+      dim, lambda, nu, rho = NULL, tau = NULL) {
+    if (!missing(dim) && !missing(lambda) &&
+          !(missing(nu) && missing(rho) && missing(tau))) {
+      if (missing(nu)) {
+        if (!is.null(rho)) {
+          nu <- invRho(.Object, rho)
+        } else if (!is.null(tau)) {
+          nu <- invTau(.Object, tau)
+        }
+      }
+
+      setDimension(.Object) <- dim
+      setLambda(.Object) <- lambda
+      setNu(.Object) <- nu
+      validObject(.Object)
+    }
+
+    invisible(.Object)
+  })
+
+
+#' @importFrom checkmate qassert
+setMethod("invRho", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    2 * sin(value * pi / 6)
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invTau", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    sin(value * pi / 2)
+  })
+
+
+#' @describeIn ExtGaussian2FParam-class
+#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
+#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#' @aliases simulate_dt,ExtGaussian2FParam-method
+#'
+#' @inheritParams simulate_dt
+#' @param method Simulation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#' @param n_sim Number of samples.
+#'
+#' @examples
+#' parm <- ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+#' simulate_dt(parm, n_sim = 5e1)
+#'
+#' @importFrom stats qexp
+#' @importFrom copula normalCopula rCopula
+#' @include utils.R
+setMethod("simulate_dt", "ExtGaussian2FParam",
+  function(object, ...,
+      method = c("default", "ExtGaussian2FParam"), n_sim = 1e4) {
+    method <- match.arg(method)
+    out <- qexp(
+      rCopula(
+        n_sim,
+        normalCopula(param = object@nu, dim = object@dim, dispstr = "ex")
+      ),
+      rate = object@lambda, lower.tail = FALSE
+    )
+
+    simplify2vector(out)
+  })
+
+#' @describeIn ExtGaussian2FParam-class
+#'   returns the probability vector for the average default count process \eqn{L}.
+#' @aliases probability_distribution,ExtGaussian2FParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
+#' @examples
+#' probability_distribution(ExtGaussian2FParam(
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+#'
+#' @importFrom stats integrate pexp pnorm dnorm qnorm
+#' @importFrom checkmate qassert
+#' @include utils.R
+#' @export
+setMethod("probability_distribution", "ExtGaussian2FParam",
+  function(object, times, ...,
+      method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method)) {
+      method <- "ExtGaussian2FParam"
+    }
+    if (!isTRUE("ExtGaussian2FParam" == method)) {
+      out <- callNextMethod(object, times, ...)
+    } else {
+      qassert(times, "N+[0,)")
+      times <- qnorm(pexp(times, rate = object@lambda))
+      out <- outer(0:object@dim, times,
+        Vectorize(function(k, t) {
+          if (-Inf == t && 0 == k) {
+            return(1)
+          } else if (-Inf == t && 0 < k) {
+            return(0)
+          }
+          int_res <- integrate(
+            function(x) {
+              ldp <- pnorm(
+                (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
+                log.p = TRUE, lower.tail = TRUE
+              )
+              lsp <- pnorm(
+                (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
+                log.p = TRUE, lower.tail = FALSE
+              )
+              v_multiply_binomial_coefficient(
+                exp(k * ldp + (object@dim-k) * lsp) * dnorm(x), object@dim, k)
+            }, lower = -Inf, upper = Inf, rel.tol = .Machine$double.eps^0.5
+          )
+
+          int_res$value
+        }))
+    }
+
+    simplify2vector(out)
+  })
+
+#' @describeIn ExtGaussian2FParam-class
+#'   returns the expected portfolio CDS loss for a specific time-point.
+#' @aliases expected_pcds_loss,ExtGaussian2FParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
+#' @examples
+#' expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
+#'   times = 0.25, recovery_rate = 0.4)
+#' expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
+#'   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
+#'
+#' @importFrom stats pexp
+#' @importFrom checkmate qassert
+#' @export
+setMethod("expected_pcds_loss", "ExtGaussian2FParam",
+  function(object, times, recovery_rate, ...,
+      method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method)) {
+      method <- "ExtGaussian2FParam"
+    }
+    if (!isTRUE("ExtGaussian2FParam" == method)) {
+      out <- callNextMethod(object, times, recovery_rate, ...)
+    } else {
+      qassert(times, "N+[0,)")
+      qassert(recovery_rate, "N1[0,1]")
+      out <- (1 - recovery_rate) * pexp(times, rate = object@lambda)
+    }
+
+    out
+  })
+
+#' @describeIn ExtGaussian2FParam-class
+#'   returns the expected CDO loss for a specific time-point.
+#' @aliases expected_cdo_loss,ExtGaussian2FParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
+#' @examples
+#' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
+#' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam")
+#'
+#' @importFrom mvtnorm pmvnorm
+#' @importFrom stats pexp qnorm
+#' @importFrom checkmate qassert assert_numeric
+#' @export
+setMethod("expected_cdo_loss", "ExtGaussian2FParam",
+  function(
+      object, times, recovery_rate, lower, upper, ...,
+      method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method)) {
+      method <- "ExtGaussian2FParam"
+    }
+    if (!isTRUE("ExtGaussian2FParam" == method)) {
+      out <- callNextMethod(object, times, recovery_rate, lower, upper, ...)
+    } else {
+      qassert(times, "N+[0,)")
+      qassert(recovery_rate, "N1[0,1]")
+      qassert(lower, "N1[0,1]")
+      assert_numeric(upper, lower = lower, upper = 1)
+
+      corr <- matrix(c(1, rep(-sqrt(1 - object@nu), 2), 1), nrow=2, ncol=2)
+      times <- qnorm(pexp(times, rate = object@lambda))
+      out <- sapply(times, function(t) {
+        left <- pnorm(t)
+        if (lower > 0) {
+          left <- pmvnorm(
+            lower = rep(-Inf, 2),
+            upper = c(
+              -qnorm(pmin(lower / (1 - recovery_rate), 1)),
+              t
+            ),
+            corr = corr
+          )
+        }
+        right <- pmvnorm(
+          lower = rep(-Inf, 2),
+          upper = c(
+            -qnorm(pmin(upper / (1 - recovery_rate), 1)),
+            t
+          ),
+          corr = corr
+        )
+
+        (1 - recovery_rate) * as.numeric(left - right)
+      })
+    }
+
+    out
+  })
