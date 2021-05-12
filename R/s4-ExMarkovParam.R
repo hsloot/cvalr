@@ -126,3 +126,42 @@ setMethod("simulate_dt", "ExMarkovParam",
 
     simplify2vector(out)
   })
+
+#' @describeIn ExMarkovParam-class
+#'   returns the probability vector for the average default count process \eqn{L}.
+#' @aliases probability_distribution,ExMarkovParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
+#' @examples
+#' probability_distribution(CuadrasAugeExtMO2FParam(
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+#' probability_distribution(AlphaStableExtMO2FParam(
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+#' probability_distribution(PoissonExtMO2FParam(
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+#' probability_distribution(ExponentialExtMO2FParam(
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+#'
+#' @importFrom expm expm
+#' @importFrom checkmate qassert
+#' @include utils.R
+#' @export
+setMethod("probability_distribution", "ExMarkovParam",
+  function(object, times, ...,
+      method = c("default", "ExMarkovParam", "CalibrationParam")) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method)) {
+      method <- "ExMarkovParam"
+    }
+    if (!isTRUE("ExMarkovParam" == method)) {
+      out <- callNextMethod(object, times, ...)
+    } else {
+      qassert(times, "N+[0,)")
+      out <- sapply(times, function(t) expm(t * object@ex_qmatrix)[1, ])
+    }
+
+    simplify2vector(out)
+  })

@@ -176,3 +176,60 @@ setMethod("simulate_dt", "ExtGaussian2FParam",
 
     simplify2vector(out)
   })
+
+#' @describeIn ExtGaussian2FParam-class
+#'   returns the probability vector for the average default count process \eqn{L}.
+#' @aliases probability_distribution,ExtGaussian2FParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
+#' @examples
+#' probability_distribution(ExtGaussian2FParam(
+#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+#'
+#' @importFrom stats integrate pexp pnorm dnorm qnorm
+#' @importFrom checkmate qassert
+#' @include utils.R
+#' @export
+setMethod("probability_distribution", "ExtGaussian2FParam",
+  function(object, times, ...,
+      method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method)) {
+      method <- "ExtGaussian2FParam"
+    }
+    if (!isTRUE("ExtGaussian2FParam" == method)) {
+      out <- callNextMethod(object, times, ...)
+    } else {
+      qassert(times, "N+[0,)")
+      times <- qnorm(pexp(times, rate = object@lambda))
+      out <- outer(0:object@dim, times,
+        Vectorize(function(k, t) {
+          if (-Inf == t && 0 == k) {
+            return(1)
+          } else if (-Inf == t && 0 < k) {
+            return(0)
+          }
+          int_res <- integrate(
+            function(x) {
+              ldp <- pnorm(
+                (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
+                log.p = TRUE, lower.tail = TRUE
+              )
+              lsp <- pnorm(
+                (t - sqrt(object@nu) * x) / (sqrt(1 - object@nu)),
+                log.p = TRUE, lower.tail = FALSE
+              )
+              v_multiply_binomial_coefficient(
+                exp(k * ldp + (object@dim-k) * lsp) * dnorm(x), object@dim, k)
+            }, lower = -Inf, upper = Inf, rel.tol = .Machine$double.eps^0.5
+          )
+
+          int_res$value
+        }))
+    }
+
+    simplify2vector(out)
+  })

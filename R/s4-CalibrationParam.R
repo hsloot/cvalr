@@ -120,3 +120,58 @@ setMethod("simulate_adcp", "CalibrationParam",
     }
     simplify2vector(dt2adcp(tmp, times))
   })
+
+#' @describeIn CalibrationParam-class
+#'   returns the probability vector for the average default count process \eqn{L}.
+#'
+#' @param object The calibration parameter object.
+#' @param times Point-in-time.
+#' @param ... Pass-through parameter.
+#'
+#' @section Probability distribution:
+#' The probability vector of the *average default counting process* \eqn{L}
+#' for certain times can be calculated with [probability_distribution()];
+#' i.e. the values
+#' \deqn{
+#'   \mathbb{P}(L_t = k/d) , \quad k \in {\{ 0, \ldots, d \}} , \quad t \geq 0 .
+#' }
+#'
+#' @export
+setGeneric("probability_distribution",
+  function(object, times, ...) {
+    standardGeneric("probability_distribution")
+  })
+
+#' @describeIn ExMarkovParam-class
+#'   returns the probability vector for the average default count process \eqn{L}.
+#' @aliases probability_distribution,CalibrationParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#' @param seed Numeric number (if not NULL, is used to set the seed prior to
+#'   Monte-Carlo estimation of probability distribution).
+#' @param sim_args List with pass-through parameters for [simulate_adcp()].
+#'
+#' @importFrom checkmate qassert assert_number assert_list
+#' @include utils.R
+#' @export
+setMethod("probability_distribution", "CalibrationParam",
+  function(object, times, ...,
+      method = c("default", "CalibrationParam"), seed = NULL, sim_args = NULL) {
+    method <- match.arg(method)
+    qassert(times, "N+[0,)")
+    assert_number(seed, lower = 0, finite = TRUE, null.ok = TRUE)
+    assert_list(sim_args, null.ok = TRUE)
+    if (!is.null(seed)) {
+      set.seed(seed)
+    }
+    x <- do.call(simulate_adcp,
+           args = c(list(object = object, times = times), sim_args))
+    if (!is.matrix(x)) {
+      x <- as.matrix(x, ncol = 1L)
+    }
+    out <- adcp2epd(x, object@dim)
+
+    simplify2vector(out)
+  })
