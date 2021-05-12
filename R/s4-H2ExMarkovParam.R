@@ -145,7 +145,7 @@ setMethod("getModelName", "H2ExMarkovParam",
 #'   partition = list(1:2, 3:6, 7:8), fraction = 0.4,
 #'   lambda = 8e-2, rho = c(0.2, 0.7))
 #' simulate_dt(parm, n_sim = 5e1)
-#' 
+#'
 #' @include utils.R
 setMethod("simulate_dt", "H2ExMarkovParam",
   function(object, ...) {
