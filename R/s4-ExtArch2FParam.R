@@ -200,6 +200,41 @@ setMethod("simulate_dt", "ExtArch2FParam",
     simplify2vector(out)
   })
 
+#' @describeIn ExtArch2FParam-class
+#'   returns the expected portfolio CDS loss for a specific time-point.
+#' @aliases expected_pcds_loss,ExtArch2FParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
+#' @examples
+#' expected_pcds_loss(FrankExtArch2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
+#'   times = 0.25, recovery_rate = 0.4)
+#' expected_pcds_loss(FrankExtArch2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
+#'   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
+#'
+#' @importFrom stats pexp
+#' @importFrom checkmate qassert
+#' @export
+setMethod("expected_pcds_loss", "ExtArch2FParam",
+  function(object, times, recovery_rate, ...,
+      method = c("default", "ExtArch2FParam", "CalibrationParam")) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method)) {
+      method <- "ExtArch2FParam"
+    }
+    if (!isTRUE("ExtArch2FParam" == method)) {
+      out <- callNextMethod(object, times, recovery_rate, ...)
+    } else {
+      qassert(times, "N+[0,)")
+      qassert(recovery_rate, "N1[0,1]")
+      out <- (1 - recovery_rate) * pexp(times, rate = object@lambda)
+    }
+
+    out
+  })
+
 
 
 #' @rdname ExtArch2FParam-class

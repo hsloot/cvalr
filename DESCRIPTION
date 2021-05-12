@@ -54,7 +54,6 @@ Collate:
     's4-ExtGaussian2FParam.R'
     'allClass-S4.R'
     'cvalr-package.R'
-    'expected_value-S4.R'
 URL: https://github.com/hsloot/cvalr
 BugReports: https://github.com/hsloot/cvalr/issues
 Remotes: github::hsloot/rmo

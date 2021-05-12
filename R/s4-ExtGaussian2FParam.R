@@ -233,3 +233,102 @@ setMethod("probability_distribution", "ExtGaussian2FParam",
 
     simplify2vector(out)
   })
+
+#' @describeIn ExtGaussian2FParam-class
+#'   returns the expected portfolio CDS loss for a specific time-point.
+#' @aliases expected_pcds_loss,ExtGaussian2FParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
+#' @examples
+#' expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
+#'   times = 0.25, recovery_rate = 0.4)
+#' expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
+#'   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
+#'
+#' @importFrom stats pexp
+#' @importFrom checkmate qassert
+#' @export
+setMethod("expected_pcds_loss", "ExtGaussian2FParam",
+  function(object, times, recovery_rate, ...,
+      method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method)) {
+      method <- "ExtGaussian2FParam"
+    }
+    if (!isTRUE("ExtGaussian2FParam" == method)) {
+      out <- callNextMethod(object, times, recovery_rate, ...)
+    } else {
+      qassert(times, "N+[0,)")
+      qassert(recovery_rate, "N1[0,1]")
+      out <- (1 - recovery_rate) * pexp(times, rate = object@lambda)
+    }
+
+    out
+  })
+
+#' @describeIn ExtGaussian2FParam-class
+#'   returns the expected CDO loss for a specific time-point.
+#' @aliases expected_cdo_loss,ExtGaussian2FParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
+#' @examples
+#' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
+#' expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+#'   times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam")
+#'
+#' @importFrom mvtnorm pmvnorm
+#' @importFrom stats pexp qnorm
+#' @importFrom checkmate qassert assert_numeric
+#' @export
+setMethod("expected_cdo_loss", "ExtGaussian2FParam",
+  function(
+      object, times, recovery_rate, lower, upper, ...,
+      method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method)) {
+      method <- "ExtGaussian2FParam"
+    }
+    if (!isTRUE("ExtGaussian2FParam" == method)) {
+      out <- callNextMethod(object, times, recovery_rate, lower, upper, ...)
+    } else {
+      qassert(times, "N+[0,)")
+      qassert(recovery_rate, "N1[0,1]")
+      qassert(lower, "N1[0,1]")
+      assert_numeric(upper, lower = lower, upper = 1)
+
+      corr <- matrix(c(1, rep(-sqrt(1 - object@nu), 2), 1), nrow=2, ncol=2)
+      times <- qnorm(pexp(times, rate = object@lambda))
+      out <- sapply(times, function(t) {
+        left <- pnorm(t)
+        if (lower > 0) {
+          left <- pmvnorm(
+            lower = rep(-Inf, 2),
+            upper = c(
+              -qnorm(pmin(lower / (1 - recovery_rate), 1)),
+              t
+            ),
+            corr = corr
+          )
+        }
+        right <- pmvnorm(
+          lower = rep(-Inf, 2),
+          upper = c(
+            -qnorm(pmin(upper / (1 - recovery_rate), 1)),
+            t
+          ),
+          corr = corr
+        )
+
+        (1 - recovery_rate) * as.numeric(left - right)
+      })
+    }
+
+    out
+  })
