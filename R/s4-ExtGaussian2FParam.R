@@ -142,3 +142,37 @@ setMethod("invTau", "ExtGaussian2FParam",
     qassert(value, "N1[0,1]")
     sin(value * pi / 2)
   })
+
+
+#' @describeIn ExtGaussian2FParam-class
+#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
+#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#' @aliases simulate_dt,ExtGaussian2FParam-method
+#'
+#' @inheritParams simulate_dt
+#' @param method Simulation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#' @param n_sim Number of samples.
+#'
+#' @examples
+#' parm <- ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+#' simulate_dt(parm, n_sim = 5e1)
+#'
+#' @importFrom stats qexp
+#' @importFrom copula normalCopula rCopula
+#' @include utils.R
+setMethod("simulate_dt", "ExtGaussian2FParam",
+  function(object, ...,
+      method = c("default", "ExtGaussian2FParam"), n_sim = 1e4) {
+    method <- match.arg(method)
+    out <- qexp(
+      rCopula(
+        n_sim,
+        normalCopula(param = object@nu, dim = object@dim, dispstr = "ex")
+      ),
+      rate = object@lambda, lower.tail = FALSE
+    )
+
+    simplify2vector(out)
+  })

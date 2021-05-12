@@ -84,3 +84,40 @@ setMethod("initialize", "ExMOParam",
 
     invisible(.Object)
   })
+
+
+#' @describeIn ExMOParam-class
+#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
+#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#' @aliases simulate_dt,ExMOParam-method
+#'
+#' @inheritParams simulate_dt
+#' @param method Simulation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#' @param n_sim Number of samples.
+#'
+#' @examples
+#' parm <- ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
+#' simulate_dt(parm, n_sim = 5e1)
+#'
+#' @importFrom rmo rexmo_markovian
+#' @include utils.R
+#' @export
+setMethod("simulate_dt", "ExMOParam",
+  function(object, ...,
+      method = c("default", "ExMOParam", "ExMarkovParam"), n_sim = 1e4) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method)) {
+      method <- "ExMOParam"
+    }
+
+    if (isTRUE("ExMOParam" == method)) {
+      out <- rexmo_markovian(n_sim, object@dim, object@ex_intensities)
+      out <- simplify2vector(out)
+    } else {
+      out <- callNextMethod(object, ..., n_sim = n_sim)
+    }
+
+    out
+  })

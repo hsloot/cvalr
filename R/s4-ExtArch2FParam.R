@@ -170,6 +170,38 @@ setMethod("invTau", "ExtArch2FParam",
 
 
 
+#' @describeIn ExtArch2FParam-class
+#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
+#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#' @aliases simulate_dt,ExtArch2FParam-method
+#'
+#' @inheritParams simulate_dt
+#' @param method Simulation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#' @param n_sim Number of samples.
+#'
+#' @examples
+#' parm <- FrankExtArch2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' simulate_dt(parm, n_sim = 5e1)
+#'
+#' @importFrom stats qexp
+#' @importFrom copula rCopula
+#' @include utils.R
+setMethod("simulate_dt", "ExtArch2FParam",
+  function(object, ...,
+      method = c("default", "ExtArch2fParam"), n_sim = 1e4) {
+    method <- match.arg(method)
+    out <- qexp(
+      rCopula(n_sim, object@copula),
+      rate = object@lambda, lower.tail = !object@survival
+    )
+
+    simplify2vector(out)
+  })
+
+
+
 #' @rdname ExtArch2FParam-class
 #'
 #' @export ClaytonExtArch2FParam

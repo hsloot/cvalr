@@ -82,3 +82,47 @@ setMethod("initialize", "ExMarkovParam",
 
     invisible(.Object)
   })
+
+
+#' @describeIn ExMarkovParam-class
+#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
+#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#' @aliases simulate_dt,ExMarkovParam-method
+#'
+#' @inheritParams simulate_dt
+#' @param method Simulation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#' @param n_sim Number of samples.
+#'
+#' @examples
+#' parm <- ExMarkovParam(
+#'  ex_qmatrix = matrix(
+#'    c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
+#'    nrow = 3L, ncol = 3L))
+#' simulate_dt(parm, n_sim = 5e1)
+#'
+#' @importFrom stats rexp
+#' @include utils.R
+#' @export
+setMethod("simulate_dt", "ExMarkovParam",
+  function(object, ...,
+      method = c("default", "ExMarkovParam"), n_sim = 1e4) {
+    method <- match.arg(method)
+    out <- matrix(nrow = n_sim, ncol = object@dim)
+    for (k in 1:n_sim) {
+      state <- 0
+      time <- 0
+      while (state != object@dim) {
+        wt <- rexp(1, rate = -object@ex_qmatrix[1+state, 1+state])
+        time <- time + wt
+        out[k, (1+state):object@dim] <- time
+        state <- state + sample.int(n = object@dim-state, size = 1, replace = FALSE,
+                        prob = object@ex_qmatrix[1+state, (2+state):(object@dim+1)])
+      }
+      perm <- sample.int(n = object@dim, size = object@dim, replace = FALSE)
+      out[k, perm] <- out[k, perm]
+    }
+
+    simplify2vector(out)
+  })

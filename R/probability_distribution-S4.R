@@ -1,4 +1,4 @@
-#' @include allClass-S4.R simulate_param-S4.R utils.R
+#' @include allClass-S4.R utils.R
 NULL
 
 #' @describeIn CalibrationParam-class

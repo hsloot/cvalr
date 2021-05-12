@@ -64,3 +64,59 @@ setValidity("CalibrationParam",
 
     invisible(TRUE)
   })
+
+
+#' @describeIn CalibrationParam-class
+#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
+#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#'
+#' @param object [CalibrationParam-class]-object.
+#' ... Pass-through parameters.
+#'
+#' @export
+setGeneric("simulate_dt",
+  function(object, ...) {
+    standardGeneric("simulate_dt")
+  })
+
+#' @describeIn CalibrationParam-class
+#'   simulates the default counting process \eqn{L} and returns a matrix `x` with
+#'   `nrow(x) == n_sim` and `ncol(x) == length(times)` if `length(times) > 1L`
+#'   and a vector `x` with `length(x) == n_sim` otherwise.
+#'
+#' @param object Calibration parameter object.
+#' @param times The times for which the process is supposed to be simulated.
+#' @param ... Pass-through parameter.
+#'
+#' @export
+setGeneric("simulate_adcp",
+  function(object, times, ...) {
+    standardGeneric("simulate_adcp")
+  })
+
+#' @describeIn CalibrationParam-class
+#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
+#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#' @aliases simulate_adcp,CalibrationParam-method
+#'
+#' @examples
+#' parm <- ExMarkovParam(
+#'  ex_qmatrix = matrix(
+#'    c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
+#'    nrow = 3L, ncol = 3L))
+#' simulate_adcp(parm, 1, n_sim = 5e1)
+#' simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 5e1)
+#'
+#' @importFrom stats rexp
+#' @include utils.R
+#' @export
+setMethod("simulate_adcp", "CalibrationParam",
+  function(object, times, ...) {
+    tmp <- simulate_dt(object, ...)
+    if (!is.matrix(tmp)) {
+      tmp <- matrix(tmp, ncol = dim(object))
+    }
+    simplify2vector(dt2adcp(tmp, times))
+  })

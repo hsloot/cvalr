@@ -130,3 +130,29 @@ setMethod("getModelName", "H2ExMarkovParam",
   function(object) {
     "ExMarkovParam"
   })
+
+
+#' @describeIn H2ExMarkovParam-class
+#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
+#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#' @aliases simulate_dt,H2ExMarkovParam-method
+#'
+#' @inheritParams simulate_dt
+#'
+#' @examples
+#' parm <- ExponentialH2ExtMO3FParam(
+#'   partition = list(1:2, 3:6, 7:8), fraction = 0.4,
+#'   lambda = 8e-2, rho = c(0.2, 0.7))
+#' simulate_dt(parm, n_sim = 5e1)
+#' 
+#' @include utils.R
+setMethod("simulate_dt", "H2ExMarkovParam",
+  function(object, ...) {
+    fraction <- object@fraction
+    tmp0 <- simulate_dt(object@models[[1]], ...)
+    tmp1 <- reduce(map(object@models[-1], simulate_dt, ...), cbind)
+    out <- pmin(1 / fraction * tmp0, 1 / (1 - fraction) * tmp1)
+
+    simplify2vector(out)
+  })

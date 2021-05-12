@@ -120,3 +120,43 @@ setMethod("invTau", "H2ExtGaussian3FParam",
     qassert(value, "N2[0,1]")
     sin(value * pi / 2)
   })
+
+
+#' @describeIn H2ExtGaussian3FParam-class
+#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
+#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
+#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#' @aliases simulate_dt,H2ExtGaussian3FParam-method
+#'
+#' @inheritParams simulate_dt
+#' @param n_sim Number of samples.
+#'
+#' @examples
+#' parm <- H2ExtGaussian3FParam(
+#'   partition = list(1:2, 3:6, 7:8),
+#'   lambda = 8e-2, rho = c(0.2, 0.7))
+#' simulate_dt(parm, n_sim = 5e1)
+#'
+#' @importFrom purrr walk
+#' @importFrom copula normalCopula rCopula P2p p2P
+#' @importFrom stats qexp
+#' @include utils.R
+setMethod("simulate_dt", "H2ExtGaussian3FParam",
+  function(object, ..., n_sim = 1e4) {
+    d <- getDimension(object)
+    nu <- getNu(object)
+    corr <- p2P(nu[[1]], d = d)
+    walk(object@partition, ~{
+      corr[.x, .x] <<- p2P(nu[[2]], d = length(.x))
+    })
+
+    out <- qexp(
+      rCopula(
+        n_sim,
+        normalCopula(param = P2p(corr), dim = d, dispstr = "un")
+      ),
+      rate = getLambda(object), lower.tail = FALSE
+    )
+
+    simplify2vector(out)
+  })
