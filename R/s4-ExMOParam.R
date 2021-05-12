@@ -25,3 +25,13 @@ NULL
 ExMOParam <- setClass("ExMOParam", # nolint
   contains = "ExMarkovParam",
   slots = c(ex_intensities = "numeric"))
+
+
+setGeneric("getExIntensities",
+  function(object) {
+    standardGeneric("getExIntensities")
+  })
+setGeneric("setExIntensities<-",
+  function(object, value) {
+    standardGeneric("setExIntensities<-")
+  })

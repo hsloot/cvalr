@@ -1,4 +1,4 @@
-#' @include s4-H2ExCalibrationParam.R
+#' @include s4-H2ExCalibrationParam.R s4-H2ExtMO3FParam.R
 NULL
 
 #' Three-factor H2-extendible Gaussian calibration parameter classes

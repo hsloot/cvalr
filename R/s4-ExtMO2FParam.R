@@ -29,6 +29,70 @@ setClass("ExtMO2FParam", # nolint
   slots = c(lambda = "numeric", nu = "numeric"))
 
 
+setGeneric("getLambda",
+  function(object) {
+    standardGeneric("getLambda")
+  })
+setGeneric("setLambda<-",
+  function(object, value) {
+    standardGeneric("setLambda<-")
+  })
+
+setGeneric("getNu",
+  function(object) {
+    standardGeneric("getNu")
+  })
+setGeneric("setNu<-",
+  function(object, value) {
+    standardGeneric("setNu<-")
+  })
+
+setGeneric("getRho",
+  function(object) {
+    standardGeneric("getRho")
+  })
+setGeneric("setRho<-",
+  function(object, value) {
+    standardGeneric("setRho<-")
+  })
+
+setGeneric("getTau",
+  function(object) {
+    standardGeneric("getTau")
+  })
+setGeneric("setTau<-",
+  function(object, value) {
+    standardGeneric("setTau<-")
+  })
+
+setGeneric("getAlpha",
+  function(object) {
+    standardGeneric("getAlpha")
+  })
+setGeneric("setAlpha<-",
+  function(object, value) {
+    standardGeneric("setAlpha<-")
+  })
+
+setGeneric("invRho",
+  function(object, value) {
+    standardGeneric("invRho")
+  })
+setGeneric("invTau",
+  function(object, value) {
+    standardGeneric("invTau")
+  })
+setGeneric("invAlpha",
+  function(object, value) {
+    standardGeneric("invAlpha")
+  })
+
+setGeneric("constructBernsteinFunction",
+  function(object, ...) {
+    standardGeneric("constructBernsteinFunction")
+  })
+
+
 #' @rdname ExtMO2FParam-class
 #'
 #' @section Cuadras-Augé calibration parameter class:

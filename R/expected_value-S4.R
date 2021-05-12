@@ -1,4 +1,4 @@
-#' @include allClass-S4.R allGeneric-S4.R simulate_param-S4.R
+#' @include allClass-S4.R simulate_param-S4.R
 #'   probability_pistribution-S4.R
 NULL
 

@@ -25,3 +25,13 @@ NULL
 ExtMOParam <- setClass("ExtMOParam", # nolint
   contains = "ExMOParam",
   slots = c(bf = "BernsteinFunction"))
+
+
+setGeneric("getBernsteinFunction",
+  function(object) {
+    standardGeneric("getBernsteinFunction")
+  })
+setGeneric("setBernsteinFunction<-",
+ function(object, value) {
+   standardGeneric("setBernsteinFunction<-")
+ })

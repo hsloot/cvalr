@@ -12,3 +12,13 @@ NULL
 setClass("H2ExCalibrationParam",
   contains = c("CalibrationParam", "VIRTUAL"),
   slots = c(partition = "list"))
+
+
+setGeneric("getPartition",
+  function(object) {
+    standardGeneric("getPartition")
+  })
+setGeneric("setPartition<-",
+  function(object, value) {
+    standardGeneric("setPartition<-")
+  })

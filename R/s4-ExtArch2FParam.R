@@ -1,4 +1,4 @@
-#' @include s4-CalibrationParam.R
+#' @include s4-CalibrationParam.R s4-ExtMO2FParam.R
 NULL
 
 #' Two-factor extendible Archimedean calibration parameter classes

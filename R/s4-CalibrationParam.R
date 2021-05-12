@@ -29,3 +29,13 @@ NULL
 setClass("CalibrationParam", # nolint
   contains = "VIRTUAL",
   slots = c(dim = "integer"))
+
+
+setGeneric("getDimension",
+  function(object) {
+    standardGeneric("getDimension")
+  })
+setGeneric("setDimension<-",
+  function(object, value) {
+    standardGeneric("setDimension<-")
+  })

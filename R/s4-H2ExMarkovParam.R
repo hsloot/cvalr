@@ -21,3 +21,26 @@ NULL
 H2ExMarkovParam <- setClass("H2ExMarkovParam", # nolint
   contains = "H2ExCalibrationParam",
   slots = c(models = "list", fraction = "numeric"))
+
+setGeneric("getFraction",
+  function(object) {
+    standardGeneric("getFraction")
+  })
+setGeneric("setFraction<-",
+  function(object, value) {
+    standardGeneric("setFraction<-")
+  })
+
+setGeneric("getModelName",
+  function(object) {
+    standardGeneric("getModelName")
+  })
+
+setGeneric("getModels",
+  function(object) {
+    standardGeneric("getModels")
+  })
+setGeneric("setModels<-",
+  function(object, value) {
+    standardGeneric("setModels<-")
+  })

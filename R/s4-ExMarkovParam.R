@@ -23,3 +23,13 @@ NULL
 ExMarkovParam <- setClass("ExMarkovParam", # nolint
   contains = "CalibrationParam",
   slots = c(ex_qmatrix = "matrix"))
+
+
+setGeneric("getExQMatrix",
+  function(object) {
+    standardGeneric("getExQMatrix")
+  })
+setGeneric("setExQMatrix<-",
+  function(object, value) {
+    standardGeneric("setExQMatrix<-")
+  })

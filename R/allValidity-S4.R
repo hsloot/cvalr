@@ -1,4 +1,4 @@
-#' @include allClass-S4.R allGeneric-S4.R checkmate.R
+#' @include allClass-S4.R checkmate.R
 NULL
 
 #' @importFrom checkmate qassert
