@@ -1,4 +1,4 @@
-#' @include s4-CalibrationParam.R s4-ExtMO2FParam.R
+#' @include s4-CalibrationParam.R s4-ExtMO2FParam.R checkmate.R
 NULL
 
 #' Two-factor extendible Archimedean calibration parameter classes
@@ -89,6 +89,20 @@ setReplaceMethod("setTau", "ExtArch2FParam",
     setNu(object) <- invTau(object, value)
 
     invisible(object)
+  })
+
+
+#' @importFrom copula getTheta
+#' @importFrom checkmate qassert assert_true
+setValidity("ExtArch2FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N1")
+    qassert(object@survival, "B1")
+    assert_true(object@dim == object@copula@dimension)
+    assert_true(object@nu == getTheta(object@copula))
+
+    invisible(TRUE)
   })
 
 

@@ -1,4 +1,4 @@
-#' @include s4-ExtMOParam.R
+#' @include s4-ExtMOParam.R checkmate.R
 NULL
 
 #' Two-factor extendible Marshall--Olkin calibration parameter classes
@@ -179,6 +179,23 @@ setReplaceMethod("setBernsteinFunction", "ExtMO2FParam",
   })
 
 
+#' @importFrom rmo valueOf ScaledBernsteinFunction
+#' @importFrom checkmate assert qassert check_choice check_class
+setValidity("ExtMO2FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N1")
+    assert(combine = "and",
+      check_class(object@bf, "ScaledBernsteinFunction"),
+      check_choice(object@bf@scale, object@lambda),
+      check_equal(1, valueOf(object@bf@original, 1, 0L)),
+      check_equal(
+        object@nu, invAlpha(object, 2 - valueOf(object@bf@original, 2, 0L))))
+
+    invisible(TRUE)
+  })
+
+
 #' @rdname ExtMO2FParam-class
 #'
 #' @section Cuadras-Augé calibration parameter class:
@@ -193,6 +210,20 @@ setReplaceMethod("setBernsteinFunction", "ExtMO2FParam",
 CuadrasAugeExtMO2FParam <- setClass("CuadrasAugeExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
 
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
+#'   LinearBernsteinFunction ConstantBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class
+setValidity("CuadrasAugeExtMO2FParam",
+  function(object) {
+    assert(combine = "and",
+      check_choice(object@bf@scale, object@lambda),
+      check_class(object@bf@original, "SumOfBernsteinFunctions"),
+      check_class(object@bf@original@first, "LinearBernsteinFunction"),
+      check_class(object@bf@original@second, "ConstantBernsteinFunction"))
+
+    invisible(TRUE)
+  })
+
 
 #' @rdname ExtMO2FParam-class
 #'
@@ -206,6 +237,18 @@ CuadrasAugeExtMO2FParam <- setClass("CuadrasAugeExtMO2FParam", # nolint
 #' @export AlphaStableExtMO2FParam
 AlphaStableExtMO2FParam <- setClass("AlphaStableExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
+
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
+#'   AlphaStableBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class
+setValidity("AlphaStableExtMO2FParam",
+  function(object) {
+    assert(combine = "and",
+      check_choice(object@bf@scale, object@lambda),
+      check_class(object@bf@original, "AlphaStableBernsteinFunction"))
+
+    invisible(TRUE)
+  })
 
 
 #' @rdname ExtMO2FParam-class
@@ -222,6 +265,21 @@ AlphaStableExtMO2FParam <- setClass("AlphaStableExtMO2FParam", # nolint
 PoissonExtMO2FParam <- setClass("PoissonExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
 
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
+#'   LinearBernsteinFunction PoissonBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class
+setValidity("PoissonExtMO2FParam",
+  function(object) {
+    assert(combine = "and",
+      check_choice(object@bf@scale, object@lambda),
+      check_class(object@bf@original, "SumOfBernsteinFunctions"),
+      check_class(object@bf@original@first, "LinearBernsteinFunction"),
+      check_class(object@bf@original@second, "PoissonBernsteinFunction"))
+
+      invisible(TRUE)
+  })
+
+
 #' @rdname ExtMO2FParam-class
 #'
 #' @section Exponential calibration parameter class:
@@ -237,3 +295,17 @@ PoissonExtMO2FParam <- setClass("PoissonExtMO2FParam", # nolint
 #' @export ExponentialExtMO2FParam
 ExponentialExtMO2FParam <- setClass("ExponentialExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
+
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
+#'   LinearBernsteinFunction ExponentialBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class
+setValidity("ExponentialExtMO2FParam",
+  function(object) {
+    assert(combine = "and",
+      check_choice(object@bf@scale, object@lambda),
+      check_class(object@bf@original, "SumOfBernsteinFunctions"),
+      check_class(object@bf@original@first, "LinearBernsteinFunction"),
+      check_class(object@bf@original@second, "ExponentialBernsteinFunction"))
+
+      invisible(TRUE)
+  })

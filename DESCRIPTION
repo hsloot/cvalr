@@ -55,7 +55,6 @@ Collate:
     'allInitialize-S4.R'
     'utils.R'
     'allMethod-S4.R'
-    'allValidity-S4.R'
     'cvalr-package.R'
     'simulate_param-S4.R'
     'expected_value-S4.R'

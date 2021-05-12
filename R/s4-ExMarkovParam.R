@@ -1,4 +1,4 @@
-#' @include s4-CalibrationParam.R
+#' @include s4-CalibrationParam.R checkmate.R
 NULL
 
 #' Exchangeable Markovian calibration parameter
@@ -49,4 +49,13 @@ setReplaceMethod("setExQMatrix", "ExMarkovParam",
     object@ex_qmatrix <- value
 
     invisible(object)
+  })
+
+
+setValidity("ExMarkovParam",
+  function(object) {
+    assert_exqmatrix(object@ex_qmatrix,
+      nrows = object@dim+1L, ncols = object@dim + 1L)
+
+    invisible(TRUE)
   })

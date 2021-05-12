@@ -1,4 +1,4 @@
-#' @include s4-ExMOParam.R
+#' @include s4-ExMOParam.R checkmate.R
 NULL
 
 #' Extendible Marshall--Olkin calibration parameter
@@ -50,4 +50,13 @@ setReplaceMethod("setBernsteinFunction", "ExtMOParam",
    setExIntensities(object) <- exIntensities(object@bf, object@dim)
 
    invisible(object)
+ })
+
+
+#' @importFrom checkmate assert_class
+setValidity("ExtMOParam",
+ function(object) {
+   assert_class(object@bf, "BernsteinFunction")
+
+   invisible(TRUE)
  })

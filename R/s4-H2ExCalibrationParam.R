@@ -1,4 +1,4 @@
-#' @include s4-CalibrationParam.R
+#' @include s4-CalibrationParam.R checkmate.R
 NULL
 
 #' Virtual superclass for H2-exchangeable calibration parameters
@@ -37,4 +37,14 @@ setReplaceMethod("setPartition", "H2ExCalibrationParam",
     setDimension(object) <- length(unlist(value))
 
     invisible(object)
+  })
+
+
+#' @importFrom purrr map_lgl
+#' @importFrom checkmate qassert qtest assert_true
+setValidity("H2ExCalibrationParam",
+  function(object) {
+    assert_partition(object@partition)
+
+    invisible(TRUE)
   })

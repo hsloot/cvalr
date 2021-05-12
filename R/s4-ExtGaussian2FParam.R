@@ -1,4 +1,4 @@
-#' @include s4-CalibrationParam.R s4-ExtMO2FParam.R
+#' @include s4-CalibrationParam.R s4-ExtMO2FParam.R checkmate.R
 NULL
 
 #' Two-factor extendible Gaussian calibration parameter classes
@@ -80,4 +80,14 @@ setReplaceMethod("setTau", "ExtGaussian2FParam",
     setNu(object) <- invTau(object, value)
 
     invisible(object)
+  })
+
+
+#' @importFrom checkmate qassert
+setValidity("ExtGaussian2FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N1[0,1]")
+
+    invisible(TRUE)
   })

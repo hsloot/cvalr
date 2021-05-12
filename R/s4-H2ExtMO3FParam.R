@@ -1,4 +1,4 @@
-#' @include s4-H2ExtMOParam.R
+#' @include s4-H2ExtMOParam.R checkmate.R
 NULL
 
 #' Two-factor H2-extendible Marshall--Olkin calibration parameter classes
@@ -107,6 +107,16 @@ setMethod("getAlpha", "H2ExtMO3FParam",
     }
 
     alpha
+  })
+
+
+#' @importFrom checkmate qassert
+setValidity("H2ExtMO3FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N2(0,)")
+
+    invisible(TRUE)
   })
 
 

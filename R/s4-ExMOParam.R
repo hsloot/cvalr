@@ -1,4 +1,4 @@
-#' @include s4-ExMarkovParam.R
+#' @include s4-ExMarkovParam.R checkmate.R
 NULL
 
 #' Exchangeable Marshall--Olkin calibration parameter
@@ -52,4 +52,14 @@ setReplaceMethod("setExIntensities", "ExMOParam",
     setExQMatrix(object) <- rmo:::exi2exqm(value)
 
     invisible(object)
+  })
+
+
+#' @importFrom checkmate qassert assert_numeric
+setValidity("ExMOParam",
+  function(object) {
+    assert_numeric(object@ex_intensities, lower = 0, len = object@dim)
+    qassert(max(object@ex_intensities), "N1(0,)")
+
+    invisible(TRUE)
   })

@@ -1,4 +1,4 @@
-#' @include s4-H2ExCalibrationParam.R
+#' @include s4-H2ExCalibrationParam.R checkmate.R
 NULL
 
 #' H2-exchangeable Markovian calibration parameter
@@ -78,4 +78,21 @@ setReplaceMethod("setModels", "H2ExMarkovParam",
     object@models <- value
 
     invisible(object)
+  })
+
+
+#' @importFrom methods is
+#' @importFrom purrr map_lgl map2_lgl
+#' @importFrom checkmate qassert assert_true
+setValidity("H2ExMarkovParam",
+  function(object) {
+    qassert(object@fraction, "N1(0,1)")
+    assert_true(all(map_lgl(object@models, ~is(.x, getModelName(object)))))
+    assert_true(getDimension(object@models[[1]]) == getDimension(object))
+    assert_true(length(object@models) == length(object@partition) + 1L)
+    assert_true(all(map2_lgl(object@models[-1], object@partition, ~{
+      getDimension(.x) == length(.y)
+      })))
+
+    invisible(TRUE)
   })

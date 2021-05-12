@@ -1,5 +1,6 @@
 #' @importFrom methods setClass setValidity setGeneric setMethod
 #'   setReplaceMethod validObject is as new callNextMethod
+#' @include checkmate.R
 NULL
 
 #' Virtual super-class for calibration parameters
@@ -53,4 +54,13 @@ setReplaceMethod("setDimension", "CalibrationParam",
     object@dim <- as.integer(value)
 
     invisible(object)
+  })
+
+
+#' @importFrom checkmate qassert
+setValidity("CalibrationParam",
+  function(object) {
+    qassert(object@dim, "I1(0,)")
+
+    invisible(TRUE)
   })

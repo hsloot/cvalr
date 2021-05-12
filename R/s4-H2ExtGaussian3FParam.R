@@ -1,4 +1,4 @@
-#' @include s4-H2ExCalibrationParam.R s4-H2ExtMO3FParam.R
+#' @include s4-H2ExCalibrationParam.R s4-H2ExtMO3FParam.R checkmate.R
 NULL
 
 #' Three-factor H2-extendible Gaussian calibration parameter classes
@@ -60,4 +60,14 @@ setMethod("getRho", "H2ExtGaussian3FParam",
 setMethod("getTau", "H2ExtGaussian3FParam",
   function(object) {
     (2 / pi) * asin(getNu(object))
+  })
+
+
+#' @importFrom checkmate qassert
+setValidity("H2ExtGaussian3FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N2(0,)")
+
+    invisible(TRUE)
   })

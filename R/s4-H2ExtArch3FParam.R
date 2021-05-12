@@ -1,4 +1,4 @@
-#' @include s4-H2ExCalibrationParam.R s4-H2ExtMO3FParam.R
+#' @include s4-H2ExCalibrationParam.R s4-H2ExtMO3FParam.R checkmate.R
 NULL
 
 #' Three-factor H2-extendible Archimedean calibration parameter classes
@@ -77,7 +77,23 @@ setMethod("getTau", "H2ExtArch3FParam",
     }
     c(tau(object@copula@copula), tau(object@copula@childCops[[1]]@copula))
   })
-  
+
+
+#' @importFrom checkmate qassert
+setValidity("H2ExtArch3FParam",
+  function(object) {
+    qassert(object@lambda, "N1(0,)")
+    qassert(object@nu, "N2(0,)")
+    qassert(object@survival, "B1")
+    assert_true(object@dim == dim(object@copula))
+    assert_true(
+      check_equal(
+        object@nu,
+        c(object@copula@copula@theta, object@copula@childCops[[1]]@copula@theta)))
+
+    invisible(TRUE)
+  })
+
 
 #' @rdname H2ExtArch3FParam-class
 #'
