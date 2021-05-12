@@ -93,6 +93,92 @@ setGeneric("constructBernsteinFunction",
   })
 
 
+setMethod("getLambda", "ExtMO2FParam",
+  function(object) {
+    object@lambda
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setLambda", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    setBernsteinFunction(object) <- constructBernsteinFunction(
+      object, value, object@nu)
+
+    invisible(object)
+  })
+
+setMethod("getNu", "ExtMO2FParam",
+  function(object) {
+    object@nu
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setNu", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1")
+    setBernsteinFunction(object) <- constructBernsteinFunction(
+      object, object@lambda, value)
+
+    invisible(object)
+  })
+
+setMethod("getRho", "ExtMO2FParam",
+  function(object) {
+    alpha <- getAlpha(object)
+
+    3 * alpha / (4 - alpha)
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setRho", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    setNu(object) <- invRho(object, value)
+
+    invisible(object)
+  })
+
+setMethod("getTau", "ExtMO2FParam",
+  function(object) {
+    alpha <- getAlpha(object)
+
+    alpha / (2 - alpha)
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setTau", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    setNu(object) <- invTau(object, value)
+
+    invisible(object)
+  })
+
+#' @importFrom rmo valueOf
+setMethod("getAlpha", "ExtMO2FParam",
+  function(object) {
+    2 - valueOf(object@bf, 2, 0L) / valueOf(object@bf, 1, 0L)
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setAlpha", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    setNu(object) <- invAlpha(object, value)
+
+    invisible(object)
+  })
+
+#' @importFrom rmo ScaledBernsteinFunction valueOf
+#' @importFrom checkmate assert check_class
+setReplaceMethod("setBernsteinFunction", "ExtMO2FParam",
+  function(object, value) {
+    assert(combine = "and",
+      check_class(value, "ScaledBernsteinFunction"),
+      check_equal(1, valueOf(value@original, 1, 0L)))
+    object@lambda <- value@scale
+    object@nu <- invAlpha(object, 2 - valueOf(value@original, 2, 0L))
+
+    callNextMethod(object, value)
+  })
+
+
 #' @rdname ExtMO2FParam-class
 #'
 #' @section Cuadras-Augé calibration parameter class:

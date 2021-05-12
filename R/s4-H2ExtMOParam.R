@@ -1,4 +1,4 @@
-#' @include s4-H2ExMOParam.R
+#' @include s4-H2ExMOParam.R s4-ExtMO2FParam.R
 NULL
 
 #' H2-Extendible Marshall--Olkin calibration parameter

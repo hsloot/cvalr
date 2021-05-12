@@ -35,3 +35,19 @@ setGeneric("setBernsteinFunction<-",
  function(object, value) {
    standardGeneric("setBernsteinFunction<-")
  })
+
+
+setMethod("getBernsteinFunction", "ExtMOParam",
+ function(object) {
+   object@bf
+ })
+#' @importFrom rmo exIntensities
+#' @importFrom checkmate assert_class
+setReplaceMethod("setBernsteinFunction", "ExtMOParam",
+ function(object, value) {
+   assert_class(value, "BernsteinFunction")
+   object@bf <- value
+   setExIntensities(object) <- exIntensities(object@bf, object@dim)
+
+   invisible(object)
+ })

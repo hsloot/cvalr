@@ -33,3 +33,20 @@ setGeneric("setExQMatrix<-",
   function(object, value) {
     standardGeneric("setExQMatrix<-")
   })
+
+
+setMethod("getExQMatrix", "ExMarkovParam",
+  function(object) {
+    object@ex_qmatrix
+  })
+
+setReplaceMethod("setExQMatrix", "ExMarkovParam",
+  function(object, value) {
+    assert_exqmatrix(value, min.rows = 1L, min.cols = 1L)
+
+    dim <- nrow(value)-1
+    setDimension(object) <- dim
+    object@ex_qmatrix <- value
+
+    invisible(object)
+  })

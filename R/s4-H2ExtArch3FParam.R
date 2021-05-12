@@ -26,6 +26,59 @@ H2ExtArch3FParam <- setClass("H2ExtArch3FParam", # nolint
   slots = c(lambda = "numeric", nu = "numeric", family = "character",
     survival = "logical", copula = "outer_nacopula"))
 
+
+setMethod("getLambda", "H2ExtArch3FParam",
+  function(object) {
+    object@lambda
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setLambda", "H2ExtArch3FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    object@lambda <- value
+
+    invisible(object)
+  })
+
+setMethod("getNu", "H2ExtArch3FParam",
+  function(object) {
+    object@nu
+  })
+#' @importFrom copula onacopulaL
+#' @importFrom purrr map
+#' @importFrom checkmate qassert
+setReplaceMethod("setNu", "H2ExtArch3FParam",
+  function(object, value) {
+    qassert(value, "N2")
+    object@nu <- value
+    object@copula <- onacopulaL(
+      family = object@family,
+      nacList = list(value[[1]], c(), map(object@partition, ~list(value[[2]], .))))
+
+    invisible(object)
+  })
+
+#' @importFrom copula rho
+#' @importFrom purrr map_dbl
+setMethod("getRho", "H2ExtArch3FParam",
+  function(object) {
+    rho <- function(x) {
+      copula::rho(archmCopula(family = object@family, param = x@theta, dim = 2))
+    }
+    c(rho(object@copula@copula), rho(object@copula@childCops[[1]]@copula))
+  })
+
+#' @importFrom copula rho
+#' @importFrom purrr map_dbl
+setMethod("getTau", "H2ExtArch3FParam",
+  function(object) {
+    tau <- function(x) {
+      copula::tau(archmCopula(family = object@family, param = x@theta, dim = 2))
+    }
+    c(tau(object@copula@copula), tau(object@copula@childCops[[1]]@copula))
+  })
+  
+
 #' @rdname H2ExtArch3FParam-class
 #'
 #' @export ClaytonH2ExtArch3FParam

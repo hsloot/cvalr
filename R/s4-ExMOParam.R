@@ -35,3 +35,21 @@ setGeneric("setExIntensities<-",
   function(object, value) {
     standardGeneric("setExIntensities<-")
   })
+
+
+  setMethod("getExIntensities", "ExMOParam",
+    function(object) {
+      object@ex_intensities
+    })
+
+#' @importFrom checkmate qassert
+setReplaceMethod("setExIntensities", "ExMOParam",
+  function(object, value) {
+    qassert(value, "N+[0,)")
+    qassert(max(value), "N1(0,)")
+    setDimension(object) <- length(value)
+    object@ex_intensities <- value
+    setExQMatrix(object) <- rmo:::exi2exqm(value)
+
+    invisible(object)
+  })

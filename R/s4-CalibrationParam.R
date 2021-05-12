@@ -39,3 +39,18 @@ setGeneric("setDimension<-",
   function(object, value) {
     standardGeneric("setDimension<-")
   })
+
+
+setMethod("getDimension", "CalibrationParam",
+  function(object) {
+    object@dim
+  })
+
+#' @importFrom checkmate qassert
+setReplaceMethod("setDimension", "CalibrationParam",
+  function(object, value) {
+    qassert(value, "X1(0,)")
+    object@dim <- as.integer(value)
+
+    invisible(object)
+  })

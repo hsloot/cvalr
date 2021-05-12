@@ -24,3 +24,40 @@ NULL
 H2ExtGaussian3FParam <- setClass("H2ExtGaussian3FParam", # nolint
   contains = "H2ExCalibrationParam",
   slots = c(lambda = "numeric", nu = "numeric"))
+
+
+setMethod("getLambda", "H2ExtGaussian3FParam",
+  function(object) {
+    object@lambda
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setLambda", "H2ExtGaussian3FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    object@lambda <- value
+
+    invisible(object)
+  })
+
+setMethod("getNu", "H2ExtGaussian3FParam",
+  function(object) {
+    object@nu
+  })
+#' @importFrom checkmate assert_numeric
+setReplaceMethod("setNu", "H2ExtGaussian3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, sorted = TRUE)
+    object@nu <- value
+
+    invisible(object)
+  })
+
+setMethod("getRho", "H2ExtGaussian3FParam",
+  function(object) {
+    (6 / pi) * asin(getNu(object) / 2)
+  })
+
+setMethod("getTau", "H2ExtGaussian3FParam",
+  function(object) {
+    (2 / pi) * asin(getNu(object))
+  })

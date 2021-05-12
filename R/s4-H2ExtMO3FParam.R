@@ -26,6 +26,90 @@ setClass("H2ExtMO3FParam", # nolint
   slots = c(lambda = "numeric", nu = "numeric"))
 
 
+setMethod("getLambda", "H2ExtMO3FParam",
+  function(object) {
+    object@lambda
+  })
+  #' @include checkmate.R
+  #' @importFrom purrr map
+  #' @importFrom checkmate qassert
+setReplaceMethod("setLambda", "H2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    assert_partition(object@partition)
+    object@lambda <- value
+    if (0L == length(object@models)) {
+      models <- map(object@partition, ~{
+        new(getModelName(object), length(.x), value, alpha = 0.5)
+      })
+      models <- c(list(new(getModelName(object), getDimension(object), value, alpha = 0.5)), models)
+      setModels(object) <- models
+    } else {
+      object@models <- map(object@models, ~{
+        setLambda(.x) <- value
+        .x
+      })
+    }
+
+    invisible(object)
+  })
+
+setMethod("getNu", "H2ExtMO3FParam",
+  function(object) {
+    object@nu
+  })
+#' @importFrom purrr map imap
+#' @importFrom checkmate qassert
+setReplaceMethod("setNu", "H2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "N2")
+    assert_partition(object@partition)
+    object@nu <- value
+    if (0L == length(object@models)) {
+      models <- map(object@partition, ~{
+        new(getModelName(object), length(.x), 1, value[[2]])
+      })
+      models <- c(list(new(getModelName(object), getDimension(object), 1, value[[1]])), models)
+      setModels(object) <- models
+    } else {
+      object@models <- imap(object@models, ~{
+        setNu(.x) <- ifelse(1L == .y, value[[1]], value[[2]])
+        .x
+      })
+    }
+
+    invisible(object)
+  })
+
+setMethod("getRho", "H2ExtMO3FParam",
+  function(object) {
+    alpha <- getAlpha(object)
+
+    3 * alpha / (4 - alpha)
+  })
+
+setMethod("getTau", "H2ExtMO3FParam",
+  function(object) {
+    alpha <- getAlpha(object)
+
+    alpha / (2 - alpha)
+  })
+
+#' @importFrom purrr map_dbl
+setMethod("getAlpha", "H2ExtMO3FParam",
+  function(object) {
+    fraction <- getFraction(object)
+    alpha0 <- map_dbl(object@models, getAlpha)
+    if (1L == length(alpha0)) {
+      alpha <- alpha0 * fraction
+    } else {
+      alpha <- cumsum(alpha0[1:2] * c(fraction, 1 - fraction))
+    }
+
+    alpha
+  })
+
+
 #' @rdname H2ExtMO3FParam-class
 #'
 #' @section Cuadras-Augé calibration parameter class:

@@ -25,6 +25,73 @@ ExtArch2FParam <- setClass("ExtArch2FParam", # nolint
     copula = "archmCopula"))
 
 
+#' @importFrom checkmate qassert
+setReplaceMethod("setDimension", "ExtArch2FParam",
+  function(object, value) {
+    qassert(value, "X1(0,)")
+    object@dim <- as.integer(value)
+    object@copula@dimension <- as.integer(value)
+
+    invisible(object)
+  })
+
+setMethod("getLambda", "ExtArch2FParam",
+  function(object) {
+    object@lambda
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setLambda", "ExtArch2FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    object@lambda <- value
+
+    invisible(object)
+  })
+
+setMethod("getNu", "ExtArch2FParam",
+  function(object) {
+    object@nu
+  })
+#' @importFrom copula setTheta
+#' @importFrom checkmate qassert
+setReplaceMethod("setNu", "ExtArch2FParam",
+  function(object, value) {
+    qassert(value, "N1")
+    object@nu <- value
+    object@copula <- setTheta(object@copula, value)
+
+    invisible(object)
+  })
+
+#' @importFrom copula rho frankCopula
+setMethod("getRho", "ExtArch2FParam",
+  function(object) {
+    copula::rho(object@copula)
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setRho", "ExtArch2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    setNu(object) <- invRho(object, value)
+
+    invisible(object)
+  })
+
+#' @importFrom copula tau frankCopula
+setMethod("getTau", "ExtArch2FParam",
+  function(object) {
+    copula::tau(object@copula)
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setTau", "ExtArch2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    setNu(object) <- invTau(object, value)
+
+    invisible(object)
+  })
+
+
 #' @rdname ExtArch2FParam-class
 #'
 #' @export ClaytonExtArch2FParam

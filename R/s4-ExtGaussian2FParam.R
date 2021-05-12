@@ -28,3 +28,56 @@ NULL
 ExtGaussian2FParam <- setClass("ExtGaussian2FParam", # nolint
   contains = "CalibrationParam",
   slots = c("lambda", "nu"))
+
+
+setMethod("getLambda", "ExtGaussian2FParam",
+  function(object) {
+    object@lambda
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setLambda", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    object@lambda <- value
+
+    invisible(object)
+  })
+
+setMethod("getNu", "ExtGaussian2FParam",
+  function(object) {
+    object@nu
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setNu", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    object@nu <- value
+
+    invisible(object)
+  })
+
+setMethod("getRho", "ExtGaussian2FParam",
+  function(object) {
+    (6 / pi) * asin(getNu(object) / 2)
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setRho", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    setNu(object) <- invRho(object, value)
+
+    invisible(object)
+  })
+
+setMethod("getTau", "ExtGaussian2FParam",
+  function(object) {
+    (2 / pi) * asin(getNu(object))
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setTau", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    setNu(object) <- invTau(object, value)
+
+    invisible(object)
+  })

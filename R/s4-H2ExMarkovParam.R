@@ -44,3 +44,38 @@ setGeneric("setModels<-",
   function(object, value) {
     standardGeneric("setModels<-")
   })
+
+
+setMethod("getFraction", "H2ExMarkovParam",
+  function(object) {
+    object@fraction
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setFraction", "H2ExMarkovParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    object@fraction <- value
+
+    invisible(object)
+  })
+
+setMethod("getModels", "H2ExMarkovParam",
+  function(object) {
+    object@models
+  })
+#' @importFrom purrr map_lgl map_int map2
+#' @importFrom checkmate test_class
+setReplaceMethod("setModels", "H2ExMarkovParam",
+  function(object, value) {
+    assert_true(all(map_lgl(value, test_class, classes = getModelName(object))))
+    dims <- map_int(value, getDimension)
+    assert_true(dims[[1]] == sum(dims[-1]))
+    partition <- map2(
+      dims[-1], cumsum(c(0, dims[2:(length(dims)-1)])), ~{
+        .y + 1:.x
+      })
+    setPartition(object) <- partition
+    object@models <- value
+
+    invisible(object)
+  })

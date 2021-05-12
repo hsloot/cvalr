@@ -22,3 +22,19 @@ setGeneric("setPartition<-",
   function(object, value) {
     standardGeneric("setPartition<-")
   })
+
+
+setMethod("getPartition", "H2ExCalibrationParam",
+  function(object) {
+    object@partition
+  })
+#' @include checkmate.R
+#' @importFrom purrr map
+setReplaceMethod("setPartition", "H2ExCalibrationParam",
+  function(object, value) {
+    assert_partition(value)
+    object@partition <- map(value, as.integer)
+    setDimension(object) <- length(unlist(value))
+
+    invisible(object)
+  })
