@@ -196,6 +196,47 @@ setValidity("ExtMO2FParam",
   })
 
 
+#' @describeIn ExtMO2FParam-class Constructor
+#' @aliases initialize,ExtMO2FParam-method
+#' @aliases initialize,ExtMO2FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param dim Dimension.
+#' @param lambda Marginal intensity.
+#' @param nu Dependence parameter.
+#' @param rho Spearman's Rho.
+#' @param tau Kendall's Tau.
+#' @param alpha Bivariate lower tail dependence coefficient
+#'
+#' @examples
+#' CuadrasAugeExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+#' AlphaStableExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+#' PoissonExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+#' ExponentialExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+setMethod("initialize", signature = "ExtMO2FParam", # nolint
+  definition = function(.Object, # nolint
+      dim, lambda, nu, rho = NULL, tau = NULL, alpha = NULL) {
+    if (!missing(dim) && !missing(lambda) &&
+          !(missing(nu) && missing(rho) && missing(tau) && missing(alpha))) {
+      if (missing(nu)) {
+        if (!is.null(rho)) {
+          nu <- invRho(.Object, rho)
+        } else if (!is.null(tau)) {
+          nu <- invTau(.Object, tau)
+        } else if (!is.null(alpha)) {
+          nu <- invAlpha(.Object, alpha)
+        }
+      }
+
+      setDimension(.Object) <- dim
+      setBernsteinFunction(.Object) <- constructBernsteinFunction(.Object, lambda, nu)
+      validObject(.Object)
+    }
+
+    invisible(.Object)
+  })
+
+
 #' @rdname ExtMO2FParam-class
 #'
 #' @section Cuadras-Augé calibration parameter class:

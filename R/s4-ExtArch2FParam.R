@@ -106,12 +106,73 @@ setValidity("ExtArch2FParam",
   })
 
 
+#' @describeIn ExtArch2FParam-class Constructor
+#' @aliases initialize,ExtArch2FParam-method
+#' @aliases initialize,ExtArch2FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param dim Dimension.
+#' @param lambda Marginal intensity.
+#' @param nu Dependence parameter (see [copula::archmCopula-class]).
+#' @param rho Spearman's Rho.
+#' @param tau Kendall's Tau.
+#' @param survival Flag if survival copula is specified (default, except for Clayton)
+#' @param family Name of the Archimedean copula family
+#'   (see [copula::archmCopula-class]).
+#'
+#' @examples
+#' ExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1, family = "Gumbel")
+#' ExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1, family = "Amh")
+#' @importFrom copula archmCopula
+setMethod("initialize", "ExtArch2FParam",
+  function(.Object, # nolint
+      dim = 2, lambda = 0.1, nu = 1, rho = NULL, tau = NULL,
+      survival = TRUE,
+      family = c("Clayton", "Frank", "Amh", "Gumbel", "Joe")) {
+    family <- match.arg(family)
+    .Object@survival <- survival
+    .Object@copula <- archmCopula(family = family)
+    if (!missing(dim) && !missing(lambda) &&
+          !(missing(nu) && missing(rho) && missing(tau))) {
+      if (missing(nu)) {
+        if (!is.null(rho)) {
+          nu <- invRho(.Object, rho)
+        } else if (!is.null(tau)) {
+          nu <- invTau(.Object, tau)
+        }
+      }
+
+      setDimension(.Object) <- dim
+      setLambda(.Object) <- lambda
+      setNu(.Object) <- nu
+      validObject(.Object)
+    }
+
+    invisible(.Object)
+  })
+
+
 #' @rdname ExtArch2FParam-class
 #'
 #' @export ClaytonExtArch2FParam
 ClaytonExtArch2FParam <- setClass("ClaytonExtArch2FParam", # nolint
   contains = "ExtArch2FParam",
   slots = c(lambda = "numeric", nu = "numeric", copula = "claytonCopula"))
+
+#' @describeIn ExtArch2FParam-class Constructor
+#' @aliases initialize,ClaytonExtArch2FParam-method
+#' @aliases initialize,ClaytonExtArch2FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' ClaytonExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
+#' ClaytonExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+setMethod("initialize", "ClaytonExtArch2FParam",
+  function(.Object, ..., survival = FALSE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "Clayton"))
+  })
 
 
 #' @rdname ExtArch2FParam-class
@@ -121,6 +182,21 @@ FrankExtArch2FParam <- setClass("FrankExtArch2FParam", # nolint
   contains = "ExtArch2FParam",
   slots = c(lambda = "numeric", nu = "numeric", copula = "frankCopula"))
 
+#' @describeIn ExtArch2FParam-class Constructor
+#' @aliases initialize,FrankExtArch2FParam-method
+#' @aliases initialize,FrankExtArch2FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' FrankExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
+#' FrankExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+setMethod("initialize", "FrankExtArch2FParam",
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "Frank"))
+  })
+
 
 #' @rdname ExtArch2FParam-class
 #'
@@ -128,6 +204,21 @@ FrankExtArch2FParam <- setClass("FrankExtArch2FParam", # nolint
 GumbelExtArch2FParam <- setClass("GumbelExtArch2FParam", # nolint
   contains = "ExtArch2FParam",
   slots = c(lambda = "numeric", nu = "numeric", copula = "gumbelCopula"))
+
+#' @describeIn ExtArch2FParam-class Constructor
+#' @aliases initialize,GumbelExtArch2FParam-method
+#' @aliases initialize,GumbelExtArch2FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' GumbelExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
+#' GumbelExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+setMethod("initialize", "GumbelExtArch2FParam",
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "Gumbel"))
+  })
 
 
 #' @rdname ExtArch2FParam-class
@@ -137,6 +228,21 @@ AmhExtArch2FParam <- setClass("AmhExtArch2FParam", # nolint
   contains = "ExtArch2FParam",
   slots = c(lambda = "numeric", nu = "numeric", copula = "amhCopula"))
 
+#' @describeIn ExtArch2FParam-class Constructor
+#' @aliases initialize,AmhExtArch2FParam-method
+#' @aliases initialize,AmhExtArch2FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' AmhExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
+#' AmhExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+setMethod("initialize", "AmhExtArch2FParam",
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "Amh"))
+  })
+
 
 #' @rdname ExtArch2FParam-class
 #'
@@ -144,3 +250,17 @@ AmhExtArch2FParam <- setClass("AmhExtArch2FParam", # nolint
 JoeExtArch2FParam <- setClass("JoeExtArch2FParam", # nolint
   contains = "ExtArch2FParam",
   slots = c(lambda = "numeric", nu = "numeric", copula = "joeCopula"))
+
+#' @describeIn ExtArch2FParam-class Constructor
+#' @aliases initialize,JoeExtArch2FParam-method
+#' @aliases initialize,JoeExtArch2FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' JoeExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+setMethod("initialize", "JoeExtArch2FParam",
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "Joe"))
+  })

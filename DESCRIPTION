@@ -52,7 +52,6 @@ Collate:
     's4-ExtArch2FParam.R'
     's4-ExtGaussian2FParam.R'
     'allClass-S4.R'
-    'allInitialize-S4.R'
     'utils.R'
     'allMethod-S4.R'
     'cvalr-package.R'

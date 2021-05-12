@@ -63,3 +63,24 @@ setValidity("ExMOParam",
 
     invisible(TRUE)
   })
+
+
+#' @describeIn ExMOParam-class Constructor
+#' @aliases initialize,ExMOParam-method
+#' @aliases initialize,ExMOParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ex_intensities (Scaled) exchangeable intensities of the exchangeable
+#'   Marshall-Olkin distribution.
+#'
+#' @examples
+#' ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
+setMethod("initialize", "ExMOParam",
+  definition = function(.Object, ex_intensities) { # nolint
+    if (!missing(ex_intensities)) {
+      setExIntensities(.Object) <- ex_intensities
+      validObject(.Object)
+    }
+
+    invisible(.Object)
+  })

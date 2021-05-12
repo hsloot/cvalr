@@ -96,3 +96,31 @@ setValidity("H2ExMarkovParam",
 
     invisible(TRUE)
   })
+
+
+#' @importFrom purrr map_lgl map_int reduce
+#' @importFrom checkmate assert_true
+setMethod("initialize", "H2ExMarkovParam",
+  function(.Object, models = NULL, fraction = NULL) { # nolint
+    if (!missing(models) && !missing(fraction)) {
+      assert_true(all(map_lgl(models, is, class = "CalibrationParam")))
+      dims <- map_int(models, getDimension)
+      if (length(dims) > 1L) {
+        partition <- reduce(
+          dims[-1], ~{
+            c(.x, list(max(c(0L, unlist(.x))) + 1:.y))
+          }, .init = list())
+      } else {
+        partition <- list(1:dims)
+      }
+
+      .Object@dim <- dims[[1]]
+      .Object@partition <- partition
+      .Object@models <- models
+      .Object@fraction <- fraction
+
+      validObject(.Object)
+    }
+
+    invisible(.Object)
+  })

@@ -59,3 +59,26 @@ setValidity("ExMarkovParam",
 
     invisible(TRUE)
   })
+
+
+#' @describeIn ExMarkovParam-class Constructor
+#' @aliases initialize,ExMarkovParam-method
+#' @aliases initialize,ExMarkovParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ex_qmatrix (Exchangeable) Q-matrix of the default counting process.
+#'
+#' @examples
+#' ExMarkovParam(
+#'  ex_qmatrix = matrix(
+#'    c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
+#'    nrow = 3L, ncol = 3L))
+setMethod("initialize", "ExMarkovParam",
+  function(.Object, ex_qmatrix) { # nolint
+    if (!missing(ex_qmatrix)) {
+      setExQMatrix(.Object) <- ex_qmatrix
+      validObject(.Object)
+    }
+
+    invisible(.Object)
+  })

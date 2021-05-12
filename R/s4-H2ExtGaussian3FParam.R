@@ -71,3 +71,32 @@ setValidity("H2ExtGaussian3FParam",
 
     invisible(TRUE)
   })
+
+
+#' @importFrom purrr imap
+setMethod("initialize", "H2ExtGaussian3FParam",
+  function(.Object, # nolint
+      partition = list(1L:2L, 3L:5L), lambda = 1e-1, nu = c(0.2, 0.3),
+      rho = NULL, tau = NULL) {
+    if (!missing(partition) && !missing(lambda) &&
+          (!missing(nu) || !missing(rho) || !missing(tau))) {
+      if (missing(nu)) {
+        if (!is.null(rho)) {
+          nu <- invRho(.Object, rho)
+        } else if (!is.null(tau)) {
+          nu <- invTau(.Object, tau)
+        }
+      }
+
+      dim <- length(unlist(partition))
+
+      .Object@dim <- dim
+      .Object@partition <- partition
+      .Object@lambda <- lambda
+      .Object@nu <- nu
+
+      validObject(.Object)
+    }
+
+    invisible(.Object)
+  })

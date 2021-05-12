@@ -91,3 +91,39 @@ setValidity("ExtGaussian2FParam",
 
     invisible(TRUE)
   })
+
+
+#' @describeIn ExtGaussian2FParam-class Constructor
+#' @aliases initialize,ExtGaussian2FParam-method
+#' @aliases initialize,ExtGaussian2FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param dim Dimension.
+#' @param lambda Marginal intensity.
+#' @param nu Dependence parameter.
+#' @param rho Spearman's Rho.
+#' @param tau Kendall's Tau.
+#'
+#' @examples
+#' ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+setMethod("initialize", signature = "ExtGaussian2FParam",
+  definition = function(.Object, # nolint
+      dim, lambda, nu, rho = NULL, tau = NULL) {
+    if (!missing(dim) && !missing(lambda) &&
+          !(missing(nu) && missing(rho) && missing(tau))) {
+      if (missing(nu)) {
+        if (!is.null(rho)) {
+          nu <- invRho(.Object, rho)
+        } else if (!is.null(tau)) {
+          nu <- invTau(.Object, tau)
+        }
+      }
+
+      setDimension(.Object) <- dim
+      setLambda(.Object) <- lambda
+      setNu(.Object) <- nu
+      validObject(.Object)
+    }
+
+    invisible(.Object)
+  })

@@ -120,6 +120,44 @@ setValidity("H2ExtMO3FParam",
   })
 
 
+#' @importFrom purrr imap
+setMethod("initialize", "H2ExtMO3FParam", # nolint
+  function(.Object, # nolint
+    partition = list(1L:2L, 3L:5L), lambda = 1e-1, nu = c(0.2, 0.3),
+    fraction = 0.5, rho = NULL, tau = NULL, alpha = NULL) {
+  if (!missing(partition) && !missing(lambda) &&
+        (!missing(nu) || !missing(rho) || !missing(tau) || !missing(alpha)) &&
+        !missing(fraction)) {
+    .Object@fraction <- fraction
+    if (missing(nu)) {
+      if (!is.null(rho)) {
+        nu <- invRho(.Object, rho)
+      } else if (!is.null(tau)) {
+        nu <- invTau(.Object, tau)
+      } else if (!is.null(alpha)) {
+        nu <- invAlpha(.Object, alpha)
+      }
+    }
+
+    dim <- length(unlist(partition))
+    models <- imap(c(dim, map_int(partition, length)), ~{
+      new(getModelName(.Object),
+            dim = .x, lambda = lambda, nu = nu[[pmin(.y, 2L)]])
+      })
+
+    .Object@dim <- dim
+    .Object@partition <- partition
+    .Object@models <- models
+    .Object@lambda <- lambda
+    .Object@nu <- nu
+
+    validObject(.Object)
+  }
+
+  invisible(.Object)
+  })
+
+
 #' @rdname H2ExtMO3FParam-class
 #'
 #' @section Cuadras-Augé calibration parameter class:

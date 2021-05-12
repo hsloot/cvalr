@@ -60,3 +60,32 @@ setValidity("ExtMOParam",
 
    invisible(TRUE)
  })
+
+
+#' @describeIn ExtMOParam-class Constructor
+#' @aliases initialize,ExtMOParam-method
+#' @aliases initialize,ExtMOParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param dim Dimension.
+#' @param bf Bernstein function.
+#'
+#' @examples
+#' ExtMOParam(
+#'   dim = 2,
+#'   bf = rmo::ScaledBernsteinFunction(
+#'     scale = 0.05,
+#'     original = rmo::SumOfBernsteinFunctions(
+#'       first = rmo::ConstantBernsteinFunction(constant = 0.4),
+#'       second = rmo::LinearBernsteinFunction(scale = 1 - 0.4))
+#'     ))
+setMethod("initialize", "ExtMOParam",
+ definition = function(.Object, dim, bf) { # nolint
+   if (!missing(dim) && !missing(bf)) {
+     setDimension(.Object) <- dim
+     setBernsteinFunction(.Object) <- bf
+     validObject(.Object)
+   }
+
+   invisible(.Object)
+ })

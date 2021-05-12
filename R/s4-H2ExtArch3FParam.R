@@ -95,11 +95,94 @@ setValidity("H2ExtArch3FParam",
   })
 
 
+#' @describeIn H2ExtArch3FParam-class Constructor
+#' @aliases initialize,H2ExtArch3FParam-method
+#' @aliases initialize,H2ExtArch3FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param partition Partition of the components (only adjacent grouping allowed).
+#' @param lambda Marginal intensity.
+#' @param nu Dependency parameter (see [copula::archmCopula-class] and
+#'   [copula::nacopula-class]).
+#' @param rho Spearman's Rho.
+#' @param tau Kendall's Tau.
+#' @param survival Flag if survival copula is specified (default, except for Clayton)
+#' @param family Name of the Archimedean copula family
+#'   (see [copula::archmCopula-class]).
+#'
+#' @examples
+#' H2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, tau = c(0.3, 0.5),
+#'   survival = FALSE, family = "Clayton")
+#' H2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, tau = c(0.3, 0.5),
+#'   survival = TRUE, family = "Gumbel")
+#'
+#' @importFrom copula archmCopula onacopulaL iRho iTau
+#' @importFrom purrr imap map
+setMethod("initialize", "H2ExtArch3FParam",
+  function(.Object, # nolint
+      partition = list(1L:2L, 3L:5L),
+      lambda = 1e-1, nu = c(0.2, 0.3), rho = NULL, tau = NULL,
+      survival = TRUE,
+      family = c("Clayton", "Frank", "AMH", "Gumbel", "Joe")) {
+    family <- match.arg(family)
+    .Object@family <- family
+    .Object@survival <- survival
+    acopula <- archmCopula(family = family)
+    if (!missing(partition) && !missing(lambda) &&
+          (!missing(nu) || !missing(rho) || !missing(tau))) {
+      if (missing(nu)) {
+        if (!is.null(rho)) {
+          nu <- map_dbl(rho, ~copula::iRho(acopula, .))
+        } else if (!is.null(tau)) {
+          nu <- map_dbl(tau, ~copula::iTau(acopula, .))
+        }
+      }
+
+      dim <- length(unlist(partition))
+
+      .Object@dim <- as.integer(dim)
+      .Object@partition <- partition
+      .Object@lambda <- lambda
+      .Object@nu <- nu
+
+      .Object@copula <- onacopulaL(
+        family = family, list(nu[[1]], c(), map(partition, ~list(nu[[2]], .))))
+
+      validObject(.Object)
+    }
+
+    invisible(.Object)
+  })
+
+
 #' @rdname H2ExtArch3FParam-class
 #'
 #' @export ClaytonH2ExtArch3FParam
 ClaytonH2ExtArch3FParam <- setClass("ClaytonH2ExtArch3FParam", # nolint
   contains = "H2ExtArch3FParam")
+
+#' @describeIn H2ExtArch3FParam-class Constructor
+#' @aliases initialize,ClaytonH2ExtArch3FParam-method
+#' @aliases initialize,ClaytonH2ExtArch3FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' ClaytonH2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, tau = c(0.3, 0.5))
+#' ClaytonH2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, rho = c(0.3, 0.5))
+setMethod("initialize", "ClaytonH2ExtArch3FParam",
+  function(.Object, ..., survival = FALSE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "Clayton"))
+  })
 
 
 #' @rdname H2ExtArch3FParam-class
@@ -108,12 +191,50 @@ ClaytonH2ExtArch3FParam <- setClass("ClaytonH2ExtArch3FParam", # nolint
 FrankH2ExtArch3FParam <- setClass("FrankH2ExtArch3FParam", # nolint
   contains = "H2ExtArch3FParam")
 
+#' @describeIn H2ExtArch3FParam-class Constructor
+#' @aliases initialize,FrankH2ExtArch3FParam-method
+#' @aliases initialize,FrankH2ExtArch3FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' FrankH2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, tau = c(0.3, 0.5))
+#' FrankH2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, rho = c(0.3, 0.5))
+setMethod("initialize", "FrankH2ExtArch3FParam",
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "Frank"))
+  })
+
 
 #' @rdname H2ExtArch3FParam-class
 #'
 #' @export GumbelH2ExtArch3FParam
 GumbelH2ExtArch3FParam <- setClass("GumbelH2ExtArch3FParam", # nolint
   contains = "H2ExtArch3FParam")
+
+#' @describeIn H2ExtArch3FParam-class Constructor
+#' @aliases initialize,GumbelH2ExtArch3FParam-method
+#' @aliases initialize,GumbelH2ExtArch3FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' GumbelH2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, tau = c(0.3, 0.5))
+#' GumbelH2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, rho = c(0.3, 0.5))
+setMethod("initialize", "GumbelH2ExtArch3FParam",
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "Gumbel"))
+  })
 
 
 #' @rdname H2ExtArch3FParam-class
@@ -122,9 +243,44 @@ GumbelH2ExtArch3FParam <- setClass("GumbelH2ExtArch3FParam", # nolint
 AmhH2ExtArch3FParam <- setClass("AmhH2ExtArch3FParam", # nolint
   contains = "H2ExtArch3FParam")
 
+#' @describeIn H2ExtArch3FParam-class Constructor
+#' @aliases initialize,AmhH2ExtArch3FParam-method
+#' @aliases initialize,AmhH2ExtArch3FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' AmhH2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, tau = c(0.05, 0.2))
+#' AmhH2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, rho = c(0.05, 0.2))
+setMethod("initialize", "AmhH2ExtArch3FParam",
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "AMH"))
+  })
+
 
 #' @rdname H2ExtArch3FParam-class
 #'
 #' @export JoeH2ExtArch3FParam
 JoeH2ExtArch3FParam <- setClass("JoeH2ExtArch3FParam", # nolint
   contains = "H2ExtArch3FParam")
+
+#' @describeIn H2ExtArch3FParam-class Constructor
+#' @aliases initialize,JoeH2ExtArch3FParam-method
+#' @aliases initialize,JoeH2ExtArch3FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' JoeH2ExtArch3FParam(
+#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   lambda = 8e-2, tau = c(0.3, 0.5))
+setMethod("initialize", "JoeH2ExtArch3FParam",
+  function(.Object, ..., survival = TRUE) { # nolint
+    invisible(callNextMethod(.Object, ..., survival = survival, family = "Joe"))
+  })
