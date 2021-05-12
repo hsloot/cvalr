@@ -9,3 +9,9 @@ NULL
 #' @export H2ExtMOParam
 H2ExtMOParam <- setClass("H2ExtMOParam", # nolint
   contains = "H2ExMOParam")
+
+
+setMethod("getModelName", "H2ExtMOParam",
+  function(object) {
+    "ExtMOParam"
+  })

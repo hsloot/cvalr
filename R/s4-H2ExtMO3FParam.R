@@ -158,6 +158,27 @@ setMethod("initialize", "H2ExtMO3FParam", # nolint
   })
 
 
+setMethod("getModelName", "H2ExtMO3FParam",
+  function(object) {
+    "ExtMO2FParam"
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invRho", "H2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "N2[0,1]")
+    invAlpha(object, 4 * value / (3 + value))
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invTau", "H2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "N2[0,1]")
+    invAlpha(object, 2 * value / (1 + value))
+  })
+
+
+
 #' @rdname H2ExtMO3FParam-class
 #'
 #' @section Cuadras-Augé calibration parameter class:
@@ -173,6 +194,21 @@ CuadrasAugeH2ExtMO3FParam <- setClass("CuadrasAugeH2ExtMO3FParam", # nolint
   contains = "H2ExtMO3FParam")
 
 
+setMethod("getModelName", "CuadrasAugeH2ExtMO3FParam",
+  function(object) {
+    "CuadrasAugeExtMO2FParam"
+  })
+
+#' @include utils.R
+#' @importFrom checkmate qassert
+setMethod("invAlpha", "CuadrasAugeH2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "N2[0,1]")
+    adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
+  })
+
+
+
 #' @rdname H2ExtMO3FParam-class
 #'
 #' @section Alpha-stable calibration parameter class:
@@ -185,6 +221,23 @@ CuadrasAugeH2ExtMO3FParam <- setClass("CuadrasAugeH2ExtMO3FParam", # nolint
 #' @export AlphaStableH2ExtMO3FParam
 AlphaStableH2ExtMO3FParam <- setClass("AlphaStableH2ExtMO3FParam", # nolint
   contains = "H2ExtMO3FParam")
+
+
+setMethod("getModelName", "AlphaStableH2ExtMO3FParam",
+  function(object) {
+    "AlphaStableExtMO2FParam"
+  })
+
+#' @include utils.R
+#' @importFrom checkmate qassert
+setMethod("invAlpha", "AlphaStableH2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "N2[0,1]")
+    value <- adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
+    log2(2 - value)
+
+  })
+
 
 
 #' @rdname H2ExtMO3FParam-class
@@ -202,6 +255,22 @@ PoissonH2ExtMO3FParam <- setClass("PoissonH2ExtMO3FParam", # nolint
   contains = "H2ExtMO3FParam")
 
 
+setMethod("getModelName", "PoissonH2ExtMO3FParam",
+  function(object) {
+    "PoissonExtMO2FParam"
+  })
+
+#' @include utils.R
+#' @importFrom checkmate qassert
+setMethod("invAlpha", "PoissonH2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "N2[0,1]")
+    value <- adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
+    -log(1 - sqrt(value))
+  })
+
+
+
 #' @rdname H2ExtMO3FParam-class
 #'
 #' @section Exponential calibration parameter class:
@@ -217,3 +286,18 @@ PoissonH2ExtMO3FParam <- setClass("PoissonH2ExtMO3FParam", # nolint
 #' @export ExponentialH2ExtMO3FParam
 ExponentialH2ExtMO3FParam <- setClass("ExponentialH2ExtMO3FParam", # nolint
   contains = "H2ExtMO3FParam")
+
+
+setMethod("getModelName", "ExponentialH2ExtMO3FParam",
+  function(object) {
+    "ExponentialExtMO2FParam"
+  })
+
+#' @include utils.R
+#' @importFrom checkmate qassert
+setMethod("invAlpha", "ExponentialH2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "N2[0,1]")
+    value <- adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
+    0.5 * (-3 + sqrt(1 + 8 / value))
+  })

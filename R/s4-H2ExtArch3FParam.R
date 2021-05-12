@@ -159,11 +159,36 @@ setMethod("initialize", "H2ExtArch3FParam",
   })
 
 
+setMethod("getModelName", "H2ExtArch3FParam",
+  function(object) {
+    "ExtArch2FParam"
+  })
+
+#' @importFrom copula iRho
+#' @importFrom purrr map_dbl
+#' @importFrom checkmate qassert
+setMethod("invRho", "H2ExtArch3FParam",
+  function(object, value) {
+    qassert(value, "N2[0,1]")
+    map_dbl(value, ~copula::iRho(object@copula@copula, .))
+  })
+
+#' @importFrom copula iTau
+#' @importFrom checkmate qassert
+setMethod("invTau", "H2ExtArch3FParam",
+  function(object, value) {
+    qassert(value, "N2[0,1]")
+    copula::iTau(object@copula@copula, value)
+  })
+
+
+
 #' @rdname H2ExtArch3FParam-class
 #'
 #' @export ClaytonH2ExtArch3FParam
 ClaytonH2ExtArch3FParam <- setClass("ClaytonH2ExtArch3FParam", # nolint
   contains = "H2ExtArch3FParam")
+
 
 #' @describeIn H2ExtArch3FParam-class Constructor
 #' @aliases initialize,ClaytonH2ExtArch3FParam-method
@@ -185,11 +210,19 @@ setMethod("initialize", "ClaytonH2ExtArch3FParam",
   })
 
 
+setMethod("getModelName", "ClaytonH2ExtArch3FParam",
+  function(object) {
+    "ClaytonExtArch2FParam"
+  })
+
+
+
 #' @rdname H2ExtArch3FParam-class
 #'
 #' @export FrankH2ExtArch3FParam
 FrankH2ExtArch3FParam <- setClass("FrankH2ExtArch3FParam", # nolint
   contains = "H2ExtArch3FParam")
+
 
 #' @describeIn H2ExtArch3FParam-class Constructor
 #' @aliases initialize,FrankH2ExtArch3FParam-method
@@ -211,11 +244,19 @@ setMethod("initialize", "FrankH2ExtArch3FParam",
   })
 
 
+setMethod("getModelName", "FrankH2ExtArch3FParam",
+  function(object) {
+    "FrankExtArch2FParam"
+  })
+
+
+
 #' @rdname H2ExtArch3FParam-class
 #'
 #' @export GumbelH2ExtArch3FParam
 GumbelH2ExtArch3FParam <- setClass("GumbelH2ExtArch3FParam", # nolint
   contains = "H2ExtArch3FParam")
+
 
 #' @describeIn H2ExtArch3FParam-class Constructor
 #' @aliases initialize,GumbelH2ExtArch3FParam-method
@@ -237,11 +278,19 @@ setMethod("initialize", "GumbelH2ExtArch3FParam",
   })
 
 
+setMethod("getModelName", "GumbelH2ExtArch3FParam",
+  function(object) {
+    "GumbelExtArch2FParam"
+  })
+
+
+
 #' @rdname H2ExtArch3FParam-class
 #'
 #' @export AmhH2ExtArch3FParam
 AmhH2ExtArch3FParam <- setClass("AmhH2ExtArch3FParam", # nolint
   contains = "H2ExtArch3FParam")
+
 
 #' @describeIn H2ExtArch3FParam-class Constructor
 #' @aliases initialize,AmhH2ExtArch3FParam-method
@@ -263,11 +312,19 @@ setMethod("initialize", "AmhH2ExtArch3FParam",
   })
 
 
+setMethod("getModelName", "AmhH2ExtArch3FParam",
+  function(object) {
+    "AmhExtArch2FParam"
+  })
+
+
+
 #' @rdname H2ExtArch3FParam-class
 #'
 #' @export JoeH2ExtArch3FParam
 JoeH2ExtArch3FParam <- setClass("JoeH2ExtArch3FParam", # nolint
   contains = "H2ExtArch3FParam")
+
 
 #' @describeIn H2ExtArch3FParam-class Constructor
 #' @aliases initialize,JoeH2ExtArch3FParam-method
@@ -283,4 +340,10 @@ JoeH2ExtArch3FParam <- setClass("JoeH2ExtArch3FParam", # nolint
 setMethod("initialize", "JoeH2ExtArch3FParam",
   function(.Object, ..., survival = TRUE) { # nolint
     invisible(callNextMethod(.Object, ..., survival = survival, family = "Joe"))
+  })
+
+
+setMethod("getModelName", "JoeH2ExtArch3FParam",
+  function(object) {
+    "JoeExtArch2FParam"
   })

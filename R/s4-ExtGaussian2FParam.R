@@ -127,3 +127,18 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 
     invisible(.Object)
   })
+
+
+#' @importFrom checkmate qassert
+setMethod("invRho", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    2 * sin(value * pi / 6)
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invTau", "ExtGaussian2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    sin(value * pi / 2)
+  })

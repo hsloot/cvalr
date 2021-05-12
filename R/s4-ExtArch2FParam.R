@@ -152,6 +152,24 @@ setMethod("initialize", "ExtArch2FParam",
   })
 
 
+#' @importFrom copula iRho frankCopula
+#' @importFrom checkmate qassert
+setMethod("invRho", "ExtArch2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    copula::iRho(object@copula, value)
+  })
+
+#' @importFrom copula iTau frankCopula
+#' @importFrom checkmate qassert
+setMethod("invTau", "ExtArch2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    copula::iTau(object@copula, value)
+  })
+
+
+
 #' @rdname ExtArch2FParam-class
 #'
 #' @export ClaytonExtArch2FParam
@@ -173,6 +191,7 @@ setMethod("initialize", "ClaytonExtArch2FParam",
   function(.Object, ..., survival = FALSE) { # nolint
     invisible(callNextMethod(.Object, ..., survival = survival, family = "Clayton"))
   })
+
 
 
 #' @rdname ExtArch2FParam-class
@@ -198,6 +217,7 @@ setMethod("initialize", "FrankExtArch2FParam",
   })
 
 
+
 #' @rdname ExtArch2FParam-class
 #'
 #' @export GumbelExtArch2FParam
@@ -221,6 +241,7 @@ setMethod("initialize", "GumbelExtArch2FParam",
   })
 
 
+
 #' @rdname ExtArch2FParam-class
 #'
 #' @export AmhExtArch2FParam
@@ -242,6 +263,7 @@ setMethod("initialize", "AmhExtArch2FParam",
   function(.Object, ..., survival = TRUE) { # nolint
     invisible(callNextMethod(.Object, ..., survival = survival, family = "Amh"))
   })
+
 
 
 #' @rdname ExtArch2FParam-class

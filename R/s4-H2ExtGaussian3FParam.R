@@ -100,3 +100,23 @@ setMethod("initialize", "H2ExtGaussian3FParam",
 
     invisible(.Object)
   })
+
+
+setMethod("getModelName", "H2ExtGaussian3FParam",
+  function(object) {
+    "ExtGaussian2FParam"
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invRho", "H2ExtGaussian3FParam",
+  function(object, value) {
+    qassert(value, "N2[0,1]")
+    2 * sin(value * pi / 6)
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invTau", "H2ExtGaussian3FParam",
+  function(object, value) {
+    qassert(value, "N2[0,1]")
+    sin(value * pi / 2)
+  })

@@ -237,6 +237,21 @@ setMethod("initialize", signature = "ExtMO2FParam", # nolint
   })
 
 
+#' @importFrom checkmate qassert
+setMethod("invRho", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    invAlpha(object, 4 * value / (3 + value))
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invTau", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    invAlpha(object, 2 * value / (1 + value))
+  })
+
+
 #' @rdname ExtMO2FParam-class
 #'
 #' @section Cuadras-Augé calibration parameter class:
@@ -266,6 +281,27 @@ setValidity("CuadrasAugeExtMO2FParam",
   })
 
 
+#' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction
+#'   ConstantBernsteinFunction
+setMethod("constructBernsteinFunction", "CuadrasAugeExtMO2FParam",
+  function(object, lambda, nu, ...) {
+    ScaledBernsteinFunction(
+      scale = lambda,
+      original = SumOfBernsteinFunctions(
+        first = LinearBernsteinFunction(scale = 1 - nu),
+        second = ConstantBernsteinFunction(constant = nu))
+    )
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invAlpha", "CuadrasAugeExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    value
+  })
+
+
+
 #' @rdname ExtMO2FParam-class
 #'
 #' @section Alpha-stable calibration parameter class:
@@ -292,6 +328,24 @@ setValidity("AlphaStableExtMO2FParam",
   })
 
 
+#' @importFrom rmo SumOfBernsteinFunctions AlphaStableBernsteinFunction
+setMethod("constructBernsteinFunction", "AlphaStableExtMO2FParam",
+  function(object, lambda, nu, ...) {
+    ScaledBernsteinFunction(
+      scale = lambda,
+      original = AlphaStableBernsteinFunction(alpha = nu)
+    )
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invAlpha", "AlphaStableExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    log2(2 - value)
+  })
+
+
+
 #' @rdname ExtMO2FParam-class
 #'
 #' @section Poisson calibration parameter class:
@@ -306,6 +360,7 @@ setValidity("AlphaStableExtMO2FParam",
 PoissonExtMO2FParam <- setClass("PoissonExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
 
+
 #' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
 #'   LinearBernsteinFunction PoissonBernsteinFunction
 #' @importFrom checkmate assert check_choice check_class
@@ -319,6 +374,28 @@ setValidity("PoissonExtMO2FParam",
 
       invisible(TRUE)
   })
+
+
+#' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction
+#'   PoissonBernsteinFunction
+setMethod("constructBernsteinFunction", "PoissonExtMO2FParam",
+  function(object, lambda, nu, ...) {
+    ScaledBernsteinFunction(
+      scale = lambda,
+      original = SumOfBernsteinFunctions(
+        first = LinearBernsteinFunction(scale = exp(-nu)),
+        second = PoissonBernsteinFunction(lambda = 1, eta = nu)
+      )
+    )
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invAlpha", "PoissonExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    -log(1 - sqrt(value))
+  })
+
 
 
 #' @rdname ExtMO2FParam-class
@@ -349,4 +426,25 @@ setValidity("ExponentialExtMO2FParam",
       check_class(object@bf@original@second, "ExponentialBernsteinFunction"))
 
       invisible(TRUE)
+  })
+
+
+#' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction
+#'   ExponentialBernsteinFunction
+setMethod("constructBernsteinFunction", "ExponentialExtMO2FParam",
+  function(object, lambda, nu, ...) {
+    ScaledBernsteinFunction(
+      scale = lambda,
+      original = SumOfBernsteinFunctions(
+        first = LinearBernsteinFunction(scale = 1 - 1 / (1 + nu)),
+        second = ExponentialBernsteinFunction(lambda = nu)
+      )
+    )
+  })
+
+#' @importFrom checkmate qassert
+setMethod("invAlpha", "ExponentialExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    0.5 * (-3 + sqrt(1 + 8 / value))
   })

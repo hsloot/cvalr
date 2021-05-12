@@ -124,3 +124,9 @@ setMethod("initialize", "H2ExMarkovParam",
 
     invisible(.Object)
   })
+
+
+setMethod("getModelName", "H2ExMarkovParam",
+  function(object) {
+    "ExMarkovParam"
+  })
