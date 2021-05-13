@@ -71,7 +71,7 @@
 \item{family}{Name of the Archimedean copula family
 (see \link[copula:archmCopula-class]{copula::archmCopula}).}
 
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
 \item{...}{Pass-through parameters.}
 

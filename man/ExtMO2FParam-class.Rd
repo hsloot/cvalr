@@ -41,11 +41,11 @@
 
 \item{alpha}{Bivariate lower tail dependence coefficient}
 
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
-\item{times}{Point-in-time.}
+\item{times}{A non-negative \code{numeric} vector of timepoints.}
 
-\item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Recovery rate of the portfolio CDS/CDO.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}

@@ -10,7 +10,7 @@
 \S4method{simulate_dt}{H2ExMarkovParam}(object, ...)
 }
 \arguments{
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
 \item{...}{Pass-through parameter.}
 }

@@ -11,24 +11,20 @@ times <- seq(0, 5, by = 0.25)
 
 test_that("`probability_distribution` works as expected for `CalibrationParam`", {
   # HELPER START
-  pfn <- function(t, parm, n) {
+  pfn <- function(parm, times, n, seed = NULL) {
     d <- getDimension(parm)
-    x <- simulate_adcp(parm, t, n_sim = n)
-    if (!is.matrix(x)) {
-      x <- as.matrix(x, ncol = 1L)
+    if (!is.null(seed)) {
+      set.seed(seed)
     }
-    out <- t(sapply((0L:d) / d, function(.x) {
-      apply(x, 2, function(.y) {
-        mean(.x == .y)
-      })
-    }))
-    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
-
-    out
+    simulate_adcp(parm, times, n_sim = n) %>%
+      purrr::array_branch(2) %>%
+      purrr::cross2((0:d) / d, .) %>%
+      purrr::map_dbl(~mean(.[[2]] == .[[1]])) %>%
+      matrix(nrow = d+1)
   }
   # HELPER END
 
-  parm <- AlphaStableExtMO2FParam(dim = d, lambda = lambda, rho = rho)
+  parm <- AlphaStableExtMO2FParam(d, lambda, rho = rho)
 
   x <- probability_distribution(
     parm, times, seed = 1623, method = "CalibrationParam", sim_args = list(n_sim = n))
@@ -36,10 +32,11 @@ test_that("`probability_distribution` works as expected for `CalibrationParam`",
     x, mode = "numeric", any.missing = FALSE, nrows = d+1L, ncols = length(times))
   expect_numeric(
     x, lower = 0, upper = 1, finite = TRUE)
-  expect_equal(apply(x, 2, sum), rep(1, length(times)))
+  purrr::array_branch(x, 2) %>%
+    purrr::map_dbl(sum) %>%
+    expect_equal(rep(1, length(times)))
 
-  set.seed(1623)
-  y <- pfn(times, parm, n)
+  y <- pfn(parm, times, n, seed = 1623)
   expect_equal(x, y)
 
   y <- probability_distribution(
@@ -50,8 +47,7 @@ test_that("`probability_distribution` works as expected for `CalibrationParam`",
   x <- probability_distribution(
     parm, times, seed = 1623, method = "CalibrationParam",
     sim_args = list(n_sim = n, method = "ExMarkovParam"))
-  set.seed(1623)
-  y <- pfn(times, as(parm, "ExMarkovParam"), n)
+  y <- pfn(as(parm, "ExMarkovParam"), times, n, seed = 1623)
   expect_equal(x, y)
 })
 
@@ -76,7 +72,7 @@ test_that("`expected_value` works as expected for `CalibrationParam`", {
 
     as.vector(t(probs) %*% mu)
   }
-  efn2 <- function(t, g, parm, seed, n) {
+  efn2 <- function(t, g, parm, n, seed) {
     mu <- sapply((0L:d) / d, g, recovery_rate = recovery_rate, lower = lower, upper = upper)
     probs <- probability_distribution(
       parm, t, method = "CalibrationParam", seed = seed, sim_args = list(n_sim = n))
@@ -85,7 +81,7 @@ test_that("`expected_value` works as expected for `CalibrationParam`", {
   }
   # HELPER END
 
-  parm <- ExtGaussian2FParam(dim = d, lambda = lambda, rho = rho)
+  parm <- ExtGaussian2FParam(d, lambda, rho = rho)
 
   # using the default
   x <- expected_value(
@@ -103,7 +99,7 @@ test_that("`expected_value` works as expected for `CalibrationParam`", {
   expect_numeric(
     x, any.missing = FALSE, lower = 0, upper = 1, len = length(times), sorted = TRUE)
 
-  y <- efn2(times, g_cdo, parm, 1623, n)
+  y <- efn2(times, g_cdo, parm, n, 1623)
   expect_equal(x, y)
 })
 

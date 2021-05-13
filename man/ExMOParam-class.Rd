@@ -24,7 +24,7 @@
 \item{ex_intensities}{(Scaled) exchangeable intensities of the exchangeable
 Marshall-Olkin distribution.}
 
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}

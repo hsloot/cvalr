@@ -32,17 +32,18 @@
 )
 }
 \arguments{
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
-\item{times}{Point-in-time.}
+\item{times}{A non-negative \code{numeric} vector of timepoints.}
 
-\item{...}{Pass-through parameter.}
+\item{...}{arguments to specify properties of the new object, to
+      be passed to \code{initialize()}.}
 
 \item{method}{Calculation method (either \code{"default"} or the name of the
 class whose implementation should be used).}
 
-\item{seed}{Numeric number (if not NULL, is used to set the seed prior to
-Monte-Carlo estimation of probability distribution).}
+\item{seed}{Numeric number (if not NULL, it is used to set the seed prior to
+Monte-Carlo estimation of the probability distribution).}
 
 \item{sim_args}{List with pass-through parameters for \code{\link[=simulate_adcp]{simulate_adcp()}}.}
 
@@ -68,7 +69,8 @@ The probability of \eqn{j > i} portfolio items being defaulted at time
 }
 \section{Functions}{
 \itemize{
-\item \code{probability_distribution,CalibrationParam-method}: returns the probability vector for the average default count process \eqn{L}.
+\item \code{probability_distribution,CalibrationParam-method}: calculates the \emph{probability vector} for the \emph{average default count process}
+and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, length(times))}.
 
 \item \code{initialize,ExMarkovParam-method}: Constructor
 

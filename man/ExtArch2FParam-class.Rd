@@ -84,7 +84,7 @@
 \item{family}{Name of the Archimedean copula family
 (see \link[copula:archmCopula-class]{copula::archmCopula}).}
 
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
 \item{...}{Pass-through parameters.}
 
@@ -93,9 +93,9 @@ class whose implementation should be used).}
 
 \item{n_sim}{Number of samples.}
 
-\item{times}{Point-in-time.}
+\item{times}{A non-negative \code{numeric} vector of timepoints.}
 
-\item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Recovery rate of the portfolio CDS/CDO.}
 }
 \description{
 Calibration parameter classes with two parameters for the extendible

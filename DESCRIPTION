@@ -24,20 +24,22 @@ Imports:
     copula,
     checkmate,
     waldo,
-    purrr
+    purrr,
+    magrittr,
+    rlang
 LinkingTo:
     Rcpp,
     rmo
 Suggests:
     testthat (>= 3.0.0),
     covr,
-    rmarkdown,
-    magrittr
+    rmarkdown
 Config/testthat/edition: 3
 Collate:
     'RcppExports.R'
     'checkmate.R'
     'cvalr-package.R'
+    'utils-math.R'
     'utils.R'
     's4-CalibrationParam.R'
     's4-ExMarkovParam.R'
@@ -53,6 +55,7 @@ Collate:
     's4-H2ExtMO3FParam.R'
     's4-H2ExtArch3FParam.R'
     's4-H2ExtGaussian3FParam.R'
+    'utils-pipe.R'
 URL: https://github.com/hsloot/cvalr
 BugReports: https://github.com/hsloot/cvalr/issues
 Remotes: github::hsloot/rmo

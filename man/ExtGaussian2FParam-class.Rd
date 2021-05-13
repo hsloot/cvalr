@@ -59,7 +59,7 @@
 
 \item{tau}{Kendall's Tau.}
 
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
@@ -69,9 +69,9 @@ class whose implementation should be used).}
 
 \item{n_sim}{Number of samples.}
 
-\item{times}{Point-in-time.}
+\item{times}{A non-negative \code{numeric} vector of timepoints.}
 
-\item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Recovery rate of the portfolio CDS/CDO.}
 
 \item{lower}{Lower attachment point of the CDO tranche.}
 
