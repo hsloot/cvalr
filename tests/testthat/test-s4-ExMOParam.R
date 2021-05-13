@@ -24,13 +24,11 @@ test_that("`ExMOParam`-class is correctly initialized", {
 
 test_that("`simulate_dt` works as expected for `ExMOParam`", {
   # HELPER START
-  rfn <- function(n, ex_intensities) {
+  rfn <- function(parm, n, ex_intensities) {
     qassert(n, "X1(0,)")
-    assert_numeric(
-      ex_intensities, lower = 0, upper = Inf, finite = TRUE, any.missing = FALSE)
-    d <- length(ex_intensities)
+    d <- getDimension(parm)
+    ex_intensities <- getExIntensities(parm)
     out <- rmo::rexmo_markovian(n, d, ex_intensities)
-    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
 
     out
   }
@@ -45,7 +43,7 @@ test_that("`simulate_dt` works as expected for `ExMOParam`", {
     x, lower = 0, finite = TRUE, any.missing = FALSE, len = d)
 
   set.seed(1623)
-  y <- rfn(1L, ex_intensities)
+  y <- rfn(parm, 1L)
   expect_equal(x, y)
 
   # n and d are larger than 1
@@ -59,6 +57,6 @@ test_that("`simulate_dt` works as expected for `ExMOParam`", {
     x, lower = 0, finite = TRUE)
 
   set.seed(1623)
-  y <- rfn(n, ex_intensities)
+  y <- rfn(parm, n)
   expect_equal(x, y)
 })

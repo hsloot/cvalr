@@ -7,6 +7,7 @@
 \alias{initialize,ExMOParam-method}
 \alias{initialize,ExMOParam,ANY-method}
 \alias{simulate_dt,ExMOParam-method}
+\alias{show,ExMOParam-method}
 \title{Exchangeable Marshall--Olkin calibration parameter}
 \usage{
 \S4method{initialize}{ExMOParam}(.Object, ex_intensities)
@@ -17,12 +18,14 @@
   method = c("default", "ExMOParam", "ExMarkovParam"),
   n_sim = 10000
 )
+
+\S4method{show}{ExMOParam}(object)
 }
 \arguments{
 \item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
 
-\item{ex_intensities}{(Scaled) exchangeable intensities of the exchangeable
-Marshall-Olkin distribution.}
+\item{ex_intensities}{The (scaled) exchangeable intensities  of the
+Marshall-Olkin distribution (see \code{\link[rmo:BernsteinFunction-class]{rmo::exIntensities()}}).}
 
 \item{object}{A \linkS4class{CalibrationParam}-object.}
 
@@ -35,40 +38,53 @@ class whose implementation should be used).}
 \item{n_sim}{Number of samples.}
 }
 \description{
-Calibration parameter classfor the general exchangeable model from the
-Marshall--Olkin class.
+\linkS4class{CalibrationParam}-class for the exchangeable Marshall--Olkin class
+model for the \emph{average default counting process}.
 }
 \details{
-The joint survival function of all portfolio items is assumed to be
+The model is defined by the assumption that the multivariate default times
+\eqn{\tau = (\tau_1, \ldots, \tau_d)} are Marshall-Olkin.
+The joint survival function of all portfolio items is
 \deqn{
   P(\tau > t)
     = \exp{(- a_0 t_{[1]} - \cdots - a_{d-1} t_{[d]})} ,
 }
-for \eqn{t_{[1]} \geq \cdots \geq t_{[d]}} begin the descendingly ordered
-version of \eqn{t} and
+for \eqn{t_{[1]} \geq \cdots \geq t_{[d]}} begin the descending version of
+\eqn{t} and
 \deqn{
   a_{i}
     = \sum_{l=0}^{d-i-1} \binom{d-i-1}{l} \lambda_{l+1} .
+}
+The (scaled) exchangeable intensities, provided to the constructor are
+\deqn{
+  \binom{d}{i} \lambda_{i} , \ i \in \{ 1 , \ldots , d \} .
 }
 }
 \section{Functions}{
 \itemize{
 \item \code{initialize,ExMOParam-method}: Constructor
 
-\item \code{simulate_dt,ExMOParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
-\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_dt,ExMOParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
+
+\item \code{show,ExMOParam-method}: Display the object.
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{ex_intensities}}{The exchangeable intensities (see details)}
+\item{\code{ex_intensities}}{The (scaled) exchangeable intensities  of the
+Marshall-Olkin distribution (see \code{\link[rmo:BernsteinFunction-class]{rmo::exIntensities()}}).}
 }}
 
+\section{Simulation}{
+
+The default times are sampled using \code{\link[rmo:rexmo_markovian]{rmo::rexmo_markovian()}}.
+}
+
 \examples{
-ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
-parm <- ExMOParam(ex_intensities = c(0.02647059, 0.02352941))
-simulate_dt(parm, n_sim = 5e1)
+ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
+parm <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
+simulate_dt(parm, n_sim = 5L)
 
 }

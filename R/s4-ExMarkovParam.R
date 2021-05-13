@@ -7,8 +7,13 @@ NULL
 #' [CalibrationParam-class]-class for the exchangeable Markovian *default
 #' counting process* model.
 #'
-#' @slot ex_qmatrix The \eqn{(d+1) \times (d+1)} Markov generator matrix of the
-#'   default counting process.
+#' @slot ex_qmatrix The \eqn{(d+1) \times (d+1)} Markov generator matrix (see
+#'   [rmo::exQMatrix()]).
+#'
+#' @details
+#' The model is defined by the assumption that the *(average) default counting
+#' process* is Markovian on the state space \eqn{\{ 0, 1/d, \ldots, (d-1)/d, 1 \}}
+#' with the generator matrix provided to the constructor.
 #'
 #' @export ExMarkovParam
 ExMarkovParam <- setClass("ExMarkovParam", # nolint
@@ -55,8 +60,8 @@ setValidity("ExMarkovParam",
 #' @aliases initialize,ExMarkovParam,ANY-method
 #'
 #' @inheritParams methods::initialize
-#' @param ex_qmatrix (Exchangeable) Generator-matrix of the
-#'   *(average) default counting process*.
+#' @param ex_qmatrix The \eqn{(d+1) \times (d+1)} Markov generator matrix (see
+#'   [rmo::exQMatrix()]).
 #'
 #' @examples
 #' ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
@@ -80,6 +85,13 @@ setMethod("initialize", "ExMarkovParam",
 #' @param method Simulation method (either `"default"` or the name of the
 #'   class whose implementation should be used).
 #' @param n_sim Number of samples.
+#'
+#' @section Simulation:
+#' The default times are sampled using the Markovian representation of the
+#' *(average) default counting process*: The ordered version of the default-time
+#' vector can be recorded while sampling the (average) default counting process.
+#' This vector is uniformly shuffled to obtain a sample with the desired
+#' distribution.
 #'
 #' @examples
 #' parm <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
