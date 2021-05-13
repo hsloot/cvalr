@@ -38,12 +38,12 @@ class whose implementation should be used).}
 \item{n_sim}{Number of samples.}
 }
 \description{
-\linkS4class{CalibrationParam}-class for the exchangeable Marshall--Olkin class
-model for the \emph{average default counting process}.
+\linkS4class{CalibrationParam}-class for the exchangeable Marshall-Olkin model for
+the \emph{average default counting process}.
 }
 \details{
 The model is defined by the assumption that the multivariate default times
-\eqn{\tau = (\tau_1, \ldots, \tau_d)} are Marshall-Olkin.
+\eqn{\tau = (\tau_1, \ldots, \tau_d)} are exchangeable Marshall-Olkin.
 The joint survival function of all portfolio items is
 \deqn{
   P(\tau > t)
@@ -74,7 +74,7 @@ The (scaled) exchangeable intensities, provided to the constructor are
 
 \describe{
 \item{\code{ex_intensities}}{The (scaled) exchangeable intensities  of the
-Marshall-Olkin distribution (see \code{\link[rmo:BernsteinFunction-class]{rmo::exIntensities()}}).}
+exchangeable Marshall-Olkin distribution (see \code{\link[rmo:BernsteinFunction-class]{rmo::exIntensities()}}).}
 }}
 
 \section{Simulation}{

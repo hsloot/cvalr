@@ -1,5 +1,5 @@
 #' @importFrom methods setClass setValidity setGeneric setMethod
-#'   setReplaceMethod validObject is as new callNextMethod
+#'   setReplaceMethod validObject is as new callNextMethod show
 #' @include checkmate.R
 NULL
 

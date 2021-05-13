@@ -4,15 +4,15 @@ NULL
 #' Exchangeable Marshall--Olkin calibration parameter
 #'
 #' @description
-#' [CalibrationParam-class]-class for the exchangeable Marshall--Olkin class
-#' model for the *average default counting process*.
+#' [CalibrationParam-class]-class for the exchangeable Marshall-Olkin model for
+#' the *average default counting process*.
 #'
 #' @slot ex_intensities The (scaled) exchangeable intensities  of the
-#'   Marshall-Olkin distribution (see [rmo::exIntensities()]).
+#'   exchangeable Marshall-Olkin distribution (see [rmo::exIntensities()]).
 #'
 #' @details
 #' The model is defined by the assumption that the multivariate default times
-#' \eqn{\tau = (\tau_1, \ldots, \tau_d)} are Marshall-Olkin.
+#' \eqn{\tau = (\tau_1, \ldots, \tau_d)} are exchangeable Marshall-Olkin.
 #' The joint survival function of all portfolio items is
 #' \deqn{
 #'   P(\tau > t)
