@@ -103,8 +103,7 @@ setGeneric("simulate_adcp",
 #' @export
 setMethod("simulate_adcp", "CalibrationParam",
   function(object, times, ...) {
-    object %>%
-      simulate_dt(...) %>%
+     simulate_dt(object, ...) %>%
       dt2adcp(times)
   })
 

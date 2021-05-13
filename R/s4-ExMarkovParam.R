@@ -3,21 +3,12 @@ NULL
 
 #' Exchangeable Markovian calibration parameter
 #'
-#' Calibration parameter class for the general exchangeable model with a
-#' Markovian *default counting process*.
+#' @description
+#' [CalibrationParam-class]-class for the exchangeable Markovian *default
+#' counting process* model.
 #'
-#' @slot qmatrix The \eqn{(d+1) \times (d+1)} Markov generator matrix of the
+#' @slot ex_qmatrix The \eqn{(d+1) \times (d+1)} Markov generator matrix of the
 #'   default counting process.
-#'
-#' @details
-#' The probability of \eqn{j > i} portfolio items being defaulted at time
-#' \eqn{t > s} conditioned on \eqn{i} portfolio items being defaulted at time
-#' \eqn{s} is
-#'
-#' \deqn{
-#'   \mathbb{P}(Z_t = j \mid Z_s = i)
-#'     = \delta_{i}^\top \operatorname{e}^{(t-s) Q} \delta_{j} .
-#' }
 #'
 #' @export ExMarkovParam
 ExMarkovParam <- setClass("ExMarkovParam", # nolint
@@ -29,33 +20,31 @@ setGeneric("getExQMatrix",
   function(object) {
     standardGeneric("getExQMatrix")
   })
-setGeneric("setExQMatrix<-",
-  function(object, value) {
-    standardGeneric("setExQMatrix<-")
-  })
-
-
 setMethod("getExQMatrix", "ExMarkovParam",
   function(object) {
     object@ex_qmatrix
   })
 
+setGeneric("setExQMatrix<-",
+  function(object, value) {
+    standardGeneric("setExQMatrix<-")
+  })
+#' @include checkmate.R
 setReplaceMethod("setExQMatrix", "ExMarkovParam",
   function(object, value) {
     assert_exqmatrix(value, min.rows = 1L, min.cols = 1L)
 
-    dim <- nrow(value)-1
-    setDimension(object) <- dim
+    setDimension(object) <- nrow(value) - 1L
     object@ex_qmatrix <- value
 
     invisible(object)
   })
 
 
+#' @include checkmate.R
 setValidity("ExMarkovParam",
   function(object) {
-    assert_exqmatrix(object@ex_qmatrix,
-      nrows = object@dim+1L, ncols = object@dim + 1L)
+    assert_exqmatrix(object@ex_qmatrix, nrows = object@dim+1L, ncols = object@dim + 1L)
 
     invisible(TRUE)
   })
@@ -66,13 +55,11 @@ setValidity("ExMarkovParam",
 #' @aliases initialize,ExMarkovParam,ANY-method
 #'
 #' @inheritParams methods::initialize
-#' @param ex_qmatrix (Exchangeable) Q-matrix of the default counting process.
+#' @param ex_qmatrix (Exchangeable) Generator-matrix of the
+#'   *(average) default counting process*.
 #'
 #' @examples
-#' ExMarkovParam(
-#'  ex_qmatrix = matrix(
-#'    c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
-#'    nrow = 3L, ncol = 3L))
+#' ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 setMethod("initialize", "ExMarkovParam",
   function(.Object, ex_qmatrix) { # nolint
     if (!missing(ex_qmatrix)) {
@@ -85,9 +72,8 @@ setMethod("initialize", "ExMarkovParam",
 
 
 #' @describeIn ExMarkovParam-class
-#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
-#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#'    simulates the vector of *default times* and returns a matrix `x` with
+#'    `dim(x) == c(n_sim, getDimension(object))`.
 #' @aliases simulate_dt,ExMarkovParam-method
 #'
 #' @inheritParams simulate_dt
@@ -96,18 +82,16 @@ setMethod("initialize", "ExMarkovParam",
 #' @param n_sim Number of samples.
 #'
 #' @examples
-#' parm <- ExMarkovParam(
-#'  ex_qmatrix = matrix(
-#'    c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
-#'    nrow = 3L, ncol = 3L))
-#' simulate_dt(parm, n_sim = 5e1)
+#' parm <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
+#' simulate_dt(parm, n_sim = 5L)
 #'
 #' @importFrom stats rexp
 #' @include utils.R
+#'
 #' @export
 setMethod("simulate_dt", "ExMarkovParam",
   function(object, ...,
-      method = c("default", "ExMarkovParam"), n_sim = 1e4) {
+      method = c("default", "ExMarkovParam"), n_sim = 1e1L) {
     method <- match.arg(method)
     out <- matrix(nrow = n_sim, ncol = object@dim)
     for (k in 1:n_sim) {
@@ -117,18 +101,21 @@ setMethod("simulate_dt", "ExMarkovParam",
         wt <- rexp(1, rate = -object@ex_qmatrix[1+state, 1+state])
         time <- time + wt
         out[k, (1+state):object@dim] <- time
-        state <- state + sample.int(n = object@dim-state, size = 1, replace = FALSE,
-                        prob = object@ex_qmatrix[1+state, (2+state):(object@dim+1)])
+        state <- state +
+          sample.int(
+            n = object@dim-state, size = 1, replace = FALSE,
+            prob = object@ex_qmatrix[1+state, (2+state):(object@dim+1)])
       }
       perm <- sample.int(n = object@dim, size = object@dim, replace = FALSE)
       out[k, perm] <- out[k, perm]
     }
 
-    simplify2vector(out)
+    out
   })
 
 #' @describeIn ExMarkovParam-class
-#'   returns the probability vector for the average default count process \eqn{L}.
+#'   calculates the *probability vector* for the *average default count process*
+#'   and returns a matrix `x` with `dim(x) == c(getDimension(object)+1L, length(times))`.
 #' @aliases probability_distribution,ExMarkovParam-method
 #'
 #' @inheritParams probability_distribution
@@ -137,17 +124,29 @@ setMethod("simulate_dt", "ExMarkovParam",
 #'
 #' @examples
 #' probability_distribution(CuadrasAugeExtMO2FParam(
-#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+#'   dim = 5L, lambda = 0.05, rho = 0.4), 0.3)
 #' probability_distribution(AlphaStableExtMO2FParam(
-#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+#'   dim = 5L, lambda = 0.05, rho = 0.4), 0.3)
 #' probability_distribution(PoissonExtMO2FParam(
-#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+#'   dim = 5L, lambda = 0.05, rho = 0.4), 0.3)
 #' probability_distribution(ExponentialExtMO2FParam(
-#'   dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+#'   dim = 5L, lambda = 0.05, rho = 0.4), 0.3)
+#'
+#' @section Probability distribution:
+#' The probability of \eqn{j > i} portfolio items being defaulted at time
+#' \eqn{t > s} conditioned on \eqn{i} portfolio items being defaulted at time
+#' \eqn{s} is
+#'
+#' \deqn{
+#'   \mathbb{P}(Z_t = j \mid Z_s = i)
+#'     = \delta_{i}^\top \operatorname{e}^{(t-s) Q} \delta_{j} .
+#' }
 #'
 #' @importFrom expm expm
 #' @importFrom checkmate qassert
+#' @importFrom purrr map reduce
 #' @include utils.R
+#'
 #' @export
 setMethod("probability_distribution", "ExMarkovParam",
   function(object, times, ...,
@@ -157,11 +156,29 @@ setMethod("probability_distribution", "ExMarkovParam",
       method <- "ExMarkovParam"
     }
     if (!isTRUE("ExMarkovParam" == method)) {
-      out <- callNextMethod(object, times, ...)
+      out <- callNextMethod(object, times, ..., method = method)
     } else {
       qassert(times, "N+[0,)")
-      out <- sapply(times, function(t) expm(t * object@ex_qmatrix)[1, ])
+      out <- map(times, ~expm(. * object@ex_qmatrix)[1, ]) %>%
+        reduce(cbind) %>%
+        `dimnames<-`(NULL) %>%
+        matrix(nrow = getDimension(object) + 1L, ncol = length(times))
     }
 
-    simplify2vector(out)
+    out
+  })
+
+
+#' @describeIn ExMarkovParam-class Display the object.
+#' @aliases show,ExMarkovParam-method
+#'
+#' @export
+setMethod("show", "ExMarkovParam",
+  function(object) {
+    cat("An object of class \"ExMarkovParam\"\n")
+    cat(sprintf("Dimension: %i\n", getDimension(object)))
+    cat("Generator matrix:\n")
+    print.table(getExQMatrix(object), zero.print = "")
+
+    invisible(NULL)
   })

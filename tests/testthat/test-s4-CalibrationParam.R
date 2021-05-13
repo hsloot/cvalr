@@ -26,6 +26,21 @@ test_that("`probability_distribution` works as expected for `CalibrationParam`",
 
   parm <- AlphaStableExtMO2FParam(d, lambda, rho = rho)
 
+  # length of `times` is 1
+  x <- probability_distribution(
+    parm, times[[1]], seed = 1623, method = "CalibrationParam", sim_args = list(n_sim = n))
+  expect_matrix(
+    x, mode = "numeric", any.missing = FALSE, nrows = d+1L, ncols = 1L)
+  expect_numeric(
+    x, lower = 0, upper = 1, finite = TRUE)
+  purrr::array_branch(x, 2) %>%
+    purrr::map_dbl(sum) %>%
+    expect_equal(1)
+
+  y <- pfn(parm, times[[1]], n, seed = 1623)
+  expect_equal(x, y)
+
+  # length of `times` is larger than 1
   x <- probability_distribution(
     parm, times, seed = 1623, method = "CalibrationParam", sim_args = list(n_sim = n))
   expect_matrix(
@@ -66,13 +81,13 @@ upper <- 0.25
 # TODO: Use a different `g` here (maybe nth-to-default).
 test_that("`expected_value` works as expected for `CalibrationParam`", {
   # HELPER START
-  efn1 <- function(t, g, parm) {
+  efn1 <- function(parm, t, g) {
     mu <- sapply((0L:d) / d, g, recovery_rate = recovery_rate, lower = lower, upper = upper)
     probs <- probability_distribution(parm, t)
 
     as.vector(t(probs) %*% mu)
   }
-  efn2 <- function(t, g, parm, n, seed) {
+  efn2 <- function(parm, t, g, seed, n) {
     mu <- sapply((0L:d) / d, g, recovery_rate = recovery_rate, lower = lower, upper = upper)
     probs <- probability_distribution(
       parm, t, method = "CalibrationParam", seed = seed, sim_args = list(n_sim = n))
@@ -89,7 +104,7 @@ test_that("`expected_value` works as expected for `CalibrationParam`", {
   expect_numeric(
     x, any.missing = FALSE, lower = 0, upper = 1, len = length(times), sorted = TRUE)
 
-  y <- efn1(times, g_cdo, parm)
+  y <- efn1(parm, times, g_cdo)
   expect_equal(x, y)
 
   # using MC-simulation
@@ -99,7 +114,7 @@ test_that("`expected_value` works as expected for `CalibrationParam`", {
   expect_numeric(
     x, any.missing = FALSE, lower = 0, upper = 1, len = length(times), sorted = TRUE)
 
-  y <- efn2(times, g_cdo, parm, n, 1623)
+  y <- efn2(parm, times, g_cdo, 1623, n)
   expect_equal(x, y)
 })
 

@@ -21,10 +21,10 @@ test_that("`ExMarkovParam`-class is correctly initialized", {
 
 test_that("`simulate_dt` works as expected for `ExMarkovParam`-class", {
   # HELPER START
-  rfn <- function(n, ex_qmatrix) {
+  rfn <- function(parm, n) {
     qassert(n, "X1(0,)")
-    assert_exqmatrix(ex_qmatrix)
-    d <- nrow(ex_qmatrix) - 1L
+    d <- getDimension(parm)
+    ex_qmatrix <- getExQMatrix(parm)
     out <- matrix(nrow = n, ncol = d)
     for (k in 1:n) {
       state <- 0L
@@ -40,7 +40,6 @@ test_that("`simulate_dt` works as expected for `ExMarkovParam`-class", {
       perm <- sample.int(n = d, size = d, replace = FALSE)
       out[k, perm] <- out[k, perm]
     }
-    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
 
     out
   }
@@ -55,7 +54,7 @@ test_that("`simulate_dt` works as expected for `ExMarkovParam`-class", {
     x, lower = 0, finite = TRUE, any.missing = FALSE, len = d)
 
   set.seed(1623)
-  y <- rfn(1L, ex_qmatrix)
+  y <- rfn(parm, 1L)
   expect_equal(x, y)
 
   # n and d are larger than 1
@@ -69,20 +68,20 @@ test_that("`simulate_dt` works as expected for `ExMarkovParam`-class", {
     x, lower = 0, finite = TRUE)
 
   set.seed(1623)
-  y <- rfn(n, ex_qmatrix)
+  y <- rfn(parm, n)
   expect_equal(x, y)
 })
 
 test_that("`probability_distribution` works as expected for `ExMarkovParam`", {
   # HELPER START
-  pfn <- function(t, ex_qmatrix) {
-    qassert(t, "N+[0,)")
-    assert_exqmatrix(ex_qmatrix)
-    out <- purrr::map(t, ~{
-        t(expm(.x * ex_qmatrix)[1L, , drop = FALSE])
+  pfn <- function(parm, times) {
+    qassert(times, "N+[0,)")
+    ex_qmatrix <- getExQMatrix(parm)
+    out <- purrr::map(times, ~{
+        t(expm::expm(. * ex_qmatrix)[1L, , drop = FALSE])
       }) %>%
-      purrr::reduce(cbind)
-    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
+      purrr::reduce(cbind) %>%
+      `dimnames<-`(NULL)
 
     out
   }
@@ -96,7 +95,7 @@ test_that("`probability_distribution` works as expected for `ExMarkovParam`", {
   expect_numeric(
     x, lower = 0, upper = 1, finite = TRUE, any.missing = FALSE, len = d+1L)
   expect_equal(sum(x), 1)
-  expect_equal(x, pfn(times[[1]], ex_qmatrix))
+  expect_equal(x, pfn(parm, times[[1]]))
 
   # length of `times` is larger than 1
   x <- probability_distribution(parm, times)
@@ -105,7 +104,7 @@ test_that("`probability_distribution` works as expected for `ExMarkovParam`", {
   expect_numeric(
     x, lower = 0, upper = 1, finite = TRUE, any.missing = FALSE)
   expect_equal(apply(x, 2, sum), rep(1, ncol(x)))
-  expect_equal(x, pfn(times, ex_qmatrix))
+  expect_equal(x, pfn(parm, times))
 
   # specify class explicitly
   expect_equal(x, probability_distribution(parm, times, method = "ExMarkovParam"))
