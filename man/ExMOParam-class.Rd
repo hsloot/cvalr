@@ -39,7 +39,7 @@ class whose implementation should be used).}
 }
 \description{
 \linkS4class{CalibrationParam}-class for the exchangeable Marshall-Olkin model for
-the \emph{average default counting process}.
+the \emph{average default counting process}. Extends \linkS4class{ExMarkovParam}.
 }
 \details{
 The model is defined by the assumption that the multivariate default times

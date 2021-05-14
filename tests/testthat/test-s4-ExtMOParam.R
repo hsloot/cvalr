@@ -24,3 +24,12 @@ test_that("`ExtMOParam`-class is correctly initialized", {
   expect_equal(as(parm, "ExMOParam"), ExMOParam(ex_intensities))
   expect_equal(as(parm, "ExMarkovParam"), ExMarkovParam(ex_qmatrix))
 })
+
+test_that("`ExtMOParam`-class setters can be used in arbitrary order", {
+  parm <- ExtMOParam(d, bf)
+
+  parm2 <- ExtMOParam()
+  setBernsteinFunction(parm2) <- bf
+  setDimension(parm2) <- d
+  expect_equal(parm, parm2)
+})

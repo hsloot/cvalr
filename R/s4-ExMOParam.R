@@ -5,7 +5,7 @@ NULL
 #'
 #' @description
 #' [CalibrationParam-class]-class for the exchangeable Marshall-Olkin model for
-#' the *average default counting process*.
+#' the *average default counting process*. Extends [ExMarkovParam-class].
 #'
 #' @slot ex_intensities The (scaled) exchangeable intensities  of the
 #'   exchangeable Marshall-Olkin distribution (see [rmo::exIntensities()]).
@@ -137,7 +137,7 @@ setMethod("simulate_dt", "ExMOParam",
 #' @export
 setMethod("show", "ExMOParam",
   function(object) {
-    cat("An object of class \"ExMOParam\"\n")
+    cat(sprintf("An object of class %s\n", classLabel(class(object))))
     cat(sprintf("Dimension: %i\n", getDimension(object)))
     cat("(Scaled) intensity vector:\n")
     print(getExIntensities(object))

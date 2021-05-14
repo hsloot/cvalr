@@ -58,8 +58,8 @@ Monte-Carlo estimation of the probability distribution).}
 \item{n_sim}{Number of samples.}
 }
 \description{
-\linkS4class{CalibrationParam}-class for the exchangeable Markovian \emph{default
-counting process} model.
+\linkS4class{CalibrationParam}-class for the exchangeable Markovian \emph{(average)
+default counting process} model.
 }
 \details{
 The model is defined by the assumption that the \emph{(average) default counting

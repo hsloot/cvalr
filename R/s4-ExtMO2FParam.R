@@ -1,22 +1,32 @@
 #' @include s4-ExtMOParam.R checkmate.R
 NULL
 
-#' Two-factor extendible Marshall--Olkin calibration parameter classes
+#' Two-factor extendible Marshall-Olkin calibration parameters
 #'
-#' Calibration parameter classes with two parameters for the extendible
-#' Marshall--Olkin family.
+#' @description
+#' [CalibrationParam-class]-class with two parameters for the extendible
+#' Marshall-Olkin *(average) default counting process* model. Extends
+#' [ExtMOParam-class].
 #'
-#' @slot lambda The marginal rate
-#' @slot nu Model specific dependence parameter
+#' @slot lambda A non-negative number for the marginal rate.
+#' @slot nu A numeric number ofr the model specific dependence parameter (range
+#'   depends on specific model, use `rho`, `tau`, or `alpha` to set dependence
+#'   parameter).
 #'
 #' @details
-#' For all implemented families, the parameter `nu` can be replaced by
-#' *Spearman's Rho* `rho`, *Kendall' Tau* `tau` or the
-#' *(lower) tail dependence coefficient* `alpha`.
-#' For all implemented families, the possible range for `rho`, `tau`, and
-#' `alpha` is from zero to one (boundaries might not be included) and have a
-#' one-to-one mapping to the model-specific parameter `nu`.
-#' The link between lower tail dependence coefficient \eqn{\alpha} and
+#' The model is defined by the assumption that the multivariate default times
+#' \eqn{\tau = (\tau_1, \ldots, \tau_d)} are extendible Marshall-Olkin, see
+#' [ExtMOParam-class] for the details. This class provides an interface for
+#' easy-to-use, 2-factor families for this model.
+#' For all implemented families, the marginal rate can be specified by `lambda`
+#' and the dependence can be specified by `rho` (*Spearman's Rho*), `tau`
+#' (*Kendall's Tau*), or `alpha` (*Lower tail-dependence coefficient*).
+#' For all implemented families, the (internal) dependence parameter `nu` has a
+#' one-to-one relationship and can be replaced by *Spearman's Rho* `rho`,
+#' *Kendall' Tau* `tau` or the *(lower) tail dependence coefficient* `alpha`.
+#' The possible range for `rho`, `tau`, and `alpha` is from zero to one
+#' (boundaries might not be included).
+#' The link between lower tail-dependence coefficient \eqn{\alpha} and
 #' Spearman's Rho and Kendall's Tau is
 #' \itemize{
 #'   \item \eqn{\alpha = 4 \rho / (3 + \rho)} and \eqn{\rho = 3 \alpha / (4 - \alpha)}
@@ -29,103 +39,113 @@ setClass("ExtMO2FParam", # nolint
   slots = c(lambda = "numeric", nu = "numeric"))
 
 
+setGeneric("constructBernsteinFunction",
+  function(object, ...) {
+    standardGeneric("constructBernsteinFunction")
+  })
+
+#' @importFrom rmo ScaledBernsteinFunction valueOf
+#' @importFrom checkmate assert check_class
+setReplaceMethod("setBernsteinFunction", "ExtMO2FParam",
+  function(object, value) {
+    assert(combine = "and",
+      check_class(value, "ScaledBernsteinFunction"),
+      check_equal(1, valueOf(value@original, 1, 0L)))
+
+    callNextMethod()
+  })
+
 setGeneric("getLambda",
   function(object) {
     standardGeneric("getLambda")
   })
+setMethod("getLambda", "ExtMO2FParam",
+  function(object) {
+    object@lambda
+  })
+
 setGeneric("setLambda<-",
   function(object, value) {
     standardGeneric("setLambda<-")
+  })
+#' @importFrom checkmate qassert qtest
+setReplaceMethod("setLambda", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    object@lambda <- value
+    if (qtest(object@nu, "N1")) {
+      setBernsteinFunction(object) <- constructBernsteinFunction(object, value, object@nu)
+    }
+
+    invisible(object)
   })
 
 setGeneric("getNu",
   function(object) {
     standardGeneric("getNu")
   })
+setMethod("getNu", "ExtMO2FParam",
+  function(object) {
+    object@nu
+  })
+
 setGeneric("setNu<-",
   function(object, value) {
     standardGeneric("setNu<-")
   })
-
-setGeneric("getRho",
-  function(object) {
-    standardGeneric("getRho")
-  })
-setGeneric("setRho<-",
+#' @importFrom checkmate qassert qtest
+setReplaceMethod("setNu", "ExtMO2FParam",
   function(object, value) {
-    standardGeneric("setRho<-")
-  })
+    qassert(value, "N1")
+    object@nu <- value
+    if (qtest(object@lambda, "N1(0,)")) {
+      setBernsteinFunction(object) <- constructBernsteinFunction(object, object@lambda, value)
+    }
 
-setGeneric("getTau",
-  function(object) {
-    standardGeneric("getTau")
-  })
-setGeneric("setTau<-",
-  function(object, value) {
-    standardGeneric("setTau<-")
+    invisible(object)
   })
 
-setGeneric("getAlpha",
-  function(object) {
-    standardGeneric("getAlpha")
-  })
-setGeneric("setAlpha<-",
+setGeneric("invAlpha",
   function(object, value) {
-    standardGeneric("setAlpha<-")
+    standardGeneric("invAlpha")
   })
 
 setGeneric("invRho",
   function(object, value) {
     standardGeneric("invRho")
   })
+#' @importFrom checkmate qassert
+setMethod("invRho", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    invAlpha(object, 4 * value / (3 + value))
+  })
+
 setGeneric("invTau",
   function(object, value) {
     standardGeneric("invTau")
   })
-setGeneric("invAlpha",
-  function(object, value) {
-    standardGeneric("invAlpha")
-  })
-
-setGeneric("constructBernsteinFunction",
-  function(object, ...) {
-    standardGeneric("constructBernsteinFunction")
-  })
-
-
-setMethod("getLambda", "ExtMO2FParam",
-  function(object) {
-    object@lambda
-  })
 #' @importFrom checkmate qassert
-setReplaceMethod("setLambda", "ExtMO2FParam",
+setMethod("invTau", "ExtMO2FParam",
   function(object, value) {
-    qassert(value, "N1(0,)")
-    setBernsteinFunction(object) <- constructBernsteinFunction(
-      object, value, object@nu)
-
-    invisible(object)
+    qassert(value, "N1[0,1]")
+    invAlpha(object, 2 * value / (1 + value))
   })
 
-setMethod("getNu", "ExtMO2FParam",
+setGeneric("getRho",
   function(object) {
-    object@nu
+    standardGeneric("getRho")
   })
-#' @importFrom checkmate qassert
-setReplaceMethod("setNu", "ExtMO2FParam",
-  function(object, value) {
-    qassert(value, "N1")
-    setBernsteinFunction(object) <- constructBernsteinFunction(
-      object, object@lambda, value)
-
-    invisible(object)
-  })
-
 setMethod("getRho", "ExtMO2FParam",
   function(object) {
     alpha <- getAlpha(object)
 
     3 * alpha / (4 - alpha)
+  })
+
+setGeneric("setRho<-",
+  function(object, value) {
+    standardGeneric("setRho<-")
   })
 #' @importFrom checkmate qassert
 setReplaceMethod("setRho", "ExtMO2FParam",
@@ -136,11 +156,20 @@ setReplaceMethod("setRho", "ExtMO2FParam",
     invisible(object)
   })
 
+setGeneric("getTau",
+  function(object) {
+    standardGeneric("getTau")
+  })
 setMethod("getTau", "ExtMO2FParam",
   function(object) {
     alpha <- getAlpha(object)
 
     alpha / (2 - alpha)
+  })
+
+setGeneric("setTau<-",
+  function(object, value) {
+    standardGeneric("setTau<-")
   })
 #' @importFrom checkmate qassert
 setReplaceMethod("setTau", "ExtMO2FParam",
@@ -151,10 +180,19 @@ setReplaceMethod("setTau", "ExtMO2FParam",
     invisible(object)
   })
 
+setGeneric("getAlpha",
+  function(object) {
+    standardGeneric("getAlpha")
+  })
 #' @importFrom rmo valueOf
 setMethod("getAlpha", "ExtMO2FParam",
   function(object) {
     2 - valueOf(object@bf, 2, 0L) / valueOf(object@bf, 1, 0L)
+  })
+
+setGeneric("setAlpha<-",
+  function(object, value) {
+    standardGeneric("setAlpha<-")
   })
 #' @importFrom checkmate qassert
 setReplaceMethod("setAlpha", "ExtMO2FParam",
@@ -165,22 +203,11 @@ setReplaceMethod("setAlpha", "ExtMO2FParam",
     invisible(object)
   })
 
-#' @importFrom rmo ScaledBernsteinFunction valueOf
-#' @importFrom checkmate assert check_class
-setReplaceMethod("setBernsteinFunction", "ExtMO2FParam",
-  function(object, value) {
-    assert(combine = "and",
-      check_class(value, "ScaledBernsteinFunction"),
-      check_equal(1, valueOf(value@original, 1, 0L)))
-    object@lambda <- value@scale
-    object@nu <- invAlpha(object, 2 - valueOf(value@original, 2, 0L))
-
-    callNextMethod(object, value)
-  })
 
 
 #' @importFrom rmo valueOf ScaledBernsteinFunction
 #' @importFrom checkmate assert qassert check_choice check_class
+#' @include checkmate.R
 setValidity("ExtMO2FParam",
   function(object) {
     qassert(object@lambda, "N1(0,)")
@@ -215,21 +242,22 @@ setValidity("ExtMO2FParam",
 #' ExponentialExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 setMethod("initialize", signature = "ExtMO2FParam", # nolint
   definition = function(.Object, # nolint
-      dim, lambda, nu, rho = NULL, tau = NULL, alpha = NULL) {
+      dim, lambda, nu, rho, tau, alpha) {
     if (!missing(dim) && !missing(lambda) &&
           !(missing(nu) && missing(rho) && missing(tau) && missing(alpha))) {
       if (missing(nu)) {
-        if (!is.null(rho)) {
+        if (!missing(rho)) {
           nu <- invRho(.Object, rho)
-        } else if (!is.null(tau)) {
+        } else if (!missing(tau)) {
           nu <- invTau(.Object, tau)
-        } else if (!is.null(alpha)) {
+        } else if (!missing(alpha)) {
           nu <- invAlpha(.Object, alpha)
         }
       }
 
       setDimension(.Object) <- dim
-      setBernsteinFunction(.Object) <- constructBernsteinFunction(.Object, lambda, nu)
+      setLambda(.Object) <- lambda
+      setNu(.Object) <- nu
       validObject(.Object)
     }
 
@@ -237,19 +265,6 @@ setMethod("initialize", signature = "ExtMO2FParam", # nolint
   })
 
 
-#' @importFrom checkmate qassert
-setMethod("invRho", "ExtMO2FParam",
-  function(object, value) {
-    qassert(value, "N1[0,1]")
-    invAlpha(object, 4 * value / (3 + value))
-  })
-
-#' @importFrom checkmate qassert
-setMethod("invTau", "ExtMO2FParam",
-  function(object, value) {
-    qassert(value, "N1[0,1]")
-    invAlpha(object, 2 * value / (1 + value))
-  })
 
 #' @describeIn ExtMO2FParam-class
 #'   returns the expected portfolio CDS loss for a specific time-point.
@@ -272,19 +287,34 @@ setMethod("expected_pcds_loss", "ExtMO2FParam",
   function(object, times, recovery_rate, ...,
       method = c("default", "ExtMO2FParam", "CalibrationParam")) {
     method <- match.arg(method)
-    if (isTRUE("default" == method)) {
-      method <- "ExtMO2FParam"
-    }
-    if (!isTRUE("ExtMO2FParam" == method)) {
-      out <- callNextMethod(object, times, recovery_rate, ...)
-    } else {
+    if (isTRUE("default" == method || "ExtMO2FParam" == method)) {
       qassert(times, "N+[0,)")
       qassert(recovery_rate, "N1[0,1]")
       out <- (1 - recovery_rate) * pexp(times, rate = object@lambda)
+    } else {
+      out <- callNextMethod(object, times, recovery_rate, ..., method = method)
     }
 
     out
   })
+
+
+#' @describeIn ExtMOParam-class Display the object.
+#' @aliases show,ExtMOParam-method
+#'
+#' @inheritParams methods::show
+#'
+#' @export
+setMethod("show", "ExtMO2FParam",
+ function(object) {
+   cat(sprintf("An object of class %s\n", classLabel(class(object))))
+   cat(sprintf("Dimension: %i\n", getDimension(object)))
+   cat(sprintf(
+     "Lambda: %s, Rho: %s, Tau: %s, Alpha: %s\n",
+     format(getLambda(object)), format(getRho(object)), format(getTau(object)),
+     format(getAlpha(object))))
+  })
+
 
 
 #' @rdname ExtMO2FParam-class
@@ -301,9 +331,9 @@ setMethod("expected_pcds_loss", "ExtMO2FParam",
 CuadrasAugeExtMO2FParam <- setClass("CuadrasAugeExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
 
-#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
-#'   LinearBernsteinFunction ConstantBernsteinFunction
-#' @importFrom checkmate assert check_choice check_class
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions LinearBernsteinFunction
+#'   ConstantBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class qassert
 setValidity("CuadrasAugeExtMO2FParam",
   function(object) {
     assert(combine = "and",
@@ -311,15 +341,18 @@ setValidity("CuadrasAugeExtMO2FParam",
       check_class(object@bf@original, "SumOfBernsteinFunctions"),
       check_class(object@bf@original@first, "LinearBernsteinFunction"),
       check_class(object@bf@original@second, "ConstantBernsteinFunction"))
+    qassert(object@nu, "N1[0,1]")
 
     invisible(TRUE)
   })
 
 
-#' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction
-#'   ConstantBernsteinFunction
+#' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction ConstantBernsteinFunction
+#' @importFrom checkmate qassert
 setMethod("constructBernsteinFunction", "CuadrasAugeExtMO2FParam",
   function(object, lambda, nu, ...) {
+    qassert(lambda, "N1(0,)")
+    qassert(nu, "N1[0,1]")
     ScaledBernsteinFunction(
       scale = lambda,
       original = SumOfBernsteinFunctions(
@@ -333,6 +366,12 @@ setMethod("invAlpha", "CuadrasAugeExtMO2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
     value
+  })
+
+setReplaceMethod("setNu", "CuadrasAugeExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    callNextMethod()
   })
 
 
@@ -350,22 +389,25 @@ setMethod("invAlpha", "CuadrasAugeExtMO2FParam",
 AlphaStableExtMO2FParam <- setClass("AlphaStableExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
 
-#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
-#'   AlphaStableBernsteinFunction
-#' @importFrom checkmate assert check_choice check_class
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions AlphaStableBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class qassert
 setValidity("AlphaStableExtMO2FParam",
   function(object) {
     assert(combine = "and",
       check_choice(object@bf@scale, object@lambda),
       check_class(object@bf@original, "AlphaStableBernsteinFunction"))
+    qassert(object@nu, "N1(0,1)")
 
     invisible(TRUE)
   })
 
 
+#' @importFrom checkmate qassert
 #' @importFrom rmo SumOfBernsteinFunctions AlphaStableBernsteinFunction
 setMethod("constructBernsteinFunction", "AlphaStableExtMO2FParam",
-  function(object, lambda, nu, ...) {
+  function(object, lambda, nu) {
+    qassert(lambda, "N1(0,)")
+    qassert(nu, "N1(0,1)")
     ScaledBernsteinFunction(
       scale = lambda,
       original = AlphaStableBernsteinFunction(alpha = nu)
@@ -375,8 +417,14 @@ setMethod("constructBernsteinFunction", "AlphaStableExtMO2FParam",
 #' @importFrom checkmate qassert
 setMethod("invAlpha", "AlphaStableExtMO2FParam",
   function(object, value) {
-    qassert(value, "N1[0,1]")
+    qassert(value, "N1(0,1)")
     log2(2 - value)
+  })
+
+setReplaceMethod("setNu", "AlphaStableExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1(0,1)")
+    callNextMethod()
   })
 
 
@@ -396,9 +444,9 @@ PoissonExtMO2FParam <- setClass("PoissonExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
 
 
-#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
-#'   LinearBernsteinFunction PoissonBernsteinFunction
-#' @importFrom checkmate assert check_choice check_class
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions LinearBernsteinFunction
+#'   PoissonBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class qassert qassert
 setValidity("PoissonExtMO2FParam",
   function(object) {
     assert(combine = "and",
@@ -406,15 +454,18 @@ setValidity("PoissonExtMO2FParam",
       check_class(object@bf@original, "SumOfBernsteinFunctions"),
       check_class(object@bf@original@first, "LinearBernsteinFunction"),
       check_class(object@bf@original@second, "PoissonBernsteinFunction"))
+    qassert(object@nu, "N1[0,)")
 
       invisible(TRUE)
   })
 
 
-#' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction
-#'   PoissonBernsteinFunction
+#' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction PoissonBernsteinFunction
+#' @importFrom checkmate qassert
 setMethod("constructBernsteinFunction", "PoissonExtMO2FParam",
-  function(object, lambda, nu, ...) {
+  function(object, lambda, nu) {
+    qassert(lambda, "N1(0,)")
+    qassert(nu, "N1[0,)")
     ScaledBernsteinFunction(
       scale = lambda,
       original = SumOfBernsteinFunctions(
@@ -427,8 +478,14 @@ setMethod("constructBernsteinFunction", "PoissonExtMO2FParam",
 #' @importFrom checkmate qassert
 setMethod("invAlpha", "PoissonExtMO2FParam",
   function(object, value) {
-    qassert(value, "N1[0,1]")
+    qassert(value, "N1[0,1)")
     -log(1 - sqrt(value))
+  })
+
+setReplaceMethod("setNu", "PoissonExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,)")
+    callNextMethod()
   })
 
 
@@ -449,9 +506,9 @@ setMethod("invAlpha", "PoissonExtMO2FParam",
 ExponentialExtMO2FParam <- setClass("ExponentialExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
 
-#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions
-#'   LinearBernsteinFunction ExponentialBernsteinFunction
-#' @importFrom checkmate assert check_choice check_class
+#' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions LinearBernsteinFunction
+#'   ExponentialBernsteinFunction
+#' @importFrom checkmate assert check_choice check_class qassert
 setValidity("ExponentialExtMO2FParam",
   function(object) {
     assert(combine = "and",
@@ -459,15 +516,18 @@ setValidity("ExponentialExtMO2FParam",
       check_class(object@bf@original, "SumOfBernsteinFunctions"),
       check_class(object@bf@original@first, "LinearBernsteinFunction"),
       check_class(object@bf@original@second, "ExponentialBernsteinFunction"))
+    qassert(object@nu, "N1(0,)")
 
-      invisible(TRUE)
+    invisible(TRUE)
   })
 
 
-#' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction
-#'   ExponentialBernsteinFunction
+#' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction ExponentialBernsteinFunction
+#' @importFrom checkmate qassert
 setMethod("constructBernsteinFunction", "ExponentialExtMO2FParam",
   function(object, lambda, nu, ...) {
+    qassert(lambda, "N1(0,)")
+    qassert(nu, "N1(0,)")
     ScaledBernsteinFunction(
       scale = lambda,
       original = SumOfBernsteinFunctions(
@@ -480,6 +540,12 @@ setMethod("constructBernsteinFunction", "ExponentialExtMO2FParam",
 #' @importFrom checkmate qassert
 setMethod("invAlpha", "ExponentialExtMO2FParam",
   function(object, value) {
-    qassert(value, "N1[0,1]")
+    qassert(value, "N1(0,1)")
     0.5 * (-3 + sqrt(1 + 8 / value))
+  })
+
+setReplaceMethod("setNu", "ExponentialExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    callNextMethod()
   })

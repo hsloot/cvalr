@@ -14,9 +14,9 @@
 \alias{PoissonExtMO2FParam}
 \alias{ExponentialExtMO2FParam-class}
 \alias{ExponentialExtMO2FParam}
-\title{Two-factor extendible Marshall--Olkin calibration parameter classes}
+\title{Two-factor extendible Marshall-Olkin calibration parameters}
 \usage{
-\S4method{initialize}{ExtMO2FParam}(.Object, dim, lambda, nu, rho = NULL, tau = NULL, alpha = NULL)
+\S4method{initialize}{ExtMO2FParam}(.Object, dim, lambda, nu, rho, tau, alpha)
 
 \S4method{expected_pcds_loss}{ExtMO2FParam}(
   object,
@@ -54,17 +54,24 @@
 class whose implementation should be used).}
 }
 \description{
-Calibration parameter classes with two parameters for the extendible
-Marshall--Olkin family.
+\linkS4class{CalibrationParam}-class with two parameters for the extendible
+Marshall-Olkin \emph{(average) default counting process} model. Extends
+\linkS4class{ExtMOParam}.
 }
 \details{
-For all implemented families, the parameter \code{nu} can be replaced by
-\emph{Spearman's Rho} \code{rho}, \emph{Kendall' Tau} \code{tau} or the
-\emph{(lower) tail dependence coefficient} \code{alpha}.
-For all implemented families, the possible range for \code{rho}, \code{tau}, and
-\code{alpha} is from zero to one (boundaries might not be included) and have a
-one-to-one mapping to the model-specific parameter \code{nu}.
-The link between lower tail dependence coefficient \eqn{\alpha} and
+The model is defined by the assumption that the multivariate default times
+\eqn{\tau = (\tau_1, \ldots, \tau_d)} are extendible Marshall-Olkin, see
+\linkS4class{ExtMOParam} for the details. This class provides an interface for
+easy-to-use, 2-factor families for this model.
+For all implemented families, the marginal rate can be specified by \code{lambda}
+and the dependence can be specified by \code{rho} (\emph{Spearman's Rho}), \code{tau}
+(\emph{Kendall's Tau}), or \code{alpha} (\emph{Lower tail-dependence coefficient}).
+For all implemented families, the (internal) dependence parameter \code{nu} has a
+one-to-one relationship and can be replaced by \emph{Spearman's Rho} \code{rho},
+\emph{Kendall' Tau} \code{tau} or the \emph{(lower) tail dependence coefficient} \code{alpha}.
+The possible range for \code{rho}, \code{tau}, and \code{alpha} is from zero to one
+(boundaries might not be included).
+The link between lower tail-dependence coefficient \eqn{\alpha} and
 Spearman's Rho and Kendall's Tau is
 \itemize{
 \item \eqn{\alpha = 4 \rho / (3 + \rho)} and \eqn{\rho = 3 \alpha / (4 - \alpha)}
@@ -81,9 +88,11 @@ Spearman's Rho and Kendall's Tau is
 \section{Slots}{
 
 \describe{
-\item{\code{lambda}}{The marginal rate}
+\item{\code{lambda}}{A non-negative number for the marginal rate.}
 
-\item{\code{nu}}{Model specific dependence parameter}
+\item{\code{nu}}{A numeric number ofr the model specific dependence parameter (range
+depends on specific model, use \code{rho}, \code{tau}, or \code{alpha} to set dependence
+parameter).}
 }}
 
 \section{Cuadras-Augé calibration parameter class}{

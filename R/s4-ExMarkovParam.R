@@ -4,8 +4,8 @@ NULL
 #' Exchangeable Markovian calibration parameter
 #'
 #' @description
-#' [CalibrationParam-class]-class for the exchangeable Markovian *default
-#' counting process* model.
+#' [CalibrationParam-class]-class for the exchangeable Markovian *(average)
+#' default counting process* model.
 #'
 #' @slot ex_qmatrix The \eqn{(d+1) \times (d+1)} Markov generator matrix (see
 #'   [rmo::exQMatrix()]).
@@ -187,7 +187,7 @@ setMethod("probability_distribution", "ExMarkovParam",
 #' @export
 setMethod("show", "ExMarkovParam",
   function(object) {
-    cat("An object of class \"ExMarkovParam\"\n")
+    cat(sprintf("An object of class %s\n", classLabel(class(object))))
     cat(sprintf("Dimension: %i\n", getDimension(object)))
     cat("Generator matrix:\n")
     print.table(getExQMatrix(object), zero.print = "")

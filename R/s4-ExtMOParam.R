@@ -5,7 +5,7 @@ NULL
 #'
 #' @description
 #' [CalibrationParam-class]-class for the extendible Marshall-Olkin model for
-#' the *average default counting process*.
+#' the *average default counting process*. Extends [ExtMOParam-class].
 #'
 #' @slot bf The Bernstein function of the extendible Marshall-Olkin distribution
 #' (see [rmo::BernsteinFunction-class]).
@@ -36,6 +36,20 @@ ExtMOParam <- setClass("ExtMOParam", # nolint
   contains = "ExMOParam",
   slots = c(bf = "BernsteinFunction"))
 
+#' @importFrom rmo exIntensities
+#' @importFrom checkmate test_class qassert
+setReplaceMethod("setDimension", "ExtMOParam",
+  function(object, value) {
+    qassert(value, "X1[1,)")
+    if (test_class(object@bf, "BernsteinFunction") && !isTRUE(object@dim == value)) {
+      object <- callNextMethod()
+      setExIntensities(object) <- exIntensities(object@bf, value)
+    } else {
+      object <- callNextMethod()
+    }
+
+    invisible(object)
+  })
 
 setGeneric("getBernsteinFunction",
   function(object) {
@@ -56,7 +70,9 @@ setReplaceMethod("setBernsteinFunction", "ExtMOParam",
  function(object, value) {
    assert_class(value, "BernsteinFunction")
    object@bf <- value
-   setExIntensities(object) <- exIntensities(object@bf, object@dim)
+   if (qtest(object@dim, "I1[1,)")) {
+     setExIntensities(object) <- exIntensities(value, object@dim)
+   }
 
    invisible(object)
  })
@@ -108,7 +124,7 @@ setMethod("initialize", "ExtMOParam",
 #' @export
 setMethod("show", "ExtMOParam",
  function(object) {
-   cat("An object of class \"ExtMOParam\"\n")
+   cat(sprintf("An object of class %s\n", classLabel(class(object))))
    cat(sprintf("Dimension: %i\n", getDimension(object)))
    cat("Bernstein function:\n")
    print(getBernsteinFunction(object))
