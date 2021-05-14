@@ -78,7 +78,7 @@ setGeneric("simulate_dt",
 #'   matrix `x` with `dim(x) == c(n_sim, length(times))`.
 #'
 #' @param object A [CalibrationParam-class]-object.
-#' @param times A non-negative `numeric` vector of timepoints.
+#' @param times A non-negative numeric vector of timepoints.
 #' @param ... Pass-through parameters.
 #'
 #' @export
@@ -235,7 +235,7 @@ setMethod("expected_value", "CalibrationParam",
 #'   *average default count process* for given timepoints and returns a vector
 #'   `x` with `length(x) == length(times)`.
 #'
-#' @param recovery_rate Recovery rate of the portfolio CDS/CDO.
+#' @param recovery_rate Non-negative number between zero and one for the recovery rate of the portfolio CDS/CDO.
 #'
 #' @export
 setGeneric("expected_pcds_loss",
@@ -282,8 +282,8 @@ setMethod("expected_pcds_loss", "CalibrationParam",
 #'   default count process* for given timepoints and returns a vector `x` with
 #'   `length(x) == length(times)`.
 #'
-#' @param lower Lower attachment point of the CDO tranche.
-#' @param upper Upper attachment point of the CDO tranche.
+#' @param lower Non-negative number between zero and one for the lower attachment point of the CDO tranche.
+#' @param upper Non-negative number between `lower` and one for the upper attachment point of the CDO tranche.
 #'
 #' @export
 setGeneric("expected_cdo_loss",
@@ -331,9 +331,9 @@ setMethod("expected_cdo_loss", "CalibrationParam",
 #'   calculates the *payoff equation* for a *portfolio CDS* (vectorized w.r.t.
 #'   the argumentes `recovery_rate`, `coupon`, and `upfront`).
 #'
-#' @param discount_factors Discount factors for the timepoints.
-#' @param coupon Running coupon of the portfolio CDS / CDO tranche.
-#' @param upfront Upfront payment of the portfolio CDS / CDO tranche.
+#' @param discount_factors Non-negative numeric vector for the discount factors for the timepoints.
+#' @param coupon Numeric number for the running coupon of the portfolio CDS / CDO tranche.
+#' @param upfront Numeric number for the upfront payment of the portfolio CDS / CDO tranche.
 #'
 #' @export
 setGeneric("expected_pcds_equation",

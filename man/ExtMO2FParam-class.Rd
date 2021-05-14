@@ -33,19 +33,19 @@
 
 \item{lambda}{Marginal intensity.}
 
-\item{nu}{Dependence parameter.}
+\item{nu}{(Internal) dependence parameter.}
 
-\item{rho}{Spearman's Rho.}
+\item{rho}{Bivariate Spearman's Rho.}
 
-\item{tau}{Kendall's Tau.}
+\item{tau}{BivariateKendall's Tau.}
 
-\item{alpha}{Bivariate lower tail dependence coefficient}
+\item{alpha}{Bivariate lower tail-dependence coefficient.}
 
 \item{object}{A \linkS4class{CalibrationParam}-object.}
 
-\item{times}{A non-negative \code{numeric} vector of timepoints.}
+\item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{Recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate of the portfolio CDS/CDO.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
@@ -82,7 +82,9 @@ Spearman's Rho and Kendall's Tau is
 \itemize{
 \item \code{initialize,ExtMO2FParam-method}: Constructor
 
-\item \code{expected_pcds_loss,ExtMO2FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
+\item \code{expected_pcds_loss,ExtMO2FParam-method}: calculates the \emph{expected value} for the \emph{portfolio CDS loss} based on the
+\emph{average default count process} for given timepoints and returns a vector
+\code{x} with \code{length(x) == length(times)}.
 }}
 
 \section{Slots}{
@@ -90,10 +92,22 @@ Spearman's Rho and Kendall's Tau is
 \describe{
 \item{\code{lambda}}{A non-negative number for the marginal rate.}
 
-\item{\code{nu}}{A numeric number ofr the model specific dependence parameter (range
+\item{\code{nu}}{A numeric number for the model specific dependence parameter (range
 depends on specific model, use \code{rho}, \code{tau}, or \code{alpha} to set dependence
 parameter).}
 }}
+
+\section{Expected portfolio CDS loss}{
+
+The \emph{expected portfolio CDS loss} for \emph{recovery rate} \eqn{R} is calculated
+using that
+\deqn{
+  \mathbb{E}[g(L_t)]
+    = (1 - R) \cdot F(t)
+}
+with \eqn{g(x) = (1 - R) \cdot x} and \eqn{F} being the Exponential
+distribution function for rate \eqn{\lambda}.
+}
 
 \section{Cuadras-Augé calibration parameter class}{
 
@@ -144,6 +158,15 @@ ExponentialExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
   times = 0.25, recovery_rate = 0.4)
 expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-  times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
+  times = seq(0, 5, by = 0.25), recovery_rate = 0.4)
+expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
+  times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam")
+expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
+  times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
+  pd_args = list(method = "CalibrationParam", seed = 1623, sim_args = list(n_sim = 1e2L)))
+expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
+  times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
+  pd_args = list(method = "CalibrationParam", seed = 1623,
+  sim_args = list(method = "ExMarkovParam", n_sim = 1e2L)))
 
 }

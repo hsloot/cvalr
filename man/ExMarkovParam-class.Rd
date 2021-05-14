@@ -37,7 +37,7 @@
 \arguments{
 \item{object}{A \linkS4class{CalibrationParam}-object.}
 
-\item{times}{A non-negative \code{numeric} vector of timepoints.}
+\item{times}{A non-negative numeric vector of timepoints.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
@@ -103,7 +103,6 @@ distribution.
 The probability of \eqn{j > i} portfolio items being defaulted at time
 \eqn{t > s} conditioned on \eqn{i} portfolio items being defaulted at time
 \eqn{s} is
-
 \deqn{
   \mathbb{P}(Z_t = j \mid Z_s = i)
     = \delta_{i}^\top \operatorname{e}^{(t-s) Q} \delta_{j} .

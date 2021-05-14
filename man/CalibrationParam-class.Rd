@@ -109,7 +109,7 @@ expected_cdo_equation(
 
 \item{...}{Pass-through parameter.}
 
-\item{times}{A non-negative \code{numeric} vector of timepoints.}
+\item{times}{A non-negative numeric vector of timepoints.}
 
 \item{g}{A payoff transformation function.}
 
@@ -118,17 +118,17 @@ class whose implementation should be used).}
 
 \item{pd_args}{A list of parameters for \code{\link[=probability_distribution]{probability_distribution()}}.}
 
-\item{recovery_rate}{Recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate of the portfolio CDS/CDO.}
 
-\item{lower}{Lower attachment point of the CDO tranche.}
+\item{lower}{Non-negative number between zero and one for the lower attachment point of the CDO tranche.}
 
-\item{upper}{Upper attachment point of the CDO tranche.}
+\item{upper}{Non-negative number between \code{lower} and one for the upper attachment point of the CDO tranche.}
 
-\item{discount_factors}{Discount factors for the timepoints.}
+\item{discount_factors}{Non-negative numeric vector for the discount factors for the timepoints.}
 
-\item{coupon}{Running coupon of the portfolio CDS / CDO tranche.}
+\item{coupon}{Numeric number for the running coupon of the portfolio CDS / CDO tranche.}
 
-\item{upfront}{Upfront payment of the portfolio CDS / CDO tranche.}
+\item{upfront}{Numeric number for the upfront payment of the portfolio CDS / CDO tranche.}
 }
 \description{
 \code{CalibrationParam} provide a simple interface to calculate \emph{expected values}

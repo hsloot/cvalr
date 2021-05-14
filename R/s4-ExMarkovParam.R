@@ -148,7 +148,6 @@ setMethod("simulate_dt", "ExMarkovParam",
 #' The probability of \eqn{j > i} portfolio items being defaulted at time
 #' \eqn{t > s} conditioned on \eqn{i} portfolio items being defaulted at time
 #' \eqn{s} is
-#'
 #' \deqn{
 #'   \mathbb{P}(Z_t = j \mid Z_s = i)
 #'     = \delta_{i}^\top \operatorname{e}^{(t-s) Q} \delta_{j} .

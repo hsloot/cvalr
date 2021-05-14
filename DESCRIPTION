@@ -55,7 +55,6 @@ Collate:
     's4-H2ExtMO3FParam.R'
     's4-H2ExtArch3FParam.R'
     's4-H2ExtGaussian3FParam.R'
-    'utils-pipe.R'
 URL: https://github.com/hsloot/cvalr
 BugReports: https://github.com/hsloot/cvalr/issues
 Remotes: github::hsloot/rmo

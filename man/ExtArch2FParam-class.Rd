@@ -93,9 +93,9 @@ class whose implementation should be used).}
 
 \item{n_sim}{Number of samples.}
 
-\item{times}{A non-negative \code{numeric} vector of timepoints.}
+\item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{Recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate of the portfolio CDS/CDO.}
 }
 \description{
 Calibration parameter classes with two parameters for the extendible

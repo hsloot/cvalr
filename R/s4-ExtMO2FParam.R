@@ -9,7 +9,7 @@ NULL
 #' [ExtMOParam-class].
 #'
 #' @slot lambda A non-negative number for the marginal rate.
-#' @slot nu A numeric number ofr the model specific dependence parameter (range
+#' @slot nu A numeric number for the model specific dependence parameter (range
 #'   depends on specific model, use `rho`, `tau`, or `alpha` to set dependence
 #'   parameter).
 #'
@@ -230,10 +230,10 @@ setValidity("ExtMO2FParam",
 #' @inheritParams methods::initialize
 #' @param dim Dimension.
 #' @param lambda Marginal intensity.
-#' @param nu Dependence parameter.
-#' @param rho Spearman's Rho.
-#' @param tau Kendall's Tau.
-#' @param alpha Bivariate lower tail dependence coefficient
+#' @param nu (Internal) dependence parameter.
+#' @param rho Bivariate Spearman's Rho.
+#' @param tau BivariateKendall's Tau.
+#' @param alpha Bivariate lower tail-dependence coefficient.
 #'
 #' @examples
 #' CuadrasAugeExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
@@ -267,18 +267,39 @@ setMethod("initialize", signature = "ExtMO2FParam", # nolint
 
 
 #' @describeIn ExtMO2FParam-class
-#'   returns the expected portfolio CDS loss for a specific time-point.
+#'   calculates the *expected value* for the *portfolio CDS loss* based on the
+#'   *average default count process* for given timepoints and returns a vector
+#'   `x` with `length(x) == length(times)`.
 #' @aliases expected_pcds_loss,ExtMO2FParam-method
 #'
 #' @inheritParams expected_pcds_loss
 #' @param method Calculation method (either `"default"` or the name of the
 #'   class whose implementation should be used).
 #'
+#' @section Expected portfolio CDS loss:
+#' The *expected portfolio CDS loss* for *recovery rate* \eqn{R} is calculated
+#' using that
+#' \deqn{
+#'   \mathbb{E}[g(L_t)]
+#'     = (1 - R) \cdot F(t)
+#' }
+#' with \eqn{g(x) = (1 - R) \cdot x} and \eqn{F} being the Exponential
+#' distribution function for rate \eqn{\lambda}.
+#'
 #' @examples
 #' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
 #'   times = 0.25, recovery_rate = 0.4)
 #' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-#'   times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
+#'   times = seq(0, 5, by = 0.25), recovery_rate = 0.4)
+#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
+#'   times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam")
+#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
+#'   times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
+#'   pd_args = list(method = "CalibrationParam", seed = 1623, sim_args = list(n_sim = 1e2L)))
+#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
+#'   times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
+#'   pd_args = list(method = "CalibrationParam", seed = 1623,
+#'   sim_args = list(method = "ExMarkovParam", n_sim = 1e2L)))
 #'
 #' @importFrom stats pexp
 #' @importFrom checkmate qassert
@@ -300,7 +321,7 @@ setMethod("expected_pcds_loss", "ExtMO2FParam",
 
 
 #' @describeIn ExtMOParam-class Display the object.
-#' @aliases show,ExtMOParam-method
+#' @aliases show,ExtMO2FParam-method
 #'
 #' @inheritParams methods::show
 #'
