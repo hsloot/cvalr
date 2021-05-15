@@ -283,6 +283,5 @@ expected_cdo_equation(
 \linkS4class{PoissonExtMO2FParam} \linkS4class{ExponentialExtMO2FParam}
 \linkS4class{ExtArch2FParam} \linkS4class{ClaytonExtArch2FParam}
 \linkS4class{FrankExtArch2FParam} \linkS4class{GumbelExtArch2FParam}
-\linkS4class{AmhExtArch2FParam} \linkS4class{JoeExtArch2FParam}
-\code{\link[=expected_pcds_loss]{expected_pcds_loss()}}, \code{\link[=expected_cdo_loss]{expected_cdo_loss()}}
+\linkS4class{JoeExtArch2FParam} \code{\link[=expected_pcds_loss]{expected_pcds_loss()}}, \code{\link[=expected_cdo_loss]{expected_cdo_loss()}}
 }

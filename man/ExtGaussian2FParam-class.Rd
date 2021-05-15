@@ -57,7 +57,7 @@
 
 \item{rho}{Bivariate Spearman's Rho.}
 
-\item{tau}{BivariateKendall's Tau.}
+\item{tau}{Bivariate Kendall's Tau.}
 
 \item{object}{A \linkS4class{CalibrationParam}-object.}
 
@@ -79,15 +79,13 @@ class whose implementation should be used).}
 }
 \description{
 \linkS4class{CalibrationParam}-class with two parameters for the extendible
-equi-correlation Gaussian-copula with Exponential \emph{(average) default counting
-process} model.
+equi-correlation Gaussian-copula model with Exponential  margins*(average)
+default counting process*.
 }
 \details{
 The model is defined by the assumption that the multivariate default times
 \eqn{\tau = (\tau_1, \ldots, \tau_d)} are extendible equi-correlation
 Gaussian with Exponential margins.
-The parameter \code{nu} (\emph{Pearson correlation}) can be replaced by \emph{Spearman's
-Rho} \code{rho}, \emph{Kendall' Tau} \code{tau}.
 The (internal) dependence parameter \code{nu} (\emph{Pearson correlation}) has a
 one-to-one relationship and can be replaced by \emph{Spearman's Rho} \code{rho} or
 \emph{Kendall' Tau} \code{tau}. The possible range for \code{rho} or \code{tau} is from zero to

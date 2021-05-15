@@ -19,10 +19,6 @@
 \alias{GumbelH2ExtArch3FParam}
 \alias{initialize,GumbelH2ExtArch3FParam-method}
 \alias{initialize,GumbelH2ExtArch3FParam,ANY-method}
-\alias{AmhH2ExtArch3FParam-class}
-\alias{AmhH2ExtArch3FParam}
-\alias{initialize,AmhH2ExtArch3FParam-method}
-\alias{initialize,AmhH2ExtArch3FParam,ANY-method}
 \alias{JoeH2ExtArch3FParam-class}
 \alias{JoeH2ExtArch3FParam}
 \alias{initialize,JoeH2ExtArch3FParam-method}
@@ -37,7 +33,7 @@
   rho = NULL,
   tau = NULL,
   survival = TRUE,
-  family = c("Clayton", "Frank", "AMH", "Gumbel", "Joe")
+  family = c("Clayton", "Frank", "Gumbel", "Joe")
 )
 
 \S4method{simulate_dt}{H2ExtArch3FParam}(object, ..., n_sim = 10000)
@@ -47,8 +43,6 @@
 \S4method{initialize}{FrankH2ExtArch3FParam}(.Object, ..., survival = TRUE)
 
 \S4method{initialize}{GumbelH2ExtArch3FParam}(.Object, ..., survival = TRUE)
-
-\S4method{initialize}{AmhH2ExtArch3FParam}(.Object, ..., survival = TRUE)
 
 \S4method{initialize}{JoeH2ExtArch3FParam}(.Object, ..., survival = TRUE)
 }
@@ -104,8 +98,6 @@ matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} i
 
 \item \code{initialize,GumbelH2ExtArch3FParam-method}: Constructor
 
-\item \code{initialize,AmhH2ExtArch3FParam-method}: Constructor
-
 \item \code{initialize,JoeH2ExtArch3FParam-method}: Constructor
 }}
 
@@ -153,12 +145,6 @@ GumbelH2ExtArch3FParam(
 GumbelH2ExtArch3FParam(
   partition = list(1:3, 4:6, 7:10, 11:15),
   lambda = 8e-2, rho = c(0.3, 0.5))
-AmhH2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
-  lambda = 8e-2, tau = c(0.05, 0.2))
-AmhH2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
-  lambda = 8e-2, rho = c(0.05, 0.2))
 JoeH2ExtArch3FParam(
   partition = list(1:3, 4:6, 7:10, 11:15),
   lambda = 8e-2, tau = c(0.3, 0.5))

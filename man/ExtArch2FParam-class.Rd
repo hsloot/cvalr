@@ -8,6 +8,7 @@
 \alias{initialize,ExtArch2FParam,ANY-method}
 \alias{simulate_dt,ExtArch2FParam-method}
 \alias{expected_pcds_loss,ExtArch2FParam-method}
+\alias{show,ExtArch2FParam-method}
 \alias{ClaytonExtArch2FParam-class}
 \alias{ClaytonExtArch2FParam}
 \alias{initialize,ClaytonExtArch2FParam-method}
@@ -20,10 +21,6 @@
 \alias{GumbelExtArch2FParam}
 \alias{initialize,GumbelExtArch2FParam-method}
 \alias{initialize,GumbelExtArch2FParam,ANY-method}
-\alias{AmhExtArch2FParam-class}
-\alias{AmhExtArch2FParam}
-\alias{initialize,AmhExtArch2FParam-method}
-\alias{initialize,AmhExtArch2FParam,ANY-method}
 \alias{JoeExtArch2FParam-class}
 \alias{JoeExtArch2FParam}
 \alias{initialize,JoeExtArch2FParam-method}
@@ -32,20 +29,20 @@
 \usage{
 \S4method{initialize}{ExtArch2FParam}(
   .Object,
-  dim = 2,
-  lambda = 0.1,
-  nu = 1,
-  rho = NULL,
-  tau = NULL,
-  survival = TRUE,
-  family = c("Clayton", "Frank", "Amh", "Gumbel", "Joe")
+  dim,
+  lambda,
+  nu,
+  rho,
+  tau,
+  survival,
+  family = c("Clayton", "Frank", "Gumbel", "Joe")
 )
 
 \S4method{simulate_dt}{ExtArch2FParam}(
   object,
   ...,
   method = c("default", "ExtArch2fParam"),
-  n_sim = 10000
+  n_sim = 10000L
 )
 
 \S4method{expected_pcds_loss}{ExtArch2FParam}(
@@ -56,13 +53,13 @@
   method = c("default", "ExtArch2FParam", "CalibrationParam")
 )
 
+\S4method{show}{ExtArch2FParam}(object)
+
 \S4method{initialize}{ClaytonExtArch2FParam}(.Object, ..., survival = FALSE)
 
 \S4method{initialize}{FrankExtArch2FParam}(.Object, ..., survival = TRUE)
 
 \S4method{initialize}{GumbelExtArch2FParam}(.Object, ..., survival = TRUE)
-
-\S4method{initialize}{AmhExtArch2FParam}(.Object, ..., survival = TRUE)
 
 \S4method{initialize}{JoeExtArch2FParam}(.Object, ..., survival = TRUE)
 }
@@ -73,16 +70,15 @@
 
 \item{lambda}{Marginal intensity.}
 
-\item{nu}{Dependence parameter (see \link[copula:archmCopula-class]{copula::archmCopula}).}
+\item{nu}{(Internal) dependence parameter (see \link[copula:archmCopula-class]{copula::archmCopula}).}
 
-\item{rho}{Spearman's Rho.}
+\item{rho}{Bivariate Spearman's Rho.}
 
-\item{tau}{Kendall's Tau.}
+\item{tau}{Bivariate Kendall's Tau.}
 
-\item{survival}{Flag if survival copula is specified (default, except for Clayton)}
+\item{survival}{Flag if survival copula is specified (default, except for Clayton).}
 
-\item{family}{Name of the Archimedean copula family
-(see \link[copula:archmCopula-class]{copula::archmCopula}).}
+\item{family}{Name of the Archimedean copula family (see \link[copula:archmCopula-class]{copula::archmCopula}).}
 
 \item{object}{A \linkS4class{CalibrationParam}-object.}
 
@@ -98,25 +94,30 @@ class whose implementation should be used).}
 \item{recovery_rate}{Non-negative number between zero and one for the recovery rate of the portfolio CDS/CDO.}
 }
 \description{
-Calibration parameter classes with two parameters for the extendible
-Archimedean families with exponential margins.
+\linkS4class{CalibrationParam}-class with two parameters for the extendible
+Archimedean-(survival-)copula model with Exponential margins for the
+\emph{(average) default counting process}.
 }
 \details{
-For all implemented families, the parameter \code{nu} can be replaced by
-\emph{Spearman's Rho} \code{rho}, \emph{Kendall's Tau} \code{tau}.
-For all implemented families, the possible range for \code{rho} and \code{tau}
-is from zero to one (boundaries might not be included) and have a
-one-to-one mapping to the model-specific parameter \code{nu}.
+The model is defined by the assumption that the multivariate default times
+\eqn{\tau = (\tau_1, \ldots, \tau_d)} are from an extendible
+Archimedean-(survival-)copula with Exponential margins.
+The (internal) dependency parameter \eqn{\nu} (model specific) has a
+one-to-one relationship and can be replaced by \emph{Spearman's Rho} \code{rho} (except
+for the family based on Joe's copula) or \emph{Kendall's Tau} \code{tau}. The possible
+range for \code{rho} and \code{tau} is from zero to one (boundaries might not be
+included).
 }
 \section{Functions}{
 \itemize{
 \item \code{initialize,ExtArch2FParam-method}: Constructor
 
-\item \code{simulate_dt,ExtArch2FParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
-\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_dt,ExtArch2FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
 
 \item \code{expected_pcds_loss,ExtArch2FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
+
+\item \code{show,ExtArch2FParam-method}: Display the object.
 
 \item \code{initialize,ClaytonExtArch2FParam-method}: Constructor
 
@@ -124,37 +125,55 @@ matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} i
 
 \item \code{initialize,GumbelExtArch2FParam-method}: Constructor
 
-\item \code{initialize,AmhExtArch2FParam-method}: Constructor
-
 \item \code{initialize,JoeExtArch2FParam-method}: Constructor
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{lambda}}{The marginal rate}
+\item{\code{lambda}}{A non-negative number for the marginal rate.}
 
-\item{\code{nu}}{Model specific parameter}
+\item{\code{nu}}{A numeric number for the model specific dependence parameter.}
 }}
 
+\section{Simulation}{
+
+The default times are sampled in a two-stage procedure: First a sample is
+drawn from the Archimedean copula, see \link[copula:archmCopula-class]{copula::archmCopula} and
+\code{\link[copula:Copula]{copula::rCopula()}}; then the results are transformed using \code{\link[stats:Exponential]{stats::qexp()}}.
+}
+
+\section{Expected portfolio CDS loss}{
+
+The \emph{expected portfolio CDS loss} for \emph{recovery rate} \eqn{R} is calculated
+using that
+\deqn{
+  \mathbb{E}[g(L_t)]
+    = (1 - R) \cdot F(t)
+}
+with \eqn{g(x) = (1 - R) \cdot x} and \eqn{F} being the Exponential
+distribution function for rate \eqn{\lambda}.
+}
+
 \examples{
-ExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1, family = "Gumbel")
-ExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1, family = "Amh")
+ExtArch2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1, family = "Clayton", survival = TRUE)
+ExtArch2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1, family = "Gumbel", survival = FALSE)
+ExtArch2FParam(dim = 5L, lambda = 8e-2, tau = 4e-1, family = "Frank", survival = FALSE)
+ExtArch2FParam(dim = 5L, lambda = 8e-2, tau = 4e-1, family = "Joe", survival = FALSE)
 parm <- FrankExtArch2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
-simulate_dt(parm, n_sim = 5e1)
+simulate_dt(parm, n_sim = 5L)
 
-expected_pcds_loss(FrankExtArch2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
-  times = 0.25, recovery_rate = 0.4)
-expected_pcds_loss(FrankExtArch2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
-  times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
+parm <- FrankExtArch2FParam(75L, 8e-2, rho = 4e-1)
+expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+  method = "CalibrationParam", pd_args = list(n_sim = 1e2L))
 
-ClaytonExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
-ClaytonExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
-FrankExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
-FrankExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
-GumbelExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
-GumbelExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
-AmhExtArch2FParam(dim = 2L, lambda = 8e-2, rho = 4e-1)
-AmhExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
-JoeExtArch2FParam(dim = 2L, lambda = 8e-2, tau = 4e-1)
+ClaytonExtArch2FParam(5L, 8e-2, rho = 4e-1)
+ClaytonExtArch2FParam(5L, 8e-2, tau = 4e-1)
+FrankExtArch2FParam(5L, 8e-2, rho = 4e-1)
+FrankExtArch2FParam(5L, 8e-2, tau = 4e-1)
+GumbelExtArch2FParam(5L, 8e-2, rho = 4e-1)
+GumbelExtArch2FParam(5L, 8e-2, tau = 4e-1)
+JoeExtArch2FParam(5L, 8e-2, tau = 4e-1)
 }

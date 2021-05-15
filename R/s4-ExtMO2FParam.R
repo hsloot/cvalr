@@ -5,8 +5,8 @@ NULL
 #'
 #' @description
 #' [CalibrationParam-class]-class with two parameters for the extendible
-#' Marshall-Olkin *(average) default counting process* model. Extends
-#' [ExtMOParam-class].
+#' Marshall-Olkin model for the *(average) default counting process*.
+#' Extends [ExtMOParam-class].
 #'
 #' @slot lambda A non-negative number for the marginal rate.
 #' @slot nu A numeric number for the model specific dependence parameter (range

@@ -55,8 +55,8 @@ class whose implementation should be used).}
 }
 \description{
 \linkS4class{CalibrationParam}-class with two parameters for the extendible
-Marshall-Olkin \emph{(average) default counting process} model. Extends
-\linkS4class{ExtMOParam}.
+Marshall-Olkin model for the \emph{(average) default counting process}.
+Extends \linkS4class{ExtMOParam}.
 }
 \details{
 The model is defined by the assumption that the multivariate default times

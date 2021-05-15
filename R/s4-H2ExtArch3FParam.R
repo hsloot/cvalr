@@ -127,7 +127,7 @@ setMethod("initialize", "H2ExtArch3FParam",
       partition = list(1L:2L, 3L:5L),
       lambda = 1e-1, nu = c(0.2, 0.3), rho = NULL, tau = NULL,
       survival = TRUE,
-      family = c("Clayton", "Frank", "AMH", "Gumbel", "Joe")) {
+      family = c("Clayton", "Frank", "Gumbel", "Joe")) {
     family <- match.arg(family)
     .Object@family <- family
     .Object@survival <- survival
@@ -311,41 +311,7 @@ setMethod("getModelName", "GumbelH2ExtArch3FParam",
   function(object) {
     "GumbelExtArch2FParam"
   })
-
-
-
-#' @rdname H2ExtArch3FParam-class
-#'
-#' @export AmhH2ExtArch3FParam
-AmhH2ExtArch3FParam <- setClass("AmhH2ExtArch3FParam", # nolint
-  contains = "H2ExtArch3FParam")
-
-
-#' @describeIn H2ExtArch3FParam-class Constructor
-#' @aliases initialize,AmhH2ExtArch3FParam-method
-#' @aliases initialize,AmhH2ExtArch3FParam,ANY-method
-#'
-#' @inheritParams methods::initialize
-#' @param ... Pass-through parameters.
-#'
-#' @examples
-#' AmhH2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
-#'   lambda = 8e-2, tau = c(0.05, 0.2))
-#' AmhH2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
-#'   lambda = 8e-2, rho = c(0.05, 0.2))
-setMethod("initialize", "AmhH2ExtArch3FParam",
-  function(.Object, ..., survival = TRUE) { # nolint
-    invisible(callNextMethod(.Object, ..., survival = survival, family = "AMH"))
-  })
-
-
-setMethod("getModelName", "AmhH2ExtArch3FParam",
-  function(object) {
-    "AmhExtArch2FParam"
-  })
-
+  
 
 
 #' @rdname H2ExtArch3FParam-class

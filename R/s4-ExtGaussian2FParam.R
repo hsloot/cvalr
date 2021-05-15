@@ -1,12 +1,12 @@
-#' @include s4-CalibrationParam.R s4-ExtMO2FParam.R checkmate.R
+#' @include s4-ExtMO2FParam.R checkmate.R
 NULL
 
 #' Two-factor extendible Gaussian calibration parameters
 #'
 #' @description
 #' [CalibrationParam-class]-class with two parameters for the extendible
-#' equi-correlation Gaussian-copula with Exponential *(average) default counting
-#' process* model.
+#' equi-correlation Gaussian-copula model with Exponential  margins*(average)
+#' default counting process*.
 #'
 #' @slot lambda A non-negative number for the marginal rate.
 #' @slot nu A numeric number for the model specific dependence parameter
@@ -17,8 +17,6 @@ NULL
 #' The model is defined by the assumption that the multivariate default times
 #' \eqn{\tau = (\tau_1, \ldots, \tau_d)} are extendible equi-correlation
 #' Gaussian with Exponential margins.
-#' The parameter `nu` (*Pearson correlation*) can be replaced by *Spearman's
-#' Rho* `rho`, *Kendall' Tau* `tau`.
 #' The (internal) dependence parameter `nu` (*Pearson correlation*) has a
 #' one-to-one relationship and can be replaced by *Spearman's Rho* `rho` or
 #' *Kendall' Tau* `tau`. The possible range for `rho` or `tau` is from zero to
@@ -124,7 +122,7 @@ setValidity("ExtGaussian2FParam",
 #' @param lambda Marginal intensity.
 #' @param nu (Internal) dependence parameter.
 #' @param rho Bivariate Spearman's Rho.
-#' @param tau BivariateKendall's Tau.
+#' @param tau Bivariate Kendall's Tau.
 #'
 #' @examples
 #' ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)

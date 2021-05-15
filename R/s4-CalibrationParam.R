@@ -17,8 +17,7 @@ NULL
 #'   [PoissonExtMO2FParam-class] [ExponentialExtMO2FParam-class]
 #'   [ExtArch2FParam-class] [ClaytonExtArch2FParam-class]
 #'   [FrankExtArch2FParam-class] [GumbelExtArch2FParam-class]
-#'   [AmhExtArch2FParam-class] [JoeExtArch2FParam-class]
-#'   [expected_pcds_loss()], [expected_cdo_loss()]
+#'   [JoeExtArch2FParam-class] [expected_pcds_loss()], [expected_cdo_loss()]
 #'
 #' @export
 setClass("CalibrationParam", # nolint

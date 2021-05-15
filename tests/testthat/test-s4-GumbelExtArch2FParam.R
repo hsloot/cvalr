@@ -1,4 +1,4 @@
-d <- 5L
+d <- 4L
 lambda <- 0.08
 rho <- 0.45
 
@@ -25,4 +25,50 @@ test_that("`GumbelExtArch2FParam`-class is correctly initialized", {
   expect_equal(parm, GumbelExtArch2FParam(d, lambda, nu))
   expect_equal(parm, GumbelExtArch2FParam(d, lambda, rho = rho))
   expect_equal(parm, GumbelExtArch2FParam(d, lambda, tau = tau))
+})
+
+test_that("`GumbelExtArch2FParam`-class setters can be used in arbitrary order", { # nolint
+  parm <- GumbelExtArch2FParam(d, lambda, nu)
+
+  parm2 <- GumbelExtArch2FParam()
+  setDimension(parm2) <- d
+  setLambda(parm2) <- lambda
+  setRho(parm2) <- rho
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelExtArch2FParam()
+  setDimension(parm2) <- d
+  setLambda(parm2) <- lambda
+  setTau(parm2) <- tau
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelExtArch2FParam()
+  setDimension(parm2) <- d
+  setNu(parm2) <- nu
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelExtArch2FParam()
+  setLambda(parm2) <- lambda
+  setDimension(parm2) <- d
+  setNu(parm2) <- nu
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelExtArch2FParam()
+  setNu(parm2) <- nu
+  setDimension(parm2) <- d
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelExtArch2FParam()
+  setLambda(parm2) <- lambda
+  setNu(parm2) <- nu
+  setDimension(parm2) <- d
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelExtArch2FParam()
+  setNu(parm2) <- nu
+  setLambda(parm2) <- lambda
+  setDimension(parm2) <- d
+  expect_equal(parm, parm2)
 })
