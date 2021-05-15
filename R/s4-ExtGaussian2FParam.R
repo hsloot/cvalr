@@ -177,11 +177,11 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 #' @export
 setMethod("simulate_dt", "ExtGaussian2FParam",
   function(object, ...,
-      method = c("default", "ExtGaussian2FParam"), n_sim = 1e4L) {
+      method = c("default", "ExtGaussian2FParam"), n_sim = 1e1L) {
     method <- match.arg(method)
-    normalCopula(param = object@nu, dim = object@dim, dispstr = "ex") %>%
+    normalCopula(param = getNu(object), dim = getDimension(object), dispstr = "ex") %>%
       rCopula(n_sim, .) %>%
-      qexp(rate = object@lambda, lower.tail = FALSE)
+      qexp(rate = getLambda(object), lower.tail = FALSE)
   })
 
 #' @describeIn ExtGaussian2FParam-class
@@ -294,7 +294,7 @@ setMethod("expected_pcds_loss", "ExtGaussian2FParam",
     if (isTRUE("default" == method || "ExtGaussian2FParam" == method)) {
       qassert(times, "N+[0,)")
       qassert(recovery_rate, "N1[0,1]")
-      out <- (1 - recovery_rate) * pexp(times, rate = object@lambda)
+      out <- (1 - recovery_rate) * pexp(times, rate = getLambda(object))
     } else {
       out <- callNextMethod(object, times, recovery_rate, ..., method = method)
     }
@@ -349,15 +349,15 @@ setMethod("expected_cdo_loss", "ExtGaussian2FParam",
       qassert(lower, "N1[0,1]")
       assert_numeric(upper, lower = lower, upper = 1)
 
-      cop <- normalCopula(-sqrt(1-object@nu))
-      out <- pexp(times, rate = object@lambda) %>%
+      cop <- normalCopula(-sqrt(1-getNu(object)))
+      out <- pexp(times, rate = getLambda(object)) %>%
         map_dbl(~{
           u_left <- c(pmax(1 - lower / (1 - recovery_rate), 0), .)
           u_right <- c(pmax(1 - upper / (1 - recovery_rate), 0), .)
           (1 - recovery_rate) * (pCopula(u_left, cop) - pCopula(u_right, cop))
         })
     } else {
-      out <- callNextMethod(object, times, recovery_rate, lower, upper, ...)
+      out <- callNextMethod(object, times, recovery_rate, lower, upper, ..., method = method)
     }
 
     out

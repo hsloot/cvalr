@@ -312,7 +312,7 @@ setMethod("invTau", "ExtArch2FParam",
 #' @include utils.R
 setMethod("simulate_dt", "ExtArch2FParam",
   function(object, ...,
-      method = c("default", "ExtArch2fParam"), n_sim = 1e4L) {
+      method = c("default", "ExtArch2fParam"), n_sim = 1e1L) {
     method <- match.arg(method)
     out <- qexp(
       rCopula(n_sim, getCopula(object)),

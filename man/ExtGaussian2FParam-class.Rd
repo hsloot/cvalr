@@ -18,7 +18,7 @@
   object,
   ...,
   method = c("default", "ExtGaussian2FParam"),
-  n_sim = 10000L
+  n_sim = 10L
 )
 
 \S4method{probability_distribution}{ExtGaussian2FParam}(

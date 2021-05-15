@@ -43,7 +43,7 @@ setGeneric("setDimension<-",
 #' @importFrom checkmate qassert
 setReplaceMethod("setDimension", "CalibrationParam",
   function(object, value) {
-    qassert(value, "X1[1,)")
+    qassert(value, "X1[2,)")
     object@dim <- as.integer(value)
 
     invisible(object)
@@ -53,7 +53,7 @@ setReplaceMethod("setDimension", "CalibrationParam",
 #' @importFrom checkmate qassert
 setValidity("CalibrationParam",
   function(object) {
-    qassert(object@dim, "I1[1,)")
+    qassert(object@dim, "I1[2,)")
 
     invisible(TRUE)
   })

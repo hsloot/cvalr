@@ -37,7 +37,7 @@ setGeneric("setExQMatrix<-",
 #' @include checkmate.R
 setReplaceMethod("setExQMatrix", "ExMarkovParam",
   function(object, value) {
-    assert_exqmatrix(value, min.rows = 1L, min.cols = 1L)
+    assert_exqmatrix(value, min.rows = 3L, min.cols = 3L)
 
     setDimension(object) <- nrow(value) - 1L
     object@ex_qmatrix <- value
@@ -49,7 +49,7 @@ setReplaceMethod("setExQMatrix", "ExMarkovParam",
 #' @include checkmate.R
 setValidity("ExMarkovParam",
   function(object) {
-    assert_exqmatrix(object@ex_qmatrix, nrows = object@dim+1L, ncols = object@dim + 1L)
+    assert_exqmatrix(object@ex_qmatrix, nrows = object@dim + 1L, ncols = object@dim + 1L)
 
     invisible(TRUE)
   })
@@ -105,20 +105,22 @@ setMethod("simulate_dt", "ExMarkovParam",
   function(object, ...,
       method = c("default", "ExMarkovParam"), n_sim = 1e1L) {
     method <- match.arg(method)
-    out <- matrix(nrow = n_sim, ncol = object@dim)
+    d <- getDimension(object)
+    ex_qmatrix <- getExQMatrix(object)
+    out <- matrix(nrow = n_sim, ncol = d)
     for (k in 1:n_sim) {
       state <- 0
       time <- 0
-      while (state != object@dim) {
-        wt <- rexp(1, rate = -object@ex_qmatrix[1+state, 1+state])
+      while (state != d) {
+        wt <- rexp(1, rate = -ex_qmatrix[1L+state, 1L+state])
         time <- time + wt
-        out[k, (1+state):object@dim] <- time
+        out[k, (1L+state):d] <- time
         state <- state +
           sample.int(
-            n = object@dim-state, size = 1, replace = FALSE,
-            prob = object@ex_qmatrix[1+state, (2+state):(object@dim+1)])
+            n = d-state, size = 1L, replace = FALSE,
+            prob = ex_qmatrix[1L+state, (2L+state):(d+1L)])
       }
-      perm <- sample.int(n = object@dim, size = object@dim, replace = FALSE)
+      perm <- sample.int(n = d, size = d, replace = FALSE)
       out[k, perm] <- out[k, perm]
     }
 
@@ -170,7 +172,8 @@ setMethod("probability_distribution", "ExMarkovParam",
       out <- callNextMethod(object, times, ..., method = method)
     } else {
       qassert(times, "N+[0,)")
-      out <- map(times, ~expm(. * object@ex_qmatrix)[1, ]) %>%
+      ex_qmatrix <- getExQMatrix(object)
+      out <- map(times, ~expm(. * ex_qmatrix)[1L, ]) %>%
         reduce(cbind) %>%
         `dimnames<-`(NULL) %>%
         matrix(nrow = getDimension(object) + 1L, ncol = length(times))

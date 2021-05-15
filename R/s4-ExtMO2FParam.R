@@ -73,8 +73,9 @@ setReplaceMethod("setLambda", "ExtMO2FParam",
   function(object, value) {
     qassert(value, "N1(0,)")
     object@lambda <- value
-    if (qtest(object@nu, "N1")) {
-      setBernsteinFunction(object) <- constructBernsteinFunction(object, value, object@nu)
+    nu <- getNu(object)
+    if (qtest(nu, "N1")) {
+      setBernsteinFunction(object) <- constructBernsteinFunction(object, value, nu)
     }
 
     invisible(object)
@@ -98,8 +99,9 @@ setReplaceMethod("setNu", "ExtMO2FParam",
   function(object, value) {
     qassert(value, "N1")
     object@nu <- value
-    if (qtest(object@lambda, "N1(0,)")) {
-      setBernsteinFunction(object) <- constructBernsteinFunction(object, object@lambda, value)
+    lambda <- getLambda(object)
+    if (qtest(lambda, "N1(0,)")) {
+      setBernsteinFunction(object) <- constructBernsteinFunction(object, lambda, value)
     }
 
     invisible(object)
@@ -311,7 +313,7 @@ setMethod("expected_pcds_loss", "ExtMO2FParam",
     if (isTRUE("default" == method || "ExtMO2FParam" == method)) {
       qassert(times, "N+[0,)")
       qassert(recovery_rate, "N1[0,1]")
-      out <- (1 - recovery_rate) * pexp(times, rate = object@lambda)
+      out <- (1 - recovery_rate) * pexp(times, rate = getLambda(object))
     } else {
       out <- callNextMethod(object, times, recovery_rate, ..., method = method)
     }

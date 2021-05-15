@@ -16,7 +16,7 @@
   object,
   ...,
   method = c("default", "ExMOParam", "ExMarkovParam"),
-  n_sim = 10000
+  n_sim = 10L
 )
 
 \S4method{show}{ExMOParam}(object)

@@ -40,10 +40,11 @@ ExtMOParam <- setClass("ExtMOParam", # nolint
 #' @importFrom checkmate test_class qassert
 setReplaceMethod("setDimension", "ExtMOParam",
   function(object, value) {
-    qassert(value, "X1[1,)")
-    if (test_class(object@bf, "BernsteinFunction") && !isTRUE(object@dim == value)) {
+    qassert(value, "X1[2,)")
+    bf <- getBernsteinFunction(object)
+    if (test_class(bf, "BernsteinFunction") && !isTRUE(getDimension(object) == value)) {
       object <- callNextMethod()
-      setExIntensities(object) <- exIntensities(object@bf, value)
+      setExIntensities(object) <- exIntensities(bf, value)
     } else {
       object <- callNextMethod()
     }
@@ -70,8 +71,9 @@ setReplaceMethod("setBernsteinFunction", "ExtMOParam",
  function(object, value) {
    assert_class(value, "BernsteinFunction")
    object@bf <- value
-   if (qtest(object@dim, "I1[1,)")) {
-     setExIntensities(object) <- exIntensities(value, object@dim)
+   d <- getDimension(object)
+   if (qtest(d, "I1[2,)")) {
+     setExIntensities(object) <- exIntensities(value, d)
    }
 
    invisible(object)

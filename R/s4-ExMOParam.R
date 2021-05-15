@@ -48,10 +48,10 @@ setGeneric("setExIntensities<-",
   function(object, value) {
     standardGeneric("setExIntensities<-")
   })
-#' @importFrom checkmate qassert
+#' @importFrom checkmate qassert assert_numeric
 setReplaceMethod("setExIntensities", "ExMOParam",
   function(object, value) {
-    qassert(value, "N+[0,)")
+    assert_numeric(value, lower = 0, finite = TRUE, any.missing = FALSE, min.len = 2)
     qassert(max(value), "N1(0,)")
     object@ex_intensities <- value
     setExQMatrix(object) <- rmo:::exi2exqm(value)
@@ -63,7 +63,7 @@ setReplaceMethod("setExIntensities", "ExMOParam",
 #' @importFrom checkmate qassert assert_numeric
 setValidity("ExMOParam",
   function(object) {
-    assert_numeric(object@ex_intensities, lower = 0, len = object@dim)
+    assert_numeric(object@ex_intensities, lower = 0, finite = TRUE, any.missing = FALSE, len = object@dim)
     qassert(max(object@ex_intensities), "N1(0,)")
 
     invisible(TRUE)
@@ -115,14 +115,14 @@ setMethod("initialize", "ExMOParam",
 #' @export
 setMethod("simulate_dt", "ExMOParam",
   function(object, ...,
-      method = c("default", "ExMOParam", "ExMarkovParam"), n_sim = 1e4) {
+      method = c("default", "ExMOParam", "ExMarkovParam"), n_sim = 1e1L) {
     method <- match.arg(method)
     if (isTRUE("default" == method)) {
       method <- "ExMOParam"
     }
 
     if (isTRUE("ExMOParam" == method)) {
-      out <- rexmo_markovian(n_sim, object@dim, object@ex_intensities)
+      out <- rexmo_markovian(n_sim, getDimension(object), getExIntensities(object))
     } else {
       out <- callNextMethod(object, ..., method = method, n_sim = n_sim)
     }
