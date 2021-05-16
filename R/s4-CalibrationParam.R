@@ -6,7 +6,7 @@ NULL
 #' Virtual super-class for calibration parameters
 #'
 #' @description
-#' `CalibrationParam` provide a simple interface to calculate *expected values*
+#' `CalibrationParam` provides a simple interface to calculate *expected values*
 #' and *pricing equations* for *portfolio CDS'* and *CDO's* with different
 #' models.
 #'

@@ -131,7 +131,7 @@ class whose implementation should be used).}
 \item{upfront}{Numeric number for the upfront payment of the portfolio CDS / CDO tranche.}
 }
 \description{
-\code{CalibrationParam} provide a simple interface to calculate \emph{expected values}
+\code{CalibrationParam} provides a simple interface to calculate \emph{expected values}
 and \emph{pricing equations} for \emph{portfolio CDS'} and \emph{CDO's} with different
 models.
 }
