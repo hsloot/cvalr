@@ -43,7 +43,7 @@ matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} i
 
 \examples{
 parm <- ExponentialH2ExtMO3FParam(
-  partition = list(1:2, 3:6, 7:8), fraction = 0.4,
+  composition = c(2L, 4L, 2L), fraction = 0.4,
   lambda = 8e-2, rho = c(0.2, 0.7))
 simulate_dt(parm, n_sim = 5e1)
 

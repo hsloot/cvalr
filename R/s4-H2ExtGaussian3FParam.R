@@ -76,9 +76,9 @@ setValidity("H2ExtGaussian3FParam",
 #' @importFrom purrr imap
 setMethod("initialize", "H2ExtGaussian3FParam",
   function(.Object, # nolint
-      partition = list(1L:2L, 3L:5L), lambda = 1e-1, nu = c(0.2, 0.3),
+      composition = c(2L, 3L), lambda = 1e-1, nu = c(0.2, 0.3),
       rho = NULL, tau = NULL) {
-    if (!missing(partition) && !missing(lambda) &&
+    if (!missing(composition) && !missing(lambda) &&
           (!missing(nu) || !missing(rho) || !missing(tau))) {
       if (missing(nu)) {
         if (!is.null(rho)) {
@@ -88,10 +88,9 @@ setMethod("initialize", "H2ExtGaussian3FParam",
         }
       }
 
-      dim <- length(unlist(partition))
+      dim <- sum(composition)
 
-      .Object@dim <- dim
-      .Object@partition <- partition
+      setComposition(.Object) <- composition
       .Object@lambda <- lambda
       .Object@nu <- nu
 
@@ -133,7 +132,7 @@ setMethod("invTau", "H2ExtGaussian3FParam",
 #'
 #' @examples
 #' parm <- H2ExtGaussian3FParam(
-#'   partition = list(1:2, 3:6, 7:8),
+#'   composition = c(2L, 4L, 2L),
 #'   lambda = 8e-2, rho = c(0.2, 0.7))
 #' simulate_dt(parm, n_sim = 5e1)
 #'
@@ -146,7 +145,7 @@ setMethod("simulate_dt", "H2ExtGaussian3FParam",
     d <- getDimension(object)
     nu <- getNu(object)
     corr <- p2P(nu[[1]], d = d)
-    walk(object@partition, ~{
+    walk(getPartition(object), ~{
       corr[.x, .x] <<- p2P(nu[[2]], d = length(.x))
     })
 

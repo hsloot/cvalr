@@ -48,7 +48,7 @@ component-models.}
 
 \examples{
 parm <- H2ExtGaussian3FParam(
-  partition = list(1:2, 3:6, 7:8),
+  composition = c(2L, 4L, 2L),
   lambda = 8e-2, rho = c(0.2, 0.7))
 simulate_dt(parm, n_sim = 5e1)
 

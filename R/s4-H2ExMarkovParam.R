@@ -63,18 +63,15 @@ setMethod("getModels", "H2ExMarkovParam",
   function(object) {
     object@models
   })
-#' @importFrom purrr map_lgl map_int map2
-#' @importFrom checkmate test_class
+#' @importFrom purrr map_lgl map_int
+#' @importFrom checkmate test_class assert_choice
 setReplaceMethod("setModels", "H2ExMarkovParam",
   function(object, value) {
     assert_true(all(map_lgl(value, test_class, classes = getModelName(object))))
-    dims <- map_int(value, getDimension)
-    assert_true(dims[[1]] == sum(dims[-1]))
-    partition <- map2(
-      dims[-1], cumsum(c(0, dims[2:(length(dims)-1)])), ~{
-        .y + 1:.x
-      })
-    setPartition(object) <- partition
+    dim <- getDimension(value[[1]])
+    composition <- map_int(value[-1], getDimension)
+    assert_choice(sum(composition), dim)
+    setComposition(object) <- composition
     object@models <- value
 
     invisible(object)
@@ -89,9 +86,9 @@ setValidity("H2ExMarkovParam",
     qassert(object@fraction, "N1(0,1)")
     assert_true(all(map_lgl(object@models, ~is(.x, getModelName(object)))))
     assert_true(getDimension(object@models[[1]]) == getDimension(object))
-    assert_true(length(object@models) == length(object@partition) + 1L)
-    assert_true(all(map2_lgl(object@models[-1], object@partition, ~{
-      getDimension(.x) == length(.y)
+    assert_true(length(object@models) == length(object@composition) + 1L)
+    assert_true(all(map2_lgl(object@models[-1], object@composition, ~{
+      getDimension(.x) == .y
       })))
 
     invisible(TRUE)
@@ -105,17 +102,8 @@ setMethod("initialize", "H2ExMarkovParam",
     if (!missing(models) && !missing(fraction)) {
       assert_true(all(map_lgl(models, is, class = "CalibrationParam")))
       dims <- map_int(models, getDimension)
-      if (length(dims) > 1L) {
-        partition <- reduce(
-          dims[-1], ~{
-            c(.x, list(max(c(0L, unlist(.x))) + 1:.y))
-          }, .init = list())
-      } else {
-        partition <- list(1:dims)
-      }
 
-      .Object@dim <- dims[[1]]
-      .Object@partition <- partition
+      setComposition(.Object) <- dims[-1]
       .Object@models <- models
       .Object@fraction <- fraction
 
@@ -142,7 +130,7 @@ setMethod("getModelName", "H2ExMarkovParam",
 #'
 #' @examples
 #' parm <- ExponentialH2ExtMO3FParam(
-#'   partition = list(1:2, 3:6, 7:8), fraction = 0.4,
+#'   composition = c(2L, 4L, 2L), fraction = 0.4,
 #'   lambda = 8e-2, rho = c(0.2, 0.7))
 #' simulate_dt(parm, n_sim = 5e1)
 #'

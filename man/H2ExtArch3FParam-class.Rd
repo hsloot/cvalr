@@ -27,7 +27,7 @@
 \usage{
 \S4method{initialize}{H2ExtArch3FParam}(
   .Object,
-  partition = list(1L:2L, 3L:5L),
+  composition = c(2L, 3L),
   lambda = 0.1,
   nu = c(0.2, 0.3),
   rho = NULL,
@@ -49,7 +49,7 @@
 \arguments{
 \item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
 
-\item{partition}{Partition of the components (only adjacent grouping allowed).}
+\item{composition}{Positive integerish vector for the component-composition.}
 
 \item{lambda}{Marginal intensity.}
 
@@ -114,38 +114,38 @@ component-models.}
 
 \examples{
 H2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
+  composition = c(3L, 3L, 4L, 5L),
   lambda = 8e-2, tau = c(0.3, 0.5),
   survival = FALSE, family = "Clayton")
 H2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
+  composition = c(3L, 3L, 4L, 5L),
   lambda = 8e-2, tau = c(0.3, 0.5),
   survival = TRUE, family = "Gumbel")
 
 parm <- FrankH2ExtArch3FParam(
-  partition = list(1:2, 3:6, 7:8),
+  composition = c(2L, 4L, 2L),
   lambda = 8e-2, rho = c(0.2, 0.7))
 simulate_dt(parm, n_sim = 5e1)
 
 ClaytonH2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
+  composition = c(3L, 3L, 4L, 5L),
   lambda = 8e-2, tau = c(0.3, 0.5))
 ClaytonH2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
+  composition = c(3L, 3L, 4L, 5L),
   lambda = 8e-2, rho = c(0.3, 0.5))
 FrankH2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
+  composition = c(3L, 3L, 4L, 5L),
   lambda = 8e-2, tau = c(0.3, 0.5))
 FrankH2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
+  composition = c(3L, 3L, 4L, 5L),
   lambda = 8e-2, rho = c(0.3, 0.5))
 GumbelH2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
+  composition = c(3L, 3L, 4L, 5L),
   lambda = 8e-2, tau = c(0.3, 0.5))
 GumbelH2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
+  composition = c(3L, 3L, 4L, 5L),
   lambda = 8e-2, rho = c(0.3, 0.5))
 JoeH2ExtArch3FParam(
-  partition = list(1:3, 4:6, 7:10, 11:15),
+  composition = c(3L, 3L, 4L, 5L),
   lambda = 8e-2, tau = c(0.3, 0.5))
 }

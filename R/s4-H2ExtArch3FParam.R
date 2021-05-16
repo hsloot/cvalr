@@ -53,7 +53,7 @@ setReplaceMethod("setNu", "H2ExtArch3FParam",
     object@nu <- value
     object@copula <- onacopulaL(
       family = object@family,
-      nacList = list(value[[1]], c(), map(object@partition, ~list(value[[2]], .))))
+      nacList = list(value[[1]], c(), map(getPartition(object), ~list(value[[2]], .))))
 
     invisible(object)
   })
@@ -100,7 +100,7 @@ setValidity("H2ExtArch3FParam",
 #' @aliases initialize,H2ExtArch3FParam,ANY-method
 #'
 #' @inheritParams methods::initialize
-#' @param partition Partition of the components (only adjacent grouping allowed).
+#' @param composition Positive integerish vector for the component-composition.
 #' @param lambda Marginal intensity.
 #' @param nu Dependency parameter (see [copula::archmCopula-class] and
 #'   [copula::nacopula-class]).
@@ -112,19 +112,20 @@ setValidity("H2ExtArch3FParam",
 #'
 #' @examples
 #' H2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   composition = c(3L, 3L, 4L, 5L),
 #'   lambda = 8e-2, tau = c(0.3, 0.5),
 #'   survival = FALSE, family = "Clayton")
 #' H2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   composition = c(3L, 3L, 4L, 5L),
 #'   lambda = 8e-2, tau = c(0.3, 0.5),
 #'   survival = TRUE, family = "Gumbel")
 #'
+#' @importFrom utils head
 #' @importFrom copula archmCopula onacopulaL iRho iTau
-#' @importFrom purrr imap map
+#' @importFrom purrr imap map map2
 setMethod("initialize", "H2ExtArch3FParam",
   function(.Object, # nolint
-      partition = list(1L:2L, 3L:5L),
+      composition = c(2L, 3L),
       lambda = 1e-1, nu = c(0.2, 0.3), rho = NULL, tau = NULL,
       survival = TRUE,
       family = c("Clayton", "Frank", "Gumbel", "Joe")) {
@@ -132,7 +133,7 @@ setMethod("initialize", "H2ExtArch3FParam",
     .Object@family <- family
     .Object@survival <- survival
     acopula <- archmCopula(family = family)
-    if (!missing(partition) && !missing(lambda) &&
+    if (!missing(composition) && !missing(lambda) &&
           (!missing(nu) || !missing(rho) || !missing(tau))) {
       if (missing(nu)) {
         if (!is.null(rho)) {
@@ -142,13 +143,14 @@ setMethod("initialize", "H2ExtArch3FParam",
         }
       }
 
-      dim <- length(unlist(partition))
-
-      .Object@dim <- as.integer(dim)
-      .Object@partition <- partition
+      dim <- sum(composition)
+      setComposition(.Object) <- composition
       .Object@lambda <- lambda
       .Object@nu <- nu
 
+      partition <- map2(c(0, cumsum(head(composition, -1L))), composition, ~{
+          .x + 1:.y
+        })
       .Object@copula <- onacopulaL(
         family = family, list(nu[[1]], c(), map(partition, ~list(nu[[2]], .))))
 
@@ -193,7 +195,7 @@ setMethod("invTau", "H2ExtArch3FParam",
 #'
 #' @examples
 #' parm <- FrankH2ExtArch3FParam(
-#'   partition = list(1:2, 3:6, 7:8),
+#'   composition = c(2L, 4L, 2L),
 #'   lambda = 8e-2, rho = c(0.2, 0.7))
 #' simulate_dt(parm, n_sim = 5e1)
 #'
@@ -228,10 +230,10 @@ ClaytonH2ExtArch3FParam <- setClass("ClaytonH2ExtArch3FParam", # nolint
 #'
 #' @examples
 #' ClaytonH2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   composition = c(3L, 3L, 4L, 5L),
 #'   lambda = 8e-2, tau = c(0.3, 0.5))
 #' ClaytonH2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   composition = c(3L, 3L, 4L, 5L),
 #'   lambda = 8e-2, rho = c(0.3, 0.5))
 setMethod("initialize", "ClaytonH2ExtArch3FParam",
   function(.Object, ..., survival = FALSE) { # nolint
@@ -262,10 +264,10 @@ FrankH2ExtArch3FParam <- setClass("FrankH2ExtArch3FParam", # nolint
 #'
 #' @examples
 #' FrankH2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   composition = c(3L, 3L, 4L, 5L),
 #'   lambda = 8e-2, tau = c(0.3, 0.5))
 #' FrankH2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   composition = c(3L, 3L, 4L, 5L),
 #'   lambda = 8e-2, rho = c(0.3, 0.5))
 setMethod("initialize", "FrankH2ExtArch3FParam",
   function(.Object, ..., survival = TRUE) { # nolint
@@ -296,10 +298,10 @@ GumbelH2ExtArch3FParam <- setClass("GumbelH2ExtArch3FParam", # nolint
 #'
 #' @examples
 #' GumbelH2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   composition = c(3L, 3L, 4L, 5L),
 #'   lambda = 8e-2, tau = c(0.3, 0.5))
 #' GumbelH2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   composition = c(3L, 3L, 4L, 5L),
 #'   lambda = 8e-2, rho = c(0.3, 0.5))
 setMethod("initialize", "GumbelH2ExtArch3FParam",
   function(.Object, ..., survival = TRUE) { # nolint
@@ -311,7 +313,7 @@ setMethod("getModelName", "GumbelH2ExtArch3FParam",
   function(object) {
     "GumbelExtArch2FParam"
   })
-  
+
 
 
 #' @rdname H2ExtArch3FParam-class
@@ -330,7 +332,7 @@ JoeH2ExtArch3FParam <- setClass("JoeH2ExtArch3FParam", # nolint
 #'
 #' @examples
 #' JoeH2ExtArch3FParam(
-#'   partition = list(1:3, 4:6, 7:10, 11:15),
+#'   composition = c(3L, 3L, 4L, 5L),
 #'   lambda = 8e-2, tau = c(0.3, 0.5))
 setMethod("initialize", "JoeH2ExtArch3FParam",
   function(.Object, ..., survival = TRUE) { # nolint

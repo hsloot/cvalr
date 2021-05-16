@@ -36,11 +36,10 @@ setMethod("getLambda", "H2ExtMO3FParam",
 setReplaceMethod("setLambda", "H2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N1(0,)")
-    assert_partition(object@partition)
     object@lambda <- value
     if (0L == length(object@models)) {
-      models <- map(object@partition, ~{
-        new(getModelName(object), length(.x), value, alpha = 0.5)
+      models <- map(getComposition(object), ~{
+        new(getModelName(object), .x, value, alpha = 0.5)
       })
       models <- c(list(new(getModelName(object), getDimension(object), value, alpha = 0.5)), models)
       setModels(object) <- models
@@ -63,11 +62,10 @@ setMethod("getNu", "H2ExtMO3FParam",
 setReplaceMethod("setNu", "H2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2")
-    assert_partition(object@partition)
     object@nu <- value
     if (0L == length(object@models)) {
-      models <- map(object@partition, ~{
-        new(getModelName(object), length(.x), 1, value[[2]])
+      models <- map(getComposition(object), ~{
+        new(getModelName(object), .x, 1, value[[2]])
       })
       models <- c(list(new(getModelName(object), getDimension(object), 1, value[[1]])), models)
       setModels(object) <- models
@@ -123,9 +121,9 @@ setValidity("H2ExtMO3FParam",
 #' @importFrom purrr imap
 setMethod("initialize", "H2ExtMO3FParam", # nolint
   function(.Object, # nolint
-    partition = list(1L:2L, 3L:5L), lambda = 1e-1, nu = c(0.2, 0.3),
+    composition = c(2L, 3L), lambda = 1e-1, nu = c(0.2, 0.3),
     fraction = 0.5, rho = NULL, tau = NULL, alpha = NULL) {
-  if (!missing(partition) && !missing(lambda) &&
+  if (!missing(composition) && !missing(lambda) &&
         (!missing(nu) || !missing(rho) || !missing(tau) || !missing(alpha)) &&
         !missing(fraction)) {
     .Object@fraction <- fraction
@@ -139,14 +137,13 @@ setMethod("initialize", "H2ExtMO3FParam", # nolint
       }
     }
 
-    dim <- length(unlist(partition))
-    models <- imap(c(dim, map_int(partition, length)), ~{
+    dim <- sum(composition)
+    models <- imap(c(dim, composition), ~{
       new(getModelName(.Object),
             dim = .x, lambda = lambda, nu = nu[[pmin(.y, 2L)]])
       })
 
-    .Object@dim <- dim
-    .Object@partition <- partition
+    setComposition(.Object) <- composition
     .Object@models <- models
     .Object@lambda <- lambda
     .Object@nu <- nu

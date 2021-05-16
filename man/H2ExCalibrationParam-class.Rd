@@ -11,6 +11,6 @@ parameters for multivariate (portfolio) credit models.
 \section{Slots}{
 
 \describe{
-\item{\code{partition}}{Partition of the components (only adjacent grouping allowed)}
+\item{\code{composition}}{Positive integerish vector for the component-composition.}
 }}
 
