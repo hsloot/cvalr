@@ -131,17 +131,16 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
       dim, lambda, nu, rho, tau) {
     if (!missing(dim) && !missing(lambda) &&
           !(missing(nu) && missing(rho) && missing(tau))) {
-      if (missing(nu)) {
-        if (!missing(rho)) {
-          nu <- invRho(.Object, rho)
-        } else if (!missing(tau)) {
-          nu <- invTau(.Object, tau)
-        }
-      }
-
       setDimension(.Object) <- dim
       setLambda(.Object) <- lambda
-      setNu(.Object) <- nu
+      if (!missing(nu)) {
+        setNu(.Object) <- nu
+      } else if (!missing(rho)) {
+        setRho(.Object) <- rho
+      } else if (!missing(tau)) {
+        setTau(.Object) <- tau
+      }
+
       validObject(.Object)
     }
 
@@ -161,10 +160,9 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
-#' The default times are sampled in a two-stage procedure: First a sample is
-#' drawn from the equi-correlation Gaussian copula, see
-#' [copula::normalCopula-class] and [copula::rCopula()]; then the results are
-#' transformed using [stats::qexp()].
+#' The default times are sampled in a two-stage procedure: First a sample is drawn from the
+#' equi-correlation Gaussian copula, see [copula::normalCopula-class] and [copula::rCopula()]; then
+#' the results are transformed using [stats::qexp()].
 #'
 #' @examples
 #' parm <- ExtGaussian2FParam(5L, 8e-2, rho = 4e-1)
@@ -315,7 +313,9 @@ setMethod("expected_pcds_loss", "ExtGaussian2FParam",
 #' \eqn{l} and \eqn{u} and *recovery rate* \eqn{R} is calculated using that
 #' \deqn{
 #'   \mathbb{E}[g(L_t)]
-#'     = (1 - R) \left( C_2\left(\left[1 - \frac{l}{1-R} \right] \vee 0, F(t); -\sqrt{1 - \nu}\right) - C_2\left(\left[1 - \frac{u}{1-R} \right] \vee 0, F(t); -\sqrt{1 - \nu}\right) \right)
+#'     = (1 - R) \left(
+#'       C_2\left(\left[1 - \frac{l}{1-R} \right] \vee 0, F(t); -\sqrt{1 - \nu}\right) -
+#'       C_2\left(\left[1 - \frac{u}{1-R} \right] \vee 0, F(t); -\sqrt{1 - \nu}\right) \right)
 #' }
 #' with \eqn{g(x) = \{[(1 - R) x - l] \vee (u-l)\} \wedge 1}, \eqn{C_2} being
 #' the bivariate Gaussian copula, and \eqn{F} being the Exponential distribution
@@ -374,7 +374,10 @@ setMethod("show", "ExtGaussian2FParam",
  function(object) {
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
    cat(sprintf("Dimension: %i\n", getDimension(object)))
-   cat(sprintf(
-     "Lambda: %s, Rho: %s, Tau: %s\n",
-     format(getLambda(object)), format(getRho(object)), format(getTau(object))))
+   cat("Parameter:\n")
+   cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+   cat(sprintf("* %s: %s\n", "Rho", format(getRho(object))))
+   cat(sprintf("* %s: %s\n", "Tau", format(getTau(object))))
+   cat("Internal parameter:\n")
+   cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
   })

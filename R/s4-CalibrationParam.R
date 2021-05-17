@@ -234,7 +234,8 @@ setMethod("expected_value", "CalibrationParam",
 #'   *average default count process* for given timepoints and returns a vector
 #'   `x` with `length(x) == length(times)`.
 #'
-#' @param recovery_rate Non-negative number between zero and one for the recovery rate of the portfolio CDS/CDO.
+#' @param recovery_rate Non-negative number between zero and one for the recovery rate
+#'   of the portfolio CDS/CDO.
 #'
 #' @export
 setGeneric("expected_pcds_loss",
@@ -281,8 +282,10 @@ setMethod("expected_pcds_loss", "CalibrationParam",
 #'   default count process* for given timepoints and returns a vector `x` with
 #'   `length(x) == length(times)`.
 #'
-#' @param lower Non-negative number between zero and one for the lower attachment point of the CDO tranche.
-#' @param upper Non-negative number between `lower` and one for the upper attachment point of the CDO tranche.
+#' @param lower Non-negative number between zero and one for the lower attachment point
+#'   of the CDO tranche.
+#' @param upper Non-negative number between `lower` and one for the upper attachment point
+#'   of the CDO tranche.
 #'
 #' @export
 setGeneric("expected_cdo_loss",

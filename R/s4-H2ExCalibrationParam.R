@@ -45,7 +45,7 @@ setReplaceMethod("setComposition", "H2ExCalibrationParam",
   function(object, value) {
     qassert(value, "X+[1,)")
     qassert(sum(value), "X1[2,)")
-    object@composition <- value
+    object@composition <- as.integer(value)
     setDimension(object) <- as.integer(sum(value))
 
     invisible(object)

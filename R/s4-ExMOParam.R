@@ -63,7 +63,8 @@ setReplaceMethod("setExIntensities", "ExMOParam",
 #' @importFrom checkmate qassert assert_numeric
 setValidity("ExMOParam",
   function(object) {
-    assert_numeric(object@ex_intensities, lower = 0, finite = TRUE, any.missing = FALSE, len = object@dim)
+    assert_numeric(
+      object@ex_intensities, lower = 0, finite = TRUE, any.missing = FALSE, len = object@dim)
     qassert(max(object@ex_intensities), "N1(0,)")
 
     invisible(TRUE)

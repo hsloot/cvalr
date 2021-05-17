@@ -23,7 +23,7 @@ test_that("`CuadrasAugeExtMO2FParam`-class is correctly initialized", {
   setBernsteinFunction(parm) <- bf
   setLambda(parm) <- lambda
   setNu(parm) <- nu
-  expect_true(validObject(parm))
+  expect_error(validObject(parm), NA)
   expect_equal(getDimension(parm), d)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
   expect_equal(getExIntensities(parm), ex_intensities)

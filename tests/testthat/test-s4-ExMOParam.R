@@ -13,7 +13,7 @@ test_that("`ExMOParam`-class is correctly initialized", {
   expect_s4_class(parm, "ExMOParam")
 
   setExIntensities(parm) <- ex_intensities
-  expect_true(validObject(parm))
+  expect_error(validObject(parm), NA)
   expect_equal(getDimension(parm), d)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
   expect_equal(getExIntensities(parm), ex_intensities)

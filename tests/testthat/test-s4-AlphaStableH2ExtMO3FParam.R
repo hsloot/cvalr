@@ -24,7 +24,7 @@ test_that("`AlphaStableH2ExtMO3FParam`-class is correctly initialized", {
   setFraction(parm) <- fraction
   setLambda(parm) <- lambda
   setNu(parm) <- nu
-  expect_true(validObject(parm))
+  expect_error(validObject(parm), NA)
   expect_equal(getDimension(parm), d)
   expect_equal(getComposition(parm), composition)
   expect_equal(getPartition(parm), partition)
@@ -38,13 +38,53 @@ test_that("`AlphaStableH2ExtMO3FParam`-class is correctly initialized", {
   expect_equal(parm, AlphaStableH2ExtMO3FParam(composition, lambda, nu, fraction))
   expect_equal(parm, AlphaStableH2ExtMO3FParam(composition, lambda, fraction = fraction, rho = rho))
   expect_equal(parm, AlphaStableH2ExtMO3FParam(composition, lambda, fraction = fraction, tau = tau))
-  # TODO: Replace after implementation of `coerce`
-  expect_equal(as(parm, "H2ExMarkovParam"), H2ExMarkovParam(models, fraction))
-  expect_equal(as(parm, "H2ExMOParam"), H2ExMOParam(models, fraction))
-  expect_equal(as(parm, "H2ExtMOParam"), H2ExtMOParam(models, fraction))
-  # nolint start
-  # expect_equal(as(parm, "H2ExMarkovParam"), H2ExMarkovParam(purrr::map(models, as, Class = "ExMarkovParam"), fraction))
-  # expect_equal(as(parm, "H2ExMOParam"), H2ExMOParam(purrr::map(models, as, Class = "ExMOParam"), fraction))
-  # expect_equal(as(parm, "H2ExtMOParam"), H2ExtMOParam(purrr::map(models, as, Class = "ExtMOParam"), fraction))
-  # nolint end
+  expect_equal(as(parm, "H2ExMarkovParam"), H2ExMarkovParam(fraction, models))
+  expect_equal(as(parm, "H2ExMOParam"), H2ExMOParam(fraction, models))
+  expect_equal(as(parm, "H2ExtMOParam"), H2ExtMOParam(fraction, models))
+})
+
+test_that("`AlphaStableH2ExtMO3FParam`-class setters can be used in arbitrary order", { # nolint
+  parm <- AlphaStableH2ExtMO3FParam(composition, lambda, nu, fraction)
+
+  parm2 <- AlphaStableH2ExtMO3FParam()
+  setComposition(parm2) <- composition
+  setLambda(parm2) <- lambda
+  setRho(parm2) <- rho
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableH2ExtMO3FParam()
+  setComposition(parm2) <- composition
+  setLambda(parm2) <- lambda
+  setTau(parm2) <- tau
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableH2ExtMO3FParam()
+  setComposition(parm2) <- composition
+  setRho(parm2) <- rho
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableH2ExtMO3FParam()
+  setLambda(parm2) <- lambda
+  setComposition(parm2) <- composition
+  setRho(parm2) <- rho
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableH2ExtMO3FParam()
+  setRho(parm2) <- rho
+  setComposition(parm2) <- composition
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableH2ExtMO3FParam()
+  setLambda(parm2) <- lambda
+  setRho(parm2) <- rho
+  setComposition(parm2) <- composition
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableH2ExtMO3FParam()
+  setRho(parm2) <- rho
+  setLambda(parm2) <- lambda
+  setComposition(parm2) <- composition
+  expect_equal(parm, parm2)
 })

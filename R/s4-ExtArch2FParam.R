@@ -253,15 +253,13 @@ setMethod("initialize", "ExtArch2FParam",
           !(missing(nu) && missing(rho) && missing(tau))) {
       setDimension(.Object) <- dim
       setLambda(.Object) <- lambda
-
-      if (missing(nu)) {
-        if (!missing(rho)) {
-          nu <- invRho(.Object, rho)
-        } else if (!missing(tau)) {
-          nu <- invTau(.Object, tau)
-        }
+      if (!missing(nu)) {
+        setNu(.Object) <- nu
+      } else if (!missing(rho)) {
+        setRho(.Object) <- rho
+      } else if (!missing(tau)) {
+        setTau(.Object) <- tau
       }
-      setNu(.Object) <- nu
 
       validObject(.Object)
     }
@@ -367,16 +365,15 @@ setMethod("show", "ExtArch2FParam",
  function(object) {
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
    cat(sprintf("Dimension: %i\n", getDimension(object)))
-   cat(sprintf("Survival copula: %s\n", ifelse(getSurvival(object), "Yes", "No")))
-   if (isTRUE(getFamily(object) == "Joe")) {
-     cat(sprintf(
-       "Lambda: %s, Tau: %s\n",
-       format(getLambda(object)), format(getTau(object))))
-   } else {
-    cat(sprintf(
-      "Lambda: %s, Rho: %s, Tau: %s\n",
-      format(getLambda(object)), format(getRho(object)), format(getTau(object))))
+   cat("Parameter:\n")
+   cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+   if (isTRUE(getFamily(object) != "Joe")) {
+     cat(sprintf("* %s: %s\n", "Rho", format(getRho(object))))
    }
+   cat(sprintf("* %s: %s\n", "Tau", format(getTau(object))))
+   cat("Internal parameter:\n")
+   cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
+   cat(sprintf("* %s: %s\n", "Survival copula", ifelse(getSurvival(object), "Yes", "No")))
  })
 
 

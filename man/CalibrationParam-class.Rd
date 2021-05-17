@@ -118,11 +118,14 @@ class whose implementation should be used).}
 
 \item{pd_args}{A list of parameters for \code{\link[=probability_distribution]{probability_distribution()}}.}
 
-\item{recovery_rate}{Non-negative number between zero and one for the recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
+of the portfolio CDS/CDO.}
 
-\item{lower}{Non-negative number between zero and one for the lower attachment point of the CDO tranche.}
+\item{lower}{Non-negative number between zero and one for the lower attachment point
+of the CDO tranche.}
 
-\item{upper}{Non-negative number between \code{lower} and one for the upper attachment point of the CDO tranche.}
+\item{upper}{Non-negative number between \code{lower} and one for the upper attachment point
+of the CDO tranche.}
 
 \item{discount_factors}{Non-negative numeric vector for the discount factors for the timepoints.}
 

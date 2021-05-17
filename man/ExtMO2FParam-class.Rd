@@ -33,11 +33,11 @@
 
 \item{lambda}{Marginal intensity.}
 
-\item{nu}{(Internal) dependence parameter.}
+\item{nu}{(Internal) bivariate dependence parameter.}
 
 \item{rho}{Bivariate Spearman's Rho.}
 
-\item{tau}{BivariateKendall's Tau.}
+\item{tau}{Bivariate Kendall's Tau.}
 
 \item{alpha}{Bivariate lower tail-dependence coefficient.}
 
@@ -45,7 +45,8 @@
 
 \item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{Non-negative number between zero and one for the recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
+of the portfolio CDS/CDO.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
@@ -64,10 +65,9 @@ The model is defined by the assumption that the multivariate default times
 \linkS4class{ExtMOParam} for the details. This class provides an interface for
 easy-to-use, 2-factor families for this model.
 For all implemented families, the marginal rate can be specified by \code{lambda}
-and the dependence can be specified by \code{rho} (\emph{Spearman's Rho}), \code{tau}
-(\emph{Kendall's Tau}), or \code{alpha} (\emph{Lower tail-dependence coefficient}).
+and the dependence can be specified by the internal parameter \code{nu}.
 For all implemented families, the (internal) dependence parameter \code{nu} has a
-one-to-one relationship and can be replaced by \emph{Spearman's Rho} \code{rho},
+one-to-one relationship, and can be replaced by, \emph{Spearman's Rho} \code{rho},
 \emph{Kendall' Tau} \code{tau} or the \emph{(lower) tail dependence coefficient} \code{alpha}.
 The possible range for \code{rho}, \code{tau}, and \code{alpha} is from zero to one
 (boundaries might not be included).
@@ -134,7 +134,7 @@ Corresponds to a Lévy subrodinator which is a convex combination of a
 Poisson subordinator with jump size \code{nu} and a pure-drift subordinator.
 \itemize{
 \item \eqn{\psi(x) = \operatorname{e}^{-\nu}x + (1 - \operatorname{e}^{-x \nu})}
-\item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\eta})}
+\item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\nu})^2}
 }
 }
 
@@ -144,17 +144,17 @@ Corresponds to a Lévy subordinator which is a convex combination of an
 Exponential-jump compound Poisson process with rate \code{nu} and unit-intensity
 and a pure-drift subordinator.
 \itemize{
-\item \eqn{\psi(x) = (1 - 1 / (1 + \nu))x + 1 / (x + \nu)}
+\item \eqn{\psi(x) = (1 - 1 / (1 + \nu))x + x   / (x + \nu)}
 \item \eqn{\nu = 0.5 \cdot (-3 + \sqrt{1 + 8 / \alpha})}
-and \eqn{\alpha = 2 / (1 + \nu) - 1 / (2 + \nu)}
+and \eqn{\alpha = 2 / (1 + \nu) - 2 / (2 + \nu)}
 }
 }
 
 \examples{
-CuadrasAugeExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-AlphaStableExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-PoissonExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-ExponentialExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+AlphaStableExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+PoissonExtMO2FParam(dim = 5L, lambda = 8e-2, tau = 4e-1)
+ExponentialExtMO2FParam(dim = 5L, lambda = 8e-2, alpha = 4e-1)
 expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
   times = 0.25, recovery_rate = 0.4)
 expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),

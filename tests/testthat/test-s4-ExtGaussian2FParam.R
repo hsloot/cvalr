@@ -13,7 +13,7 @@ test_that("`ExtGaussian2FParam`-class is correctly initialized", {
   setDimension(parm) <- d
   setLambda(parm) <- lambda
   setNu(parm) <- nu
-  expect_true(validObject(parm))
+  expect_error(validObject(parm), NA)
   expect_equal(getDimension(parm), d)
   expect_equal(getLambda(parm), lambda)
   expect_equal(getNu(parm), nu)

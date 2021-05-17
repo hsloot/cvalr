@@ -3,52 +3,37 @@ NULL
 
 #' H2-exchangeable Markovian calibration parameter
 #'
-#' Calibration parameter class for the general 2-level
-#' hierarchically-exchangeable model with Markovian *default counting processes*
-#' in the exchangeable sub-components.
+#' [CalibrationParam-class] for the H2-exchangeable Markovian *(average) default counting process*
+#' model. Extends [H2ExCalibrationParam-class] and related to [ExMarkovParam-class].
 #'
 #' @slot models A list with the global and component models (of the type
-#'   `ExMarkovParam-class`)
+#'   `ExMarkovParam-class`).
 #' @slot fraction The proportion associated with the global model, see details.
 #'
 #' @details
-#' We assume that \eqn{\tau} has the stochastic representation to be the
-#' component-wise minimum of a global exchangeable Markovian-vector
-#' \eqn{\tau^{(0)}} and a vector \eqn{(\tau^{(1)}, \ldots, \tau^{(J)})} with
-#' independent exchangeable Markovian-vector sub-vectors \eqn{\tau^{(j)}}.
+#' The model is defined by the assumption that the vector of default times is defined as the
+#' component-wise minimum of two vectors of the same length. The first vector is simulated from a
+#' (scaled) global [ExMarkovParam-class] model and the second vector is the (scaled) conjunction of
+#' independent [ExMarkovParam-class] models. The inverse scaling factors are a convex combination.
 #'
 #' @export H2ExMarkovParam
 H2ExMarkovParam <- setClass("H2ExMarkovParam", # nolint
   contains = "H2ExCalibrationParam",
-  slots = c(models = "list", fraction = "numeric"))
+  slots = c(fraction = "numeric", models = "list"))
+
 
 setGeneric("getFraction",
   function(object) {
     standardGeneric("getFraction")
   })
-setGeneric("setFraction<-",
-  function(object, value) {
-    standardGeneric("setFraction<-")
-  })
-
-setGeneric("getModelName",
-  function(object) {
-    standardGeneric("getModelName")
-  })
-
-setGeneric("getModels",
-  function(object) {
-    standardGeneric("getModels")
-  })
-setGeneric("setModels<-",
-  function(object, value) {
-    standardGeneric("setModels<-")
-  })
-
-
 setMethod("getFraction", "H2ExMarkovParam",
   function(object) {
     object@fraction
+  })
+
+setGeneric("setFraction<-",
+  function(object, value) {
+    standardGeneric("setFraction<-")
   })
 #' @importFrom checkmate qassert
 setReplaceMethod("setFraction", "H2ExMarkovParam",
@@ -59,15 +44,33 @@ setReplaceMethod("setFraction", "H2ExMarkovParam",
     invisible(object)
   })
 
+setGeneric("getModelName",
+  function(object) {
+    standardGeneric("getModelName")
+  })
+setMethod("getModelName", "H2ExMarkovParam",
+  function(object) {
+    "ExMarkovParam"
+  })
+
+setGeneric("getModels",
+  function(object) {
+    standardGeneric("getModels")
+  })
 setMethod("getModels", "H2ExMarkovParam",
   function(object) {
     object@models
+  })
+
+setGeneric("setModels<-",
+  function(object, value) {
+    standardGeneric("setModels<-")
   })
 #' @importFrom purrr map_lgl map_int
 #' @importFrom checkmate test_class assert_choice
 setReplaceMethod("setModels", "H2ExMarkovParam",
   function(object, value) {
-    assert_true(all(map_lgl(value, test_class, classes = getModelName(object))))
+    assert_list(value, types = getModelName(object), any.missing = FALSE, min.len = 2L)
     dim <- getDimension(value[[1]])
     composition <- map_int(value[-1], getDimension)
     assert_choice(sum(composition), dim)
@@ -77,35 +80,73 @@ setReplaceMethod("setModels", "H2ExMarkovParam",
     invisible(object)
   })
 
+setGeneric("getGlobalModel",
+  function(object) {
+    standardGeneric("getGlobalModel")
+  })
+#' @importFrom checkmate assert_list
+setMethod("getGlobalModel", "H2ExMarkovParam",
+  function(object) {
+    assert_list(object@models, min.len = 1L)
+    object@models[[1L]]
+  })
+
+setGeneric("getPartitionModels",
+  function(object) {
+    standardGeneric("getPartitionModels")
+  })
+#' @importFrom checkmate assert_list
+setMethod("getPartitionModels", "H2ExMarkovParam",
+  function(object) {
+    assert_list(object@models, min.len = 2L)
+    object@models[-1L]
+  })
+
 
 #' @importFrom methods is
-#' @importFrom purrr map_lgl map2_lgl
-#' @importFrom checkmate qassert assert_true
+#' @importFrom purrr map_lgl map_int walk
+#' @importFrom checkmate qassert assert_true assert_list
 setValidity("H2ExMarkovParam",
   function(object) {
     qassert(object@fraction, "N1(0,1)")
-    assert_true(all(map_lgl(object@models, ~is(.x, getModelName(object)))))
-    assert_true(getDimension(object@models[[1]]) == getDimension(object))
-    assert_true(length(object@models) == length(object@composition) + 1L)
-    assert_true(all(map2_lgl(object@models[-1], object@composition, ~{
-      getDimension(.x) == .y
-      })))
+    assert_list(
+      object@models, types = getModelName(object), any.missing = FALSE,
+      len = length(object@composition) + 1L)
+    walk(object@models, validObject)
+    assert_true(getDimension(object@models[[1]]) == object@dim)
+    assert_true(all(map_int(object@models[-1], getDimension) == object@composition))
 
     invisible(TRUE)
   })
 
 
+#' @describeIn H2ExMarkovParam-class Constructor
+#' @aliases initialize,H2ExMarkovParam-method
+#' @aliases initialize,H2ExMarkovParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param fraction The proportion associated with the global model, see details.
+#' @param models A list with the global and component models (of the type
+#'   `ExMarkovParam-class`).
+#' @param ... Pass-through parameters.
+#'
+#' @examples
+#' composition <- c(2L, 4L, 2L)
+#' d <- sum(composition)
+#' model_global <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), d))
+#' model_partition <- purrr::map(composition, ~{
+#'   ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.5), .x))
+#'   })
+#' models <- c(list(model_global), model_partition)
+#' H2ExMarkovParam(fraction = 0.4, models = models)
+#'
 #' @importFrom purrr map_lgl map_int reduce
-#' @importFrom checkmate assert_true
+#' @importFrom checkmate assert_true assert_list
 setMethod("initialize", "H2ExMarkovParam",
-  function(.Object, models = NULL, fraction = NULL) { # nolint
+  function(.Object, fraction, models) { # nolint
     if (!missing(models) && !missing(fraction)) {
-      assert_true(all(map_lgl(models, is, class = "CalibrationParam")))
-      dims <- map_int(models, getDimension)
-
-      setComposition(.Object) <- dims[-1]
-      .Object@models <- models
-      .Object@fraction <- fraction
+      setFraction(.Object) <- fraction
+      setModels(.Object) <- models
 
       validObject(.Object)
     }
@@ -114,33 +155,70 @@ setMethod("initialize", "H2ExMarkovParam",
   })
 
 
-setMethod("getModelName", "H2ExMarkovParam",
-  function(object) {
-    "ExMarkovParam"
-  })
-
-
 #' @describeIn H2ExMarkovParam-class
-#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
-#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#'    simulates the vector of *default times* and returns a matrix `x` with
+#'    `dim(x) == c(n_sim, getDimension(object))`.
 #' @aliases simulate_dt,H2ExMarkovParam-method
 #'
 #' @inheritParams simulate_dt
 #'
+#' @section Simulation:
+#' The default times are sampled using the stochastic representation described in details.
+#'
 #' @examples
-#' parm <- ExponentialH2ExtMO3FParam(
-#'   composition = c(2L, 4L, 2L), fraction = 0.4,
-#'   lambda = 8e-2, rho = c(0.2, 0.7))
+#' composition <- c(2L, 4L, 2L)
+#' d <- sum(composition)
+#' model_global <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), d))
+#' model_partition <- purrr::map(composition, ~{
+#'   ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.5), .x))
+#'   })
+#' models <- c(list(model_global), model_partition)
+#' parm <- H2ExMarkovParam(fraction = 0.4, models = models)
 #' simulate_dt(parm, n_sim = 5e1)
+#'
+#' @importFrom purrr map reduce
 #'
 #' @include utils.R
 setMethod("simulate_dt", "H2ExMarkovParam",
   function(object, ...) {
-    fraction <- object@fraction
-    tmp0 <- simulate_dt(object@models[[1]], ...)
-    tmp1 <- reduce(map(object@models[-1], simulate_dt, ...), cbind)
-    out <- pmin(1 / fraction * tmp0, 1 / (1 - fraction) * tmp1)
+    fraction <- getFraction(object)
+    dt_global <- simulate_dt(getGlobalModel(object), ...)
+    dt_partition <- map(getPartitionModels(object), simulate_dt, ...) %>%
+      reduce(cbind) %>%
+      `dimnames<-`(NULL)
 
-    simplify2vector(out)
+    pmin(1 / fraction * dt_global, 1 / (1 - fraction) * dt_partition)
   })
+
+
+#' @describeIn H2ExMarkovParam-class Display the object.
+#' @aliases show,H2ExMarkovParam-method
+#'
+#' @importFrom utils capture.output
+#' @importFrom purrr map compose flatten_chr
+#'
+#' @export
+setMethod("show", "H2ExMarkovParam",
+  function(object) {
+    cat(sprintf("An object of class %s\n", classLabel(class(object))))
+    cat(sprintf("Partition: %s = %s\n", getDimension(object),
+      paste(getComposition(object), collapse = " + ")))
+    cat(sprintf("Fraction: %s\n", format(getFraction(object))))
+    cat("Models:\n")
+    cat("* Global model\n")
+    writeLines(paste0("\t", capture.output(show(as(getGlobalModel(object), getModelName(object))))))
+    cat("* Partition models:\n")
+    to_list_item <- function(x) {
+      out <- rep("  ", length(x))
+      out[[1]] <- "- "
+
+      paste0(out, x)
+    }
+    getPartitionModels(object) %>%
+      map(compose(to_list_item, ~capture.output(show(.)), ~as(., getModelName(object)))) %>%
+      flatten_chr %>%
+      paste0("\t", .) %>%
+      writeLines
+
+    invisible(NULL)
+    })

@@ -19,10 +19,9 @@ NULL
 #' [ExtMOParam-class] for the details. This class provides an interface for
 #' easy-to-use, 2-factor families for this model.
 #' For all implemented families, the marginal rate can be specified by `lambda`
-#' and the dependence can be specified by `rho` (*Spearman's Rho*), `tau`
-#' (*Kendall's Tau*), or `alpha` (*Lower tail-dependence coefficient*).
+#' and the dependence can be specified by the internal parameter `nu`.
 #' For all implemented families, the (internal) dependence parameter `nu` has a
-#' one-to-one relationship and can be replaced by *Spearman's Rho* `rho`,
+#' one-to-one relationship, and can be replaced by, *Spearman's Rho* `rho`,
 #' *Kendall' Tau* `tau` or the *(lower) tail dependence coefficient* `alpha`.
 #' The possible range for `rho`, `tau`, and `alpha` is from zero to one
 #' (boundaries might not be included).
@@ -107,9 +106,73 @@ setReplaceMethod("setNu", "ExtMO2FParam",
     invisible(object)
   })
 
+setGeneric("calcAlpha2Nu",
+  function(object, value) {
+    standardGeneric("calcAlpha2Nu")
+  })
+
+setGeneric("calcNu2Alpha",
+  function(object, value) {
+    standardGeneric("calcNu2Alpha")
+  })
+
+#' @importFrom checkmate qassert
 setGeneric("invAlpha",
   function(object, value) {
     standardGeneric("invAlpha")
+  })
+#' @importFrom checkmate qassert
+setMethod("invAlpha", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    calcAlpha2Nu(object, value)
+  })
+
+setGeneric("getAlpha",
+  function(object) {
+    standardGeneric("getAlpha")
+  })
+#' @importFrom rmo valueOf
+setMethod("getAlpha", "ExtMO2FParam",
+  function(object) {
+    getNu(object) %>%
+      calcNu2Alpha(object, .)
+  })
+
+setGeneric("setAlpha<-",
+  function(object, value) {
+    standardGeneric("setAlpha<-")
+  })
+#' @importFrom checkmate qassert
+setReplaceMethod("setAlpha", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    setNu(object) <- invAlpha(object, value)
+
+    invisible(object)
+  })
+
+setGeneric("calcRho2Alpha",
+  function(object, value) {
+    standardGeneric("calcRho2Alpha")
+  })
+#' @importFrom checkmate qassert
+setMethod("calcRho2Alpha", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    4 * value / (3 + value)
+  })
+
+setGeneric("calcRho2Nu",
+  function(object, value) {
+    standardGeneric("calcRho2Nu")
+  })
+#' @importFrom checkmate qassert
+setMethod("calcRho2Nu", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    calcRho2Alpha(object, value) %>%
+      calcAlpha2Nu(object, .)
   })
 
 setGeneric("invRho",
@@ -120,7 +183,30 @@ setGeneric("invRho",
 setMethod("invRho", "ExtMO2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
-    invAlpha(object, 4 * value / (3 + value))
+    calcRho2Nu(object, value)
+  })
+
+setGeneric("calcTau2Alpha",
+  function(object, value) {
+    standardGeneric("calcTau2Alpha")
+  })
+#' @importFrom checkmate qassert
+setMethod("calcTau2Alpha", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    2 * value / (1 + value)
+  })
+
+setGeneric("calcTau2Nu",
+  function(object, value) {
+    standardGeneric("calcTau2Nu")
+  })
+#' @importFrom checkmate qassert
+setMethod("calcTau2Nu", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    calcTau2Alpha(object, value) %>%
+      calcAlpha2Nu(object, .)
   })
 
 setGeneric("invTau",
@@ -131,18 +217,29 @@ setGeneric("invTau",
 setMethod("invTau", "ExtMO2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
-    invAlpha(object, 2 * value / (1 + value))
+    calcTau2Nu(object, value)
+  })
+
+setGeneric("calcAlpha2Rho",
+  function(object, value) {
+    standardGeneric("calcAlpha2Rho")
+  })
+#' @importFrom checkmate qassert
+setMethod("calcAlpha2Rho", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    3 * value / (4 - value)
   })
 
 setGeneric("getRho",
   function(object) {
     standardGeneric("getRho")
   })
+#' @importFrom checkmate qassert
 setMethod("getRho", "ExtMO2FParam",
   function(object) {
-    alpha <- getAlpha(object)
-
-    3 * alpha / (4 - alpha)
+    getAlpha(object) %>%
+      calcAlpha2Rho(object, .)
   })
 
 setGeneric("setRho<-",
@@ -158,15 +255,25 @@ setReplaceMethod("setRho", "ExtMO2FParam",
     invisible(object)
   })
 
+setGeneric("calcAlpha2Tau",
+  function(object, value) {
+    standardGeneric("calcAlpha2Tau")
+  })
+#' @importFrom checkmate qassert
+setMethod("calcAlpha2Tau", "ExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    value / (2 - value)
+  })
+
 setGeneric("getTau",
   function(object) {
     standardGeneric("getTau")
   })
 setMethod("getTau", "ExtMO2FParam",
   function(object) {
-    alpha <- getAlpha(object)
-
-    alpha / (2 - alpha)
+    getAlpha(object) %>%
+      calcAlpha2Tau(object, .)
   })
 
 setGeneric("setTau<-",
@@ -178,29 +285,6 @@ setReplaceMethod("setTau", "ExtMO2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
     setNu(object) <- invTau(object, value)
-
-    invisible(object)
-  })
-
-setGeneric("getAlpha",
-  function(object) {
-    standardGeneric("getAlpha")
-  })
-#' @importFrom rmo valueOf
-setMethod("getAlpha", "ExtMO2FParam",
-  function(object) {
-    2 - valueOf(object@bf, 2, 0L) / valueOf(object@bf, 1, 0L)
-  })
-
-setGeneric("setAlpha<-",
-  function(object, value) {
-    standardGeneric("setAlpha<-")
-  })
-#' @importFrom checkmate qassert
-setReplaceMethod("setAlpha", "ExtMO2FParam",
-  function(object, value) {
-    qassert(value, "N1[0,1]")
-    setNu(object) <- invAlpha(object, value)
 
     invisible(object)
   })
@@ -232,34 +316,33 @@ setValidity("ExtMO2FParam",
 #' @inheritParams methods::initialize
 #' @param dim Dimension.
 #' @param lambda Marginal intensity.
-#' @param nu (Internal) dependence parameter.
+#' @param nu (Internal) bivariate dependence parameter.
 #' @param rho Bivariate Spearman's Rho.
-#' @param tau BivariateKendall's Tau.
+#' @param tau Bivariate Kendall's Tau.
 #' @param alpha Bivariate lower tail-dependence coefficient.
 #'
 #' @examples
-#' CuadrasAugeExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-#' AlphaStableExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-#' PoissonExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-#' ExponentialExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+#' CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' AlphaStableExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' PoissonExtMO2FParam(dim = 5L, lambda = 8e-2, tau = 4e-1)
+#' ExponentialExtMO2FParam(dim = 5L, lambda = 8e-2, alpha = 4e-1)
 setMethod("initialize", signature = "ExtMO2FParam", # nolint
   definition = function(.Object, # nolint
       dim, lambda, nu, rho, tau, alpha) {
     if (!missing(dim) && !missing(lambda) &&
           !(missing(nu) && missing(rho) && missing(tau) && missing(alpha))) {
-      if (missing(nu)) {
-        if (!missing(rho)) {
-          nu <- invRho(.Object, rho)
-        } else if (!missing(tau)) {
-          nu <- invTau(.Object, tau)
-        } else if (!missing(alpha)) {
-          nu <- invAlpha(.Object, alpha)
-        }
-      }
-
       setDimension(.Object) <- dim
       setLambda(.Object) <- lambda
-      setNu(.Object) <- nu
+      if (!missing(nu)) {
+        setNu(.Object) <- nu
+      } else if (!missing(rho)) {
+        setRho(.Object) <- rho
+      } else if (!missing(tau)) {
+        setTau(.Object) <- tau
+      } else if (!missing(alpha)) {
+        setAlpha(.Object) <- alpha
+      }
+
       validObject(.Object)
     }
 
@@ -332,10 +415,13 @@ setMethod("show", "ExtMO2FParam",
  function(object) {
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
    cat(sprintf("Dimension: %i\n", getDimension(object)))
-   cat(sprintf(
-     "Lambda: %s, Rho: %s, Tau: %s, Alpha: %s\n",
-     format(getLambda(object)), format(getRho(object)), format(getTau(object)),
-     format(getAlpha(object))))
+   cat("Parameter:\n")
+   cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+   cat(sprintf("* %s: %s\n", "Rho", format(getRho(object))))
+   cat(sprintf("* %s: %s\n", "Tau", format(getTau(object))))
+   cat(sprintf("* %s: %s\n", "Alpha", format(getAlpha(object))))
+   cat("Internal parameter:\n")
+   cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
   })
 
 
@@ -385,12 +471,20 @@ setMethod("constructBernsteinFunction", "CuadrasAugeExtMO2FParam",
   })
 
 #' @importFrom checkmate qassert
-setMethod("invAlpha", "CuadrasAugeExtMO2FParam",
+setMethod("calcAlpha2Nu", "CuadrasAugeExtMO2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
     value
   })
 
+#' @importFrom checkmate qassert
+setMethod("calcNu2Alpha", "CuadrasAugeExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,1]")
+    value
+  })
+
+#' @importFrom checkmate qassert
 setReplaceMethod("setNu", "CuadrasAugeExtMO2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
@@ -438,10 +532,17 @@ setMethod("constructBernsteinFunction", "AlphaStableExtMO2FParam",
   })
 
 #' @importFrom checkmate qassert
-setMethod("invAlpha", "AlphaStableExtMO2FParam",
+setMethod("calcAlpha2Nu", "AlphaStableExtMO2FParam",
   function(object, value) {
     qassert(value, "N1(0,1)")
     log2(2 - value)
+  })
+
+#' @importFrom checkmate qassert
+setMethod("calcNu2Alpha", "AlphaStableExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1(0,1)")
+    2 - 2 ^ value
   })
 
 setReplaceMethod("setNu", "AlphaStableExtMO2FParam",
@@ -459,7 +560,7 @@ setReplaceMethod("setNu", "AlphaStableExtMO2FParam",
 #' Poisson subordinator with jump size `nu` and a pure-drift subordinator.
 #' \itemize{
 #'   \item \eqn{\psi(x) = \operatorname{e}^{-\nu}x + (1 - \operatorname{e}^{-x \nu})}
-#'  \item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\eta})}
+#'  \item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\nu})^2}
 #' }
 #'
 #' @export PoissonExtMO2FParam
@@ -499,10 +600,17 @@ setMethod("constructBernsteinFunction", "PoissonExtMO2FParam",
   })
 
 #' @importFrom checkmate qassert
-setMethod("invAlpha", "PoissonExtMO2FParam",
+setMethod("calcAlpha2Nu", "PoissonExtMO2FParam",
   function(object, value) {
     qassert(value, "N1[0,1)")
     -log(1 - sqrt(value))
+  })
+
+#' @importFrom checkmate qassert
+setMethod("calcNu2Alpha", "PoissonExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1[0,)")
+    (1 - exp(-value))^2
   })
 
 setReplaceMethod("setNu", "PoissonExtMO2FParam",
@@ -520,9 +628,9 @@ setReplaceMethod("setNu", "PoissonExtMO2FParam",
 #' Exponential-jump compound Poisson process with rate `nu` and unit-intensity
 #' and a pure-drift subordinator.
 #' \itemize{
-#'   \item \eqn{\psi(x) = (1 - 1 / (1 + \nu))x + 1 / (x + \nu)}
+#'   \item \eqn{\psi(x) = (1 - 1 / (1 + \nu))x + x   / (x + \nu)}
 #'   \item \eqn{\nu = 0.5 \cdot (-3 + \sqrt{1 + 8 / \alpha})}
-#'     and \eqn{\alpha = 2 / (1 + \nu) - 1 / (2 + \nu)}
+#'     and \eqn{\alpha = 2 / (1 + \nu) - 2 / (2 + \nu)}
 #' }
 #'
 #' @export ExponentialExtMO2FParam
@@ -561,10 +669,17 @@ setMethod("constructBernsteinFunction", "ExponentialExtMO2FParam",
   })
 
 #' @importFrom checkmate qassert
-setMethod("invAlpha", "ExponentialExtMO2FParam",
+setMethod("calcAlpha2Nu", "ExponentialExtMO2FParam",
   function(object, value) {
     qassert(value, "N1(0,1)")
     0.5 * (-3 + sqrt(1 + 8 / value))
+  })
+
+#' @importFrom checkmate qassert
+setMethod("calcNu2Alpha", "ExponentialExtMO2FParam",
+  function(object, value) {
+    qassert(value, "N1(0,)")
+    2 * (1 / (1 + value) - 1 / (2 + value))
   })
 
 setReplaceMethod("setNu", "ExponentialExtMO2FParam",

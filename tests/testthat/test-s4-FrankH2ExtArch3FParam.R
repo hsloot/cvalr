@@ -15,7 +15,7 @@ test_that("`FrankH2ExtArch3FParam`-class is correctly initialized", {
   setComposition(parm) <- composition
   setLambda(parm) <- lambda
   setNu(parm) <- nu
-  expect_true(validObject(parm))
+  expect_error(validObject(parm), NA)
   expect_equal(getDimension(parm), d)
   expect_equal(getComposition(parm), composition)
   expect_equal(getPartition(parm), partition)

@@ -86,7 +86,8 @@ class whose implementation should be used).}
 
 \item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{Non-negative number between zero and one for the recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
+of the portfolio CDS/CDO.}
 }
 \description{
 \linkS4class{CalibrationParam}-class with two parameters for the extendible

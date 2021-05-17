@@ -71,11 +71,14 @@ class whose implementation should be used).}
 
 \item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{Non-negative number between zero and one for the recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
+of the portfolio CDS/CDO.}
 
-\item{lower}{Non-negative number between zero and one for the lower attachment point of the CDO tranche.}
+\item{lower}{Non-negative number between zero and one for the lower attachment point
+of the CDO tranche.}
 
-\item{upper}{Non-negative number between \code{lower} and one for the upper attachment point of the CDO tranche.}
+\item{upper}{Non-negative number between \code{lower} and one for the upper attachment point
+of the CDO tranche.}
 }
 \description{
 \linkS4class{CalibrationParam}-class with two parameters for the extendible
@@ -126,10 +129,9 @@ dependence parameter).}
 
 \section{Simulation}{
 
-The default times are sampled in a two-stage procedure: First a sample is
-drawn from the equi-correlation Gaussian copula, see
-\link[copula:ellipCopula-class]{copula::normalCopula} and \code{\link[copula:Copula]{copula::rCopula()}}; then the results are
-transformed using \code{\link[stats:Exponential]{stats::qexp()}}.
+The default times are sampled in a two-stage procedure: First a sample is drawn from the
+equi-correlation Gaussian copula, see \link[copula:ellipCopula-class]{copula::normalCopula} and \code{\link[copula:Copula]{copula::rCopula()}}; then
+the results are transformed using \code{\link[stats:Exponential]{stats::qexp()}}.
 }
 
 \section{Probability distribution}{
@@ -154,7 +156,9 @@ The \emph{expected loss of a CDO tranche} with \emph{upper and lower attachment 
 \eqn{l} and \eqn{u} and \emph{recovery rate} \eqn{R} is calculated using that
 \deqn{
   \mathbb{E}[g(L_t)]
-    = (1 - R) \left( C_2\left(\left[1 - \frac{l}{1-R} \right] \vee 0, F(t); -\sqrt{1 - \nu}\right) - C_2\left(\left[1 - \frac{u}{1-R} \right] \vee 0, F(t); -\sqrt{1 - \nu}\right) \right)
+    = (1 - R) \left(
+      C_2\left(\left[1 - \frac{l}{1-R} \right] \vee 0, F(t); -\sqrt{1 - \nu}\right) -
+      C_2\left(\left[1 - \frac{u}{1-R} \right] \vee 0, F(t); -\sqrt{1 - \nu}\right) \right)
 }
 with \eqn{g(x) = \{[(1 - R) x - l] \vee (u-l)\} \wedge 1}, \eqn{C_2} being
 the bivariate Gaussian copula, and \eqn{F} being the Exponential distribution

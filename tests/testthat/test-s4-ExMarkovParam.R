@@ -12,7 +12,7 @@ test_that("`ExMarkovParam`-class is correctly initialized", {
   expect_s4_class(parm, "ExMarkovParam")
 
   setExQMatrix(parm) <- ex_qmatrix
-  expect_true(validObject(parm))
+  expect_error(validObject(parm), NA)
   expect_equal(getDimension(parm), d)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
 
