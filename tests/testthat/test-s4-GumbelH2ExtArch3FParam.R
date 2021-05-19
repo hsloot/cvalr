@@ -28,3 +28,49 @@ test_that("`GumbelH2ExtArch3FParam`-class is correctly initialized", {
   expect_equal(parm, GumbelH2ExtArch3FParam(composition, lambda, rho = rho))
   expect_equal(parm, GumbelH2ExtArch3FParam(composition, lambda, tau = tau))
 })
+
+test_that("`GumbelH2ExtArch3FParam`-class setters can be used in arbitrary order", { # nolint
+  parm <- GumbelH2ExtArch3FParam(composition, lambda, nu, fraction)
+
+  parm2 <- GumbelH2ExtArch3FParam()
+  setComposition(parm2) <- composition
+  setLambda(parm2) <- lambda
+  setRho(parm2) <- rho
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelH2ExtArch3FParam()
+  setComposition(parm2) <- composition
+  setLambda(parm2) <- lambda
+  setTau(parm2) <- tau
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelH2ExtArch3FParam()
+  setComposition(parm2) <- composition
+  setRho(parm2) <- rho
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelH2ExtArch3FParam()
+  setLambda(parm2) <- lambda
+  setComposition(parm2) <- composition
+  setRho(parm2) <- rho
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelH2ExtArch3FParam()
+  setRho(parm2) <- rho
+  setComposition(parm2) <- composition
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelH2ExtArch3FParam()
+  setLambda(parm2) <- lambda
+  setRho(parm2) <- rho
+  setComposition(parm2) <- composition
+  expect_equal(parm, parm2)
+
+  parm2 <- GumbelH2ExtArch3FParam()
+  setRho(parm2) <- rho
+  setLambda(parm2) <- lambda
+  setComposition(parm2) <- composition
+  expect_equal(parm, parm2)
+})

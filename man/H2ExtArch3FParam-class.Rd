@@ -95,9 +95,8 @@ For details on the underlying extendible model, see \linkS4class{ExtArch2FParam}
 \itemize{
 \item \code{initialize,H2ExtArch3FParam-method}: Constructor
 
-\item \code{simulate_dt,H2ExtArch3FParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
-\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_dt,H2ExtArch3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
 
 \item \code{initialize,ClaytonH2ExtArch3FParam-method}: Constructor
 
@@ -117,6 +116,13 @@ matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} i
 component specific; range depends on specific model). Use \code{rho} or \code{tau} in the constructor to
 set dependence parameter.}
 }}
+
+\section{Simulation}{
+
+The default times are sampled in a two-stage procedure: First a sample is drawn from the
+\link[copula:nacopula-class]{copula::outer_nacopula} copula whose dependence reflect the inner- and outer-dependency
+parameters; then the results are transformed using \code{\link[stats:Exponential]{stats::qexp()}}.
+}
 
 \examples{
 H2ExtArch3FParam(

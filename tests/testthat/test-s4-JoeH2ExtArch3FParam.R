@@ -24,3 +24,43 @@ test_that("`JoeH2ExtArch3FParam`-class is correctly initialized", {
   expect_equal(parm, JoeH2ExtArch3FParam(composition, lambda, nu))
   expect_equal(parm, JoeH2ExtArch3FParam(composition, lambda, tau = tau))
 })
+
+test_that("`JoeH2ExtArch3FParam`-class setters can be used in arbitrary order", { # nolint
+  parm <- JoeH2ExtArch3FParam(composition, lambda, nu, fraction)
+
+  parm2 <- JoeH2ExtArch3FParam()
+  setComposition(parm2) <- composition
+  setLambda(parm2) <- lambda
+  setTau(parm2) <- tau
+  expect_equal(parm, parm2)
+
+  parm2 <- JoeH2ExtArch3FParam()
+  setComposition(parm2) <- composition
+  setTau(parm2) <- tau
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- JoeH2ExtArch3FParam()
+  setLambda(parm2) <- lambda
+  setComposition(parm2) <- composition
+  setTau(parm2) <- tau
+  expect_equal(parm, parm2)
+
+  parm2 <- JoeH2ExtArch3FParam()
+  setTau(parm2) <- tau
+  setComposition(parm2) <- composition
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- JoeH2ExtArch3FParam()
+  setLambda(parm2) <- lambda
+  setTau(parm2) <- tau
+  setComposition(parm2) <- composition
+  expect_equal(parm, parm2)
+
+  parm2 <- JoeH2ExtArch3FParam()
+  setTau(parm2) <- tau
+  setLambda(parm2) <- lambda
+  setComposition(parm2) <- composition
+  expect_equal(parm, parm2)
+})

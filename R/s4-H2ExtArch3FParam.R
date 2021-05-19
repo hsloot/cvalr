@@ -355,13 +355,17 @@ setMethod("show", "H2ExtArch3FParam",
 
 
 #' @describeIn H2ExtArch3FParam-class
-#'    simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-#'    matrix `x` with `nrow(x) == n_sim` and `ncol(x) == dim(object)` if
-#'    `dim(object) > 1L` and a vector `x` with `length(x) == n_sim` otherwise.
+#'    simulates the vector of *default times* and returns a matrix `x` with
+#'    `dim(x) == c(n_sim, getDimension(object))`.
 #' @aliases simulate_dt,H2ExtArch3FParam-method
 #'
 #' @inheritParams simulate_dt
 #' @param n_sim Number of samples.
+#'
+#' @section Simulation:
+#' The default times are sampled in a two-stage procedure: First a sample is drawn from the
+#' [copula::outer_nacopula-class] copula whose dependence reflect the inner- and outer-dependency
+#' parameters; then the results are transformed using [stats::qexp()].
 #'
 #' @examples
 #' parm <- FrankH2ExtArch3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(2e-1, 7e-1))
@@ -493,4 +497,10 @@ setMethod("initialize", "JoeH2ExtArch3FParam",
 setMethod("getModelName", "JoeH2ExtArch3FParam",
   function(object) {
     "JoeExtArch2FParam"
+  })
+
+setReplaceMethod("setRho", "JoeH2ExtArch3FParam",
+  function(object, value) {
+    stop(paste0("Spearman's Rho not implemented for family ", 
+      getFamily(object), "H2ExtArch3FParam"))
   })

@@ -541,3 +541,9 @@ setReplaceMethod("setFamily", "JoeExtArch2FParam",
 
     invisible(object)
   })
+
+setReplaceMethod("setRho", "JoeExtArch2FParam",
+  function(object, value) {
+    stop(paste0("Spearman's Rho not implemented for family ",
+      getFamily(object), "ExtArch2FParam"))
+  })
