@@ -3,19 +3,29 @@ NULL
 
 #' Extendible Marshall--Olkin calibration parameter
 #'
-#' Calibration parameter class for the general extendible model from the
-#' Marshall-Olkin class.
+#' @description
+#' [CalibrationParam-class]-class for the extendible Marshall-Olkin model for
+#' the *average default counting process*. Extends [ExtMOParam-class].
 #'
-#' @slot bf Bernstein function (see details)
+#' @slot bf The Bernstein function of the extendible Marshall-Olkin distribution
+#' (see [rmo::BernsteinFunction-class]).
 #'
 #' @details
-#' The joint survival function of all portfolio items is assumed to be
+#' The model is defined by the assumption that the multivariate default times
+#' \eqn{\tau = (\tau_1, \ldots, \tau_d)} are extendible Marshall-Olkin.
+#' The joint survival function of all portfolio items is
 #' \deqn{
 #'   P(\tau > t)
-#'     = \exp{(- a_{0} t_{[1]} - \cdots - a_{d-1} t_{[d]})} ,
+#'     = \exp{(- a_0 t_{[1]} - \cdots - a_{d-1} t_{[d]})} ,
 #' }
-#' for \eqn{t_{[1]} \geq \cdots \geq t_{[d]}} begin the descendingly ordered
-#' version of \eqn{t} and
+#' for \eqn{t_{[1]} \geq \cdots \geq t_{[d]}} begin the descending version of
+#' \eqn{t} and
+#' \deqn{
+#'   a_{i}
+#'     = \sum_{l=0}^{d-i-1} \binom{d-i-1}{l} \lambda_{l+1} .
+#' }
+#' The parameter are implicitly defined by a +Bernstein function* \eqn{\psi}
+#' (which is provided to the constructor):
 #' \deqn{
 #'   a_{i}
 #'     = \psi{(i+1)} - \psi{(i)} .
@@ -26,20 +36,34 @@ ExtMOParam <- setClass("ExtMOParam", # nolint
   contains = "ExMOParam",
   slots = c(bf = "BernsteinFunction"))
 
+#' @importFrom rmo exIntensities
+#' @importFrom checkmate test_class qassert
+setReplaceMethod("setDimension", "ExtMOParam",
+  function(object, value) {
+    qassert(value, "X1[2,)")
+    bf <- getBernsteinFunction(object)
+    if (test_class(bf, "BernsteinFunction") && !isTRUE(getDimension(object) == value)) {
+      object <- callNextMethod()
+      setExIntensities(object) <- exIntensities(bf, value)
+    } else {
+      object <- callNextMethod()
+    }
+
+    invisible(object)
+  })
 
 setGeneric("getBernsteinFunction",
   function(object) {
     standardGeneric("getBernsteinFunction")
   })
-setGeneric("setBernsteinFunction<-",
- function(object, value) {
-   standardGeneric("setBernsteinFunction<-")
- })
-
-
 setMethod("getBernsteinFunction", "ExtMOParam",
  function(object) {
    object@bf
+ })
+
+setGeneric("setBernsteinFunction<-",
+ function(object, value) {
+   standardGeneric("setBernsteinFunction<-")
  })
 #' @importFrom rmo exIntensities
 #' @importFrom checkmate assert_class
@@ -47,7 +71,10 @@ setReplaceMethod("setBernsteinFunction", "ExtMOParam",
  function(object, value) {
    assert_class(value, "BernsteinFunction")
    object@bf <- value
-   setExIntensities(object) <- exIntensities(object@bf, object@dim)
+   d <- getDimension(object)
+   if (qtest(d, "I1[2,)")) {
+     setExIntensities(object) <- exIntensities(value, d)
+   }
 
    invisible(object)
  })
@@ -88,4 +115,23 @@ setMethod("initialize", "ExtMOParam",
    }
 
    invisible(.Object)
+ })
+
+
+#' @describeIn ExtMOParam-class Display the object.
+#' @aliases show,ExtMOParam-method
+#'
+#' @inheritParams methods::show
+#'
+#' @export
+setMethod("show", "ExtMOParam",
+ function(object) {
+   cat(sprintf("An object of class %s\n", classLabel(class(object))))
+   cat(sprintf("Dimension: %i\n", getDimension(object)))
+   cat("Bernstein function:\n")
+   capture.output(print(getBernsteinFunction(object))) %>%
+     paste0("\t", .) %>%
+     writeLines
+
+   invisible(NULL)
  })

@@ -14,9 +14,9 @@
 \alias{PoissonExtMO2FParam}
 \alias{ExponentialExtMO2FParam-class}
 \alias{ExponentialExtMO2FParam}
-\title{Two-factor extendible Marshall--Olkin calibration parameter classes}
+\title{Two-factor extendible Marshall-Olkin calibration parameters}
 \usage{
-\S4method{initialize}{ExtMO2FParam}(.Object, dim, lambda, nu, rho = NULL, tau = NULL, alpha = NULL)
+\S4method{initialize}{ExtMO2FParam}(.Object, dim, lambda, nu, rho, tau, alpha)
 
 \S4method{expected_pcds_loss}{ExtMO2FParam}(
   object,
@@ -33,19 +33,20 @@
 
 \item{lambda}{Marginal intensity.}
 
-\item{nu}{Dependence parameter.}
+\item{nu}{(Internal) bivariate dependence parameter.}
 
-\item{rho}{Spearman's Rho.}
+\item{rho}{Bivariate Spearman's Rho.}
 
-\item{tau}{Kendall's Tau.}
+\item{tau}{Bivariate Kendall's Tau.}
 
-\item{alpha}{Bivariate lower tail dependence coefficient}
+\item{alpha}{Bivariate lower tail-dependence coefficient.}
 
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
-\item{times}{Point-in-time.}
+\item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
+of the portfolio CDS/CDO.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
@@ -54,17 +55,23 @@
 class whose implementation should be used).}
 }
 \description{
-Calibration parameter classes with two parameters for the extendible
-Marshall--Olkin family.
+\linkS4class{CalibrationParam}-class with two parameters for the extendible
+Marshall-Olkin model for the \emph{(average) default counting process}.
+Extends \linkS4class{ExtMOParam}.
 }
 \details{
-For all implemented families, the parameter \code{nu} can be replaced by
-\emph{Spearman's Rho} \code{rho}, \emph{Kendall' Tau} \code{tau} or the
-\emph{(lower) tail dependence coefficient} \code{alpha}.
-For all implemented families, the possible range for \code{rho}, \code{tau}, and
-\code{alpha} is from zero to one (boundaries might not be included) and have a
-one-to-one mapping to the model-specific parameter \code{nu}.
-The link between lower tail dependence coefficient \eqn{\alpha} and
+The model is defined by the assumption that the multivariate default times
+\eqn{\tau = (\tau_1, \ldots, \tau_d)} are extendible Marshall-Olkin, see
+\linkS4class{ExtMOParam} for the details. This class provides an interface for
+easy-to-use, 2-factor families for this model.
+For all implemented families, the marginal rate can be specified by \code{lambda}
+and the dependence can be specified by the internal parameter \code{nu}.
+For all implemented families, the (internal) dependence parameter \code{nu} has a
+one-to-one relationship, and can be replaced by, \emph{Spearman's Rho} \code{rho},
+\emph{Kendall' Tau} \code{tau} or the \emph{(lower) tail dependence coefficient} \code{alpha}.
+The possible range for \code{rho}, \code{tau}, and \code{alpha} is from zero to one
+(boundaries might not be included).
+The link between lower tail-dependence coefficient \eqn{\alpha} and
 Spearman's Rho and Kendall's Tau is
 \itemize{
 \item \eqn{\alpha = 4 \rho / (3 + \rho)} and \eqn{\rho = 3 \alpha / (4 - \alpha)}
@@ -75,16 +82,32 @@ Spearman's Rho and Kendall's Tau is
 \itemize{
 \item \code{initialize,ExtMO2FParam-method}: Constructor
 
-\item \code{expected_pcds_loss,ExtMO2FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
+\item \code{expected_pcds_loss,ExtMO2FParam-method}: calculates the \emph{expected value} for the \emph{portfolio CDS loss} based on the
+\emph{average default count process} for given timepoints and returns a vector
+\code{x} with \code{length(x) == length(times)}.
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{lambda}}{The marginal rate}
+\item{\code{lambda}}{A non-negative number for the marginal rate.}
 
-\item{\code{nu}}{Model specific dependence parameter}
+\item{\code{nu}}{A numeric number for the model specific dependence parameter (range
+depends on specific model, use \code{rho}, \code{tau}, or \code{alpha} to set dependence
+parameter).}
 }}
+
+\section{Expected portfolio CDS loss}{
+
+The \emph{expected portfolio CDS loss} for \emph{recovery rate} \eqn{R} is calculated
+using that
+\deqn{
+  \mathbb{E}[g(L_t)]
+    = (1 - R) \cdot F(t)
+}
+with \eqn{g(x) = (1 - R) \cdot x} and \eqn{F} being the Exponential
+distribution function for rate \eqn{\lambda}.
+}
 
 \section{Cuadras-Augé calibration parameter class}{
 
@@ -111,7 +134,7 @@ Corresponds to a Lévy subrodinator which is a convex combination of a
 Poisson subordinator with jump size \code{nu} and a pure-drift subordinator.
 \itemize{
 \item \eqn{\psi(x) = \operatorname{e}^{-\nu}x + (1 - \operatorname{e}^{-x \nu})}
-\item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\eta})}
+\item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\nu})^2}
 }
 }
 
@@ -121,20 +144,29 @@ Corresponds to a Lévy subordinator which is a convex combination of an
 Exponential-jump compound Poisson process with rate \code{nu} and unit-intensity
 and a pure-drift subordinator.
 \itemize{
-\item \eqn{\psi(x) = (1 - 1 / (1 + \nu))x + 1 / (x + \nu)}
+\item \eqn{\psi(x) = (1 - 1 / (1 + \nu))x + x   / (x + \nu)}
 \item \eqn{\nu = 0.5 \cdot (-3 + \sqrt{1 + 8 / \alpha})}
-and \eqn{\alpha = 2 / (1 + \nu) - 1 / (2 + \nu)}
+and \eqn{\alpha = 2 / (1 + \nu) - 2 / (2 + \nu)}
 }
 }
 
 \examples{
-CuadrasAugeExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-AlphaStableExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-PoissonExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-ExponentialExtMO2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
+CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+AlphaStableExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+PoissonExtMO2FParam(dim = 5L, lambda = 8e-2, tau = 4e-1)
+ExponentialExtMO2FParam(dim = 5L, lambda = 8e-2, alpha = 4e-1)
 expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
   times = 0.25, recovery_rate = 0.4)
 expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-  times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
+  times = seq(0, 5, by = 0.25), recovery_rate = 0.4)
+expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
+  times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam")
+expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
+  times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
+  pd_args = list(method = "CalibrationParam", seed = 1623, sim_args = list(n_sim = 1e2L)))
+expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
+  times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
+  pd_args = list(method = "CalibrationParam", seed = 1623,
+  sim_args = list(method = "ExMarkovParam", n_sim = 1e2L)))
 
 }

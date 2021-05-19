@@ -3,14 +3,27 @@
 \docType{class}
 \name{H2ExCalibrationParam-class}
 \alias{H2ExCalibrationParam-class}
-\title{Virtual superclass for H2-exchangeable calibration parameters}
+\title{Virtual super-class for H2-exchangeable calibration parameters}
 \description{
-A virtual superclass for all 2-level hierarchically-exchangeable calibration
-parameters for multivariate (portfolio) credit models.
+\linkS4class{H2ExCalibrationParam} provides a simple interface to calculate
+expected values and pricing equations for portfolio CDS' and CDO's with
+different hierachically-exchangeable models with 2 levels of hierarchy.
+Extends \linkS4class{CalibrationParam}.
+}
+\details{
+A \emph{H2-Exchangeable distribution} is a distribution for which a partition
+\eqn{\mathcal{P} = \{ p_1, \ldots p_k \}} with \eqn{\dot{\bigcup}_{j} p_j = \{ 1 ,
+\ldots, d \}} and a \eqn{\sigma}-algebra \eqn{\mathcal{G}} can be found such
+that conditioned on \eqn{\mathcal{G}}, the subvectors corresponding the
+elements of \eqn{\mathcal{P}} are independent and exchangeable.
+We assume for simplicity that elements from \eqn{\mathcal{P}} contain
+adjacent integer values such that \eqn{\mathcal{P}} can be identified with  a
+composition \eqn{\mathcal{C} = \{ c_1, \ldots c_k \}} with \eqn{d = c_1 +
+\cdots + c_k} and \eqn{\lvert p_i \rvert = c_i}.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{partition}}{Partition of the components (only adjacent grouping allowed)}
+\item{\code{composition}}{Positive integerish vector for the component-composition.}
 }}
 

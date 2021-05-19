@@ -6,6 +6,6 @@
 \alias{H2ExMOParam}
 \title{H2-Exchangeable Marshall--Olkin calibration parameter}
 \description{
-Calibration parameter class for the general 2-level
-hierarchically-exchangeable model from the Marshall--Olkin class.
+\linkS4class{CalibrationParam} for the H2-exchangeable Marshall-Olkin \emph{(average) default counting
+process} model. Extends \linkS4class{H2ExMarkovParam} and related to \linkS4class{ExMOParam}.
 }

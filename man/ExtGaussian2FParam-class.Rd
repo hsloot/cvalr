@@ -10,15 +10,15 @@
 \alias{probability_distribution,ExtGaussian2FParam-method}
 \alias{expected_pcds_loss,ExtGaussian2FParam-method}
 \alias{expected_cdo_loss,ExtGaussian2FParam-method}
-\title{Two-factor extendible Gaussian calibration parameter classes}
+\title{Two-factor extendible Gaussian calibration parameters}
 \usage{
-\S4method{initialize}{ExtGaussian2FParam}(.Object, dim, lambda, nu, rho = NULL, tau = NULL)
+\S4method{initialize}{ExtGaussian2FParam}(.Object, dim, lambda, nu, rho, tau)
 
 \S4method{simulate_dt}{ExtGaussian2FParam}(
   object,
   ...,
   method = c("default", "ExtGaussian2FParam"),
-  n_sim = 10000
+  n_sim = 10L
 )
 
 \S4method{probability_distribution}{ExtGaussian2FParam}(
@@ -53,13 +53,13 @@
 
 \item{lambda}{Marginal intensity.}
 
-\item{nu}{Dependence parameter.}
+\item{nu}{(Internal) dependence parameter.}
 
-\item{rho}{Spearman's Rho.}
+\item{rho}{Bivariate Spearman's Rho.}
 
-\item{tau}{Kendall's Tau.}
+\item{tau}{Bivariate Kendall's Tau.}
 
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
@@ -69,26 +69,32 @@ class whose implementation should be used).}
 
 \item{n_sim}{Number of samples.}
 
-\item{times}{Point-in-time.}
+\item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
+of the portfolio CDS/CDO.}
 
-\item{lower}{Lower attachment point of the CDO tranche.}
+\item{lower}{Non-negative number between zero and one for the lower attachment point
+of the CDO tranche.}
 
-\item{upper}{Upper attachment point of the CDO tranche.}
+\item{upper}{Non-negative number between \code{lower} and one for the upper attachment point
+of the CDO tranche.}
 }
 \description{
-Calibration parameter classes with two parameters for the extendible
-Gaussian equi-correlation family with exponential margins.
+\linkS4class{CalibrationParam}-class with two parameters for the extendible
+equi-correlation Gaussian-copula model with Exponential  margins*(average)
+default counting process*.
 }
 \details{
-For all implemented families, the parameter \code{nu} can be replaced by
-\emph{Spearman's Rho} \code{rho}, \emph{Kendall' Tau} \code{tau}.
-For all implemented families, the possible range for \code{rho} and \code{tau}
-is from zero to one (boundaries might not be included) and have a
-one-to-one mapping to the model-specific parameter \code{nu}.
-The link between the Pearson correlation coefficient and
-Spearman's Rho and Kendall's Tau is
+The model is defined by the assumption that the multivariate default times
+\eqn{\tau = (\tau_1, \ldots, \tau_d)} are extendible equi-correlation
+Gaussian with Exponential margins.
+The (internal) dependence parameter \code{nu} (\emph{Pearson correlation}) has a
+one-to-one relationship and can be replaced by \emph{Spearman's Rho} \code{rho} or
+\emph{Kendall' Tau} \code{tau}. The possible range for \code{rho} or \code{tau} is from zero to
+one (boundaries might not be included).
+The link between the Pearson correlation coefficient and Spearman's Rho and
+Kendall's Tau is
 \itemize{
 \item \eqn{\rho = 2 \sin(\rho_S \cdot \pi / 6)} and
 \eqn{\rho_S = 6 / \pi \cdot \arcsin(\rho/2)}
@@ -100,11 +106,11 @@ Spearman's Rho and Kendall's Tau is
 \itemize{
 \item \code{initialize,ExtGaussian2FParam-method}: Constructor
 
-\item \code{simulate_dt,ExtGaussian2FParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
-\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_dt,ExtGaussian2FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{probability_distribution,ExtGaussian2FParam-method}: returns the probability vector for the average default count process \eqn{L}.
+\item \code{probability_distribution,ExtGaussian2FParam-method}: calculates the \emph{probability vector} for the \emph{average default count process}
+and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, length(times))}.
 
 \item \code{expected_pcds_loss,ExtGaussian2FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
 
@@ -114,27 +120,93 @@ matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} i
 \section{Slots}{
 
 \describe{
-\item{\code{lambda}}{The marginal rate}
+\item{\code{lambda}}{A non-negative number for the marginal rate.}
 
-\item{\code{nu}}{Model specific parameter (Pearson correlation)}
+\item{\code{nu}}{A numeric number for the model specific dependence parameter
+(Pearson correlation between zero and one, use \code{rho} or \code{tau} to set
+dependence parameter).}
 }}
+
+\section{Simulation}{
+
+The default times are sampled in a two-stage procedure: First a sample is drawn from the
+equi-correlation Gaussian copula, see \link[copula:ellipCopula-class]{copula::normalCopula} and \code{\link[copula:Copula]{copula::rCopula()}}; then
+the results are transformed using \code{\link[stats:Exponential]{stats::qexp()}}.
+}
+
+\section{Probability distribution}{
+
+The probability of \eqn{j} portfolio items being defaulted at time \eqn{t} is
+calculated by numeric integration with \code{\link[stats:integrate]{stats::integrate()}} using
+\deqn{
+  \mathbb{P}\left( L_t = \frac{j}{d} \right)
+    = \int_{-\infty}^{\infty} \binom{d}{j} G(t; x)^{j} [1 - G(t; x)]^{d-k}  \phi(x)\mathrm{d}x ,
+}
+with
+\deqn{
+  G(x; t)
+    = \Phi\left( \frac{\Phi^{-1}(F(t)) - \sqrt{\nu}x}{\sqrt{1 - \nu}} \right)
+}
+and \eqn{F} being the Exponential distribution function for rate \eqn{\lambda}.
+}
+
+\section{Expected CDO tranche loss}{
+
+The \emph{expected loss of a CDO tranche} with \emph{upper and lower attachment points}
+\eqn{l} and \eqn{u} and \emph{recovery rate} \eqn{R} is calculated using that
+\deqn{
+  \mathbb{E}[g(L_t)]
+    = (1 - R) \left(
+      C_2\left(\left[1 - \frac{l}{1-R} \right] \vee 0, F(t); -\sqrt{1 - \nu}\right) -
+      C_2\left(\left[1 - \frac{u}{1-R} \right] \vee 0, F(t); -\sqrt{1 - \nu}\right) \right)
+}
+with \eqn{g(x) = \{[(1 - R) x - l] \vee (u-l)\} \wedge 1}, \eqn{C_2} being
+the bivariate Gaussian copula, and \eqn{F} being the Exponential distribution
+function for \eqn{\lambda}.
+}
+
+\section{Expected portfolio CDS loss}{
+
+The \emph{expected portfolio CDS loss} for \emph{recovery rate} \eqn{R} is calculated
+using that
+\deqn{
+  \mathbb{E}[g(L_t)]
+    = (1 - R) \cdot F(t)
+}
+with \eqn{g(x) = (1 - R) \cdot x} and \eqn{F} being the Exponential
+distribution function for rate \eqn{\lambda}.
+}
 
 \examples{
 ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-parm <- ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
-simulate_dt(parm, n_sim = 5e1)
+parm <- ExtGaussian2FParam(5L, 8e-2, rho = 4e-1)
+simulate_dt(parm, n_sim = 5L)
 
-probability_distribution(ExtGaussian2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+parm <- ExtGaussian2FParam(5L, 8e-2, rho = 4e-1)
+probability_distribution(parm, 0.3)
+probability_distribution(parm, seq(0, 1, by = 0.25))
+probability_distribution(parm, seq(0, 1, by = 0.25),
+  method = "CalibrationParam", seed = 1623, sim_args(n_sim  = 1e2L))
 
-expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
-  times = 0.25, recovery_rate = 0.4)
-expected_pcds_loss(ExtGaussian2FParam(dim = 75L, lambda = 0.05, rho = 0.6),
-  times = 0.25, recovery_rate = 0.4, method = "CalibrationParam")
+parm <- ExtGaussian2FParam(75L, 8e-2, rho = 4e-1)
+expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+  method = "CalibrationParam")
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+  method = "CalibrationParam",
+  pd_args = list(method = "CalibrationParam", seed = 1623,
+    sim_args = list(n_sim = 1e2L)))
 
-expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-  times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
-expected_cdo_loss(ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-  times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam")
+parm <- ExtGaussian2FParam(5L, 8e-2, rho = 4e-1)
+expected_cdo_loss(parm, times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
+expected_cdo_loss(parm, times = seq(0, 1, by = 0.25),
+  recovery_rate = 0.4, lower = 0.1, upper = 0.2)
+expected_cdo_loss(parm, times = seq(0, 1, by = 0.25),
+  recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam")
+expected_cdo_loss(parm, times = seq(0, 1, by = 0.25),
+  recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam",
+  pd_args = list(method = "CalibrationParam", seed = 1623,
+    sim_args = list(n_sim = 1e2L)))
 
 }

@@ -9,6 +9,7 @@
 \alias{initialize,ExMarkovParam,ANY-method}
 \alias{simulate_dt,ExMarkovParam-method}
 \alias{probability_distribution,ExMarkovParam-method}
+\alias{show,ExMarkovParam-method}
 \title{Exchangeable Markovian calibration parameter}
 \usage{
 \S4method{probability_distribution}{CalibrationParam}(
@@ -22,7 +23,7 @@
 
 \S4method{initialize}{ExMarkovParam}(.Object, ex_qmatrix)
 
-\S4method{simulate_dt}{ExMarkovParam}(object, ..., method = c("default", "ExMarkovParam"), n_sim = 10000)
+\S4method{simulate_dt}{ExMarkovParam}(object, ..., method = c("default", "ExMarkovParam"), n_sim = 10L)
 
 \S4method{probability_distribution}{ExMarkovParam}(
   object,
@@ -30,80 +31,96 @@
   ...,
   method = c("default", "ExMarkovParam", "CalibrationParam")
 )
+
+\S4method{show}{ExMarkovParam}(object)
 }
 \arguments{
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
-\item{times}{Point-in-time.}
+\item{times}{A non-negative numeric vector of timepoints.}
 
-\item{...}{Pass-through parameter.}
+\item{...}{arguments to specify properties of the new object, to
+      be passed to \code{initialize()}.}
 
 \item{method}{Calculation method (either \code{"default"} or the name of the
 class whose implementation should be used).}
 
-\item{seed}{Numeric number (if not NULL, is used to set the seed prior to
-Monte-Carlo estimation of probability distribution).}
+\item{seed}{Numeric number (if not NULL, it is used to set the seed prior to
+Monte-Carlo estimation of the probability distribution).}
 
 \item{sim_args}{List with pass-through parameters for \code{\link[=simulate_adcp]{simulate_adcp()}}.}
 
 \item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
 
-\item{ex_qmatrix}{(Exchangeable) Q-matrix of the default counting process.}
+\item{ex_qmatrix}{The \eqn{(d+1) \times (d+1)} Markov generator matrix (see
+\code{\link[rmo:BernsteinFunction-class]{rmo::exQMatrix()}}).}
 
 \item{n_sim}{Number of samples.}
 }
 \description{
-Calibration parameter class for the general exchangeable model with a
-Markovian \emph{default counting process}.
+\linkS4class{CalibrationParam}-class for the exchangeable Markovian \emph{(average)
+default counting process} model.
 }
 \details{
-The probability of \eqn{j > i} portfolio items being defaulted at time
-\eqn{t > s} conditioned on \eqn{i} portfolio items being defaulted at time
-\eqn{s} is
-
-\deqn{
-  \mathbb{P}(Z_t = j \mid Z_s = i)
-    = \delta_{i}^\top \operatorname{e}^{(t-s) Q} \delta_{j} .
-}
+The model is defined by the assumption that the \emph{(average) default counting
+process} is Markovian on the state space \eqn{\{ 0, 1/d, \ldots, (d-1)/d, 1 \}}
+with the generator matrix provided to the constructor.
 }
 \section{Functions}{
 \itemize{
-\item \code{probability_distribution,CalibrationParam-method}: returns the probability vector for the average default count process \eqn{L}.
+\item \code{probability_distribution,CalibrationParam-method}: calculates the \emph{probability vector} for the \emph{average default count process}
+and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, length(times))}.
 
 \item \code{initialize,ExMarkovParam-method}: Constructor
 
-\item \code{simulate_dt,ExMarkovParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
-\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_dt,ExMarkovParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{probability_distribution,ExMarkovParam-method}: returns the probability vector for the average default count process \eqn{L}.
+\item \code{probability_distribution,ExMarkovParam-method}: calculates the \emph{probability vector} for the \emph{average default count process}
+and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, length(times))}.
+
+\item \code{show,ExMarkovParam-method}: Display the object.
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{qmatrix}}{The \eqn{(d+1) \times (d+1)} Markov generator matrix of the
-default counting process.}
+\item{\code{ex_qmatrix}}{The \eqn{(d+1) \times (d+1)} Markov generator matrix (see
+\code{\link[rmo:BernsteinFunction-class]{rmo::exQMatrix()}}).}
 }}
 
+\section{Simulation}{
+
+The default times are sampled using the Markovian representation of the
+\emph{(average) default counting process}: The ordered version of the default-time
+vector can be recorded while sampling the (average) default counting process.
+This vector is uniformly shuffled to obtain a sample with the desired
+distribution.
+}
+
+\section{Probability distribution}{
+
+The probability of \eqn{j > i} portfolio items being defaulted at time
+\eqn{t > s} conditioned on \eqn{i} portfolio items being defaulted at time
+\eqn{s} is
+\deqn{
+  \mathbb{P}(Z_t = j \mid Z_s = i)
+    = \delta_{i}^\top \operatorname{e}^{(t-s) Q} \delta_{j} .
+}
+}
+
 \examples{
-ExMarkovParam(
- ex_qmatrix = matrix(
-   c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
-   nrow = 3L, ncol = 3L))
-parm <- ExMarkovParam(
- ex_qmatrix = matrix(
-   c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
-   nrow = 3L, ncol = 3L))
-simulate_dt(parm, n_sim = 5e1)
+ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
+parm <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
+simulate_dt(parm, n_sim = 5L)
 
 probability_distribution(CuadrasAugeExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+  dim = 5L, lambda = 0.05, rho = 0.4), 0.3)
 probability_distribution(AlphaStableExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+  dim = 5L, lambda = 0.05, rho = 0.4), 0.3)
 probability_distribution(PoissonExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+  dim = 5L, lambda = 0.05, rho = 0.4), 0.3)
 probability_distribution(ExponentialExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3)
+  dim = 5L, lambda = 0.05, rho = 0.4), 0.3)
 
 }

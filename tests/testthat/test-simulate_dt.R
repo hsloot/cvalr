@@ -76,9 +76,10 @@ test_that("`simulate_dt` spearman correlation is in appr. CI for Ext. Param", {
     corr, level = level)
 })
 
-d <- 8
 fraction <- 0.4
 partition <- list(1:2, 3:6, 7:8)
+composition <- purrr::map_int(partition, length)
+d <- sum(composition)
 lambda <- 8e-2
 rho <- c(2e-1, 7e-1)
 
@@ -90,36 +91,36 @@ walk(partition, ~{
 test_that("`simulate_dt` spearman correlation is in appr. CI for H2-Ext. Param", {
   expect_cor_not_rejected(
     simulate_dt(CuadrasAugeH2ExtMO3FParam(
-      partition = partition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
   expect_cor_not_rejected(
     simulate_dt(AlphaStableH2ExtMO3FParam(
-      partition = partition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
   expect_cor_not_rejected(
     simulate_dt(PoissonH2ExtMO3FParam(
-      partition = partition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
   expect_cor_not_rejected(
     simulate_dt(ExponentialH2ExtMO3FParam(
-      partition = partition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
 
   expect_cor_not_rejected(
     simulate_dt(H2ExtGaussian3FParam(
-      partition = partition, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
 
   expect_cor_not_rejected(
     simulate_dt(ClaytonH2ExtArch3FParam(
-      partition = partition, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
   expect_cor_not_rejected(
     simulate_dt(FrankH2ExtArch3FParam(
-      partition = partition, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
   expect_cor_not_rejected(
     simulate_dt(GumbelH2ExtArch3FParam(
-      partition = partition, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
 })

@@ -4,47 +4,82 @@
 \name{H2ExMarkovParam-class}
 \alias{H2ExMarkovParam-class}
 \alias{H2ExMarkovParam}
+\alias{initialize,H2ExMarkovParam-method}
+\alias{initialize,H2ExMarkovParam,ANY-method}
 \alias{simulate_dt,H2ExMarkovParam-method}
+\alias{show,H2ExMarkovParam-method}
 \title{H2-exchangeable Markovian calibration parameter}
 \usage{
+\S4method{initialize}{H2ExMarkovParam}(.Object, fraction, models)
+
 \S4method{simulate_dt}{H2ExMarkovParam}(object, ...)
+
+\S4method{show}{H2ExMarkovParam}(object)
 }
 \arguments{
-\item{object}{The calibration parameter object.}
+\item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
 
-\item{...}{Pass-through parameter.}
+\item{fraction}{The proportion associated with the global model, see details.}
+
+\item{models}{A list with the global and component models (of the type
+\code{ExMarkovParam-class}).}
+
+\item{object}{A \linkS4class{CalibrationParam}-object.}
+
+\item{...}{Pass-through parameters.}
 }
 \description{
-Calibration parameter class for the general 2-level
-hierarchically-exchangeable model with Markovian \emph{default counting processes}
-in the exchangeable sub-components.
+\linkS4class{CalibrationParam} for the H2-exchangeable Markovian \emph{(average) default counting process}
+model. Extends \linkS4class{H2ExCalibrationParam} and related to \linkS4class{ExMarkovParam}.
 }
 \details{
-We assume that \eqn{\tau} has the stochastic representation to be the
-component-wise minimum of a global exchangeable Markovian-vector
-\eqn{\tau^{(0)}} and a vector \eqn{(\tau^{(1)}, \ldots, \tau^{(J)})} with
-independent exchangeable Markovian-vector sub-vectors \eqn{\tau^{(j)}}.
+The model is defined by the assumption that the vector of default times is defined as the
+component-wise minimum of two vectors of the same length. The first vector is simulated from a
+(scaled) global \linkS4class{ExMarkovParam} model and the second vector is the (scaled) conjunction of
+independent \linkS4class{ExMarkovParam} models. The inverse scaling factors are a convex combination.
 }
 \section{Functions}{
 \itemize{
-\item \code{simulate_dt,H2ExMarkovParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
-\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{initialize,H2ExMarkovParam-method}: Constructor
+
+\item \code{simulate_dt,H2ExMarkovParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
+
+\item \code{show,H2ExMarkovParam-method}: Display the object.
 }}
 
 \section{Slots}{
 
 \describe{
 \item{\code{models}}{A list with the global and component models (of the type
-\code{ExMarkovParam-class})}
+\code{ExMarkovParam-class}).}
 
 \item{\code{fraction}}{The proportion associated with the global model, see details.}
 }}
 
+\section{Simulation}{
+
+The default times are sampled using the stochastic representation described in details.
+}
+
 \examples{
-parm <- ExponentialH2ExtMO3FParam(
-  partition = list(1:2, 3:6, 7:8), fraction = 0.4,
-  lambda = 8e-2, rho = c(0.2, 0.7))
+composition <- c(2L, 4L, 2L)
+d <- sum(composition)
+model_global <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), d))
+model_partition <- purrr::map(composition, ~{
+  ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.5), .x))
+  })
+models <- c(list(model_global), model_partition)
+H2ExMarkovParam(fraction = 0.4, models = models)
+
+composition <- c(2L, 4L, 2L)
+d <- sum(composition)
+model_global <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), d))
+model_partition <- purrr::map(composition, ~{
+  ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.5), .x))
+  })
+models <- c(list(model_global), model_partition)
+parm <- H2ExMarkovParam(fraction = 0.4, models = models)
 simulate_dt(parm, n_sim = 5e1)
 
 }

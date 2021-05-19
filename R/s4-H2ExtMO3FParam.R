@@ -1,24 +1,60 @@
-#' @include s4-H2ExtMOParam.R checkmate.R
+#' @include s4-H2ExtMOParam.R s4-ExtMO2FParam.R checkmate.R
 NULL
 
-#' Two-factor H2-extendible Marshall--Olkin calibration parameter classes
+#' Three-factor H2-extendible Marshall--Olkin calibration parameter
 #'
-#' Calibration parameter class with three parameters for the general 2-level
-#' hierarchically-etendiblew model from the Marshall--Olkin class.
+#' [CalibrationParam-class] for the H2-extendible Marshall-Olkin *(average) default counting
+#' process* model with 3 parameter. Extends [H2ExtMOParam-class] and related to
+#' [ExtMO2FParam-class].
 #'
-#' @slot lambda The marginal rate
-#' @slot nu Model-specific dependence parameters for the global- and the
-#'   component-models.
+#' @slot lambda A non-negative number for the marginal rate.
+#' @slot nu A numeric vector of length 2 for the model specific dependence parameters (global and
+#'   component specific; range depends on specific model). Use `rho`, `tau`, or `alpha` in the
+#'   constructor to set dependence parameter.
 #'
 #' @details
-#' For all implemented families, the parameters `nu`can be replaced by
-#' *Spearman's Rho* `rho`, *Kendall's Tau* `tau`, or the *(lower) tail
-#' dependence coefficient* `alpha`.
-#' For all implemented families, the possible range for `rho`, `tau`, and
-#' `alpha`, is between zero and one with the restriction that the global
-#' parameter has to be smaller or equal than the corresponding component
-#' parameter. Additionally, we support only that parameters of the same type are
-#' provided, i.e. `rho`. The parameters have a one-to-one mapping to `nu`.
+#' The model is defined by the assumption that the *multivariate default times* \eqn{\tau = (\tau_1,
+#' \ldots, \tau_d)} are H2-extendible Marshall-Olkin, see [H2ExtMOParam-class] for the details. This
+#' class provides an interface for easy-to-use, 3-factor families for this model. For all
+#' implemented families, the *marginal rate* can be specified by `lambda` and the *(internal)
+#' dependence parameters* (model specific) of the global model and the component models can be
+#' specified by `nu`. The dependence parameter `nu` should not be set by the user; instead they
+#' should provide either `rho` (*Spearman's Rho*), `tau` (*Kendall's Tau*), or `alpha` (*lower
+#' tail-dependence coefficient*).
+#' The parameters `rho`, `tau`, or `alpha` should be between zero and one, of length 2, and
+#' non-decreasing; the first value represents the *outer dependence* between components of different
+#' partition elements and the second value represents the *inner dependence* between components of
+#' the same partition element. Setting either of the three dependence parameters implicitely sets
+#' the `fraction`-slot, too.
+#' The link between lower tail-dependence coefficient \eqn{\alpha} and
+#' Spearman's Rho and Kendall's Tau is (all calculations are component-wise)
+#' \itemize{
+#'   \item \eqn{\alpha = 4 \rho / (3 + \rho)} and \eqn{\rho = 3 \alpha / (4 - \alpha)}
+#'   \item \eqn{\alpha = 2 \tau / (1 + \tau)} and \eqn{\tau = \alpha / (2 - \alpha)}
+#' }
+#' Consider \eqn{\tilde{\alpha}} to be the vector of the actual lower TDC of the global and the
+#' component model and \eqn{\kappa} to be the `fraction` parameter. Then:
+#' \deqn{
+#'   \alpha_1 = \kappa \tilde{\alpha}_1,
+#'     \alpha_2 = \kappa \tilde{\alpha}_1 + (1 - \kappa) \tilde{\alpha}_2
+#' }
+#' and
+#' \deqn{
+#'   \tilde{\alpha}_1 = \frac{\alpha_1}{\kappa},
+#'     \tilde{\alpha_2} = \frac{\alpha_2 - \alpha_1}{1 - \kappa} .
+#' }
+#' In particular, the boundaries \eqn{\tilde{\alpha}_i \in [0, 1]} impose the restrictions
+#' \deqn{
+#'   \alpha_1 \leq \kappa \leq \alpha_1 + (1 - \alpha_2).
+#' }
+#' For the families deriving from [H2ExtMO3FParam-class] we choose the default value for fraction to
+#' be the midpoint of the admissible interval, i.e.
+#' \deqn{
+#'   \kappa
+#'     = \frac{2 \alpha_1 + 1 - \alpha_2}{2} .
+#' }
+#'
+#' For details on the underlying extendible models, see [ExtMO2FParam-class].
 #'
 #' @export
 setClass("H2ExtMO3FParam", # nolint
@@ -26,29 +62,60 @@ setClass("H2ExtMO3FParam", # nolint
   slots = c(lambda = "numeric", nu = "numeric"))
 
 
+setGeneric("constructModels",
+  function(object, ...) {
+    standardGeneric("constructModels")
+  })
+#' @importFrom checkmate test_list qtest test_integerish test_numeric
+#' @importFrom purrr map imap
+setMethod("constructModels", "H2ExtMO3FParam",
+function(object, composition = getComposition(object), lambda = getLambda(object),
+         nu = getNu(object)) {
+  dim <- sum(composition)
+  if (test_integerish(composition, lower = 1L, any.missing = FALSE, min.len = 1L) &&
+      qtest(lambda, "N1(0,)") && test_numeric(nu, any.missing = FALSE, len = 2L)) {
+    out <- imap(c(dim, composition), ~{
+      new(getModelName(object), .x, lambda, nu[[pmin(.y, 2L)]])
+      })
+  } else {
+    out <- list()
+  }
+
+  out
+})
+
+#' @importFrom rmo exIntensities
+#' @importFrom checkmate test_list qassert
+setReplaceMethod("setComposition", "H2ExtMO3FParam",
+  function(object, value) {
+    qassert(value, "X+[1,)")
+    dim <- sum(value)
+    qassert(dim, "X1[2,)")
+    if (isTRUE(all(getComposition(object) != value))) {
+      object <- callNextMethod()
+      models <- constructModels(object)
+      if (test_list(models, types = getModelName(object), any.missing = FALSE, min.len = 2L)) {
+        setModels(object) <- models
+      }
+    }
+
+    invisible(object)
+  })
+
 setMethod("getLambda", "H2ExtMO3FParam",
   function(object) {
     object@lambda
   })
-  #' @include checkmate.R
-  #' @importFrom purrr map
-  #' @importFrom checkmate qassert
+#' @include checkmate.R
+#' @importFrom purrr map
+#' @importFrom checkmate qassert
 setReplaceMethod("setLambda", "H2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N1(0,)")
-    assert_partition(object@partition)
     object@lambda <- value
-    if (0L == length(object@models)) {
-      models <- map(object@partition, ~{
-        new(getModelName(object), length(.x), value, alpha = 0.5)
-      })
-      models <- c(list(new(getModelName(object), getDimension(object), value, alpha = 0.5)), models)
+    models <- constructModels(object)
+    if (test_list(models, types = getModelName(object), any.missing = FALSE, min.len = 2L)) {
       setModels(object) <- models
-    } else {
-      object@models <- map(object@models, ~{
-        setLambda(.x) <- value
-        .x
-      })
     }
 
     invisible(object)
@@ -63,51 +130,105 @@ setMethod("getNu", "H2ExtMO3FParam",
 setReplaceMethod("setNu", "H2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2")
-    assert_partition(object@partition)
     object@nu <- value
-    if (0L == length(object@models)) {
-      models <- map(object@partition, ~{
-        new(getModelName(object), length(.x), 1, value[[2]])
-      })
-      models <- c(list(new(getModelName(object), getDimension(object), 1, value[[1]])), models)
+    models <- constructModels(object)
+    if (test_list(models, types = getModelName(object), any.missing = FALSE, min.len = 2L)) {
       setModels(object) <- models
-    } else {
-      object@models <- imap(object@models, ~{
-        setNu(.x) <- ifelse(1L == .y, value[[1]], value[[2]])
-        .x
-      })
     }
 
     invisible(object)
   })
 
+#' @importFrom checkmate qassert
+setMethod("calcAlpha2Rho", "H2ExtMO3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    3 * value / (4 - value)
+  })
+
 setMethod("getRho", "H2ExtMO3FParam",
   function(object) {
-    alpha <- getAlpha(object)
+    getAlpha(object) %>%
+      calcAlpha2Rho(object, .)
+  })
 
-    3 * alpha / (4 - alpha)
+#' @importFrom checkmate assert_numeric
+setMethod("calcAlpha2Tau", "H2ExtMO3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    value / (2 - value)
   })
 
 setMethod("getTau", "H2ExtMO3FParam",
   function(object) {
-    alpha <- getAlpha(object)
-
-    alpha / (2 - alpha)
+    getAlpha(object) %>%
+      calcAlpha2Tau(object, .)
   })
 
+#' @importFrom utils head
 #' @importFrom purrr map_dbl
 setMethod("getAlpha", "H2ExtMO3FParam",
   function(object) {
     fraction <- getFraction(object)
-    alpha0 <- map_dbl(object@models, getAlpha)
-    if (1L == length(alpha0)) {
-      alpha <- alpha0 * fraction
-    } else {
-      alpha <- cumsum(alpha0[1:2] * c(fraction, 1 - fraction))
-    }
-
-    alpha
+    map_dbl(getModels(object), getAlpha) %>%
+      head(2L) %>%
+      `*`(., c(fraction, 1 - fraction)) %>%
+      cumsum
   })
+
+#' @importFrom checkmate assert_numeric
+setMethod("calcRho2Alpha", "H2ExtMO3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    4 * value / (3 + value)
+  })
+
+#' @importFrom checkmate assert_numeric
+setMethod("calcTau2Alpha", "H2ExtMO3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    2 * value / (1 + value)
+  })
+
+setGeneric("calcAlpha2Fraction",
+  function(object, value) {
+    standardGeneric("calcAlpha2Fraction")
+  })
+#' @importFrom checkmate test_numeric
+setMethod("calcAlpha2Fraction", "H2ExtMO3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    value[[1]] + 0.5  * (1 - value[[2]])
+  })
+
+#' @importFrom checkmate test_numeric
+setReplaceMethod("setAlpha", "H2ExtMO3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    setFraction(object) <- calcAlpha2Fraction(object, value)
+    setNu(object) <- invAlpha(object, value)
+
+    invisible(object)
+  })
+
+#' @importFrom checkmate test_numeric
+setReplaceMethod("setRho", "H2ExtMO3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    setAlpha(object) <- calcRho2Alpha(object, value)
+
+    invisible(object)
+  })
+
+#' @importFrom checkmate test_numeric
+setReplaceMethod("setTau", "H2ExtMO3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    setAlpha(object) <- calcTau2Alpha(object, value)
+
+    invisible(object)
+  })
+
 
 
 #' @importFrom checkmate qassert
@@ -119,37 +240,42 @@ setValidity("H2ExtMO3FParam",
     invisible(TRUE)
   })
 
-
-#' @importFrom purrr imap
+#' @describeIn H2ExtMO3FParam-class Constructor
+#' @aliases initialize,H2ExtMO3FParam-method
+#' @aliases initialize,H2ExtMO3FParam,ANY-method
+#'
+#' @inheritParams methods::initialize
+#' @param composition An integerish vector with the composition.
+#' @param lambda Marginal intensity.
+#' @param rho *Outer* and *inner* bivariate Spearman's Rho.
+#' @param tau *Outer* and *inner* bivariate Kendall's Tau.
+#' @param alpha *Outer* and *inner* bivariate lower tail-dependence coefficient.
+#' @param nu (Internal) *Outer* and *inner* bivariate dependence parameter.
+#' @param fraction (Internal) proportion associated with the global model, see details.
+#'
+#' @examples
+#' CuadrasAugeH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+#' AlphaStableH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+#' PoissonH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, tau = c(3e-1, 5e-1))
+#' ExponentialH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, alpha = c(3e-1, 5e-1))
 setMethod("initialize", "H2ExtMO3FParam", # nolint
   function(.Object, # nolint
-    partition = list(1L:2L, 3L:5L), lambda = 1e-1, nu = c(0.2, 0.3),
-    fraction = 0.5, rho = NULL, tau = NULL, alpha = NULL) {
-  if (!missing(partition) && !missing(lambda) &&
-        (!missing(nu) || !missing(rho) || !missing(tau) || !missing(alpha)) &&
-        !missing(fraction)) {
-    .Object@fraction <- fraction
-    if (missing(nu)) {
-      if (!is.null(rho)) {
-        nu <- invRho(.Object, rho)
-      } else if (!is.null(tau)) {
-        nu <- invTau(.Object, tau)
-      } else if (!is.null(alpha)) {
-        nu <- invAlpha(.Object, alpha)
-      }
+    composition, lambda, nu, fraction, rho, tau, alpha) {
+  if (!missing(composition) && !missing(lambda) &&
+        ((!missing(nu) && !missing(fraction)) || !missing(rho) || !missing(tau) ||
+         !missing(alpha))) {
+    setComposition(.Object) <- composition
+    setLambda(.Object) <- lambda
+    if (!missing(nu)) {
+      setFraction(.Object) <- ifelse(missing(fraction), 0.5, fraction)
+      setNu(.Object) <- nu
+    } else if (!missing(rho)) {
+      setRho(.Object) <- rho
+    } else if (!missing(tau)) {
+      setTau(.Object) <- tau
+    } else if (!missing(alpha)) {
+      setAlpha(.Object) <- alpha
     }
-
-    dim <- length(unlist(partition))
-    models <- imap(c(dim, map_int(partition, length)), ~{
-      new(getModelName(.Object),
-            dim = .x, lambda = lambda, nu = nu[[pmin(.y, 2L)]])
-      })
-
-    .Object@dim <- dim
-    .Object@partition <- partition
-    .Object@models <- models
-    .Object@lambda <- lambda
-    .Object@nu <- nu
 
     validObject(.Object)
   }
@@ -163,31 +289,56 @@ setMethod("getModelName", "H2ExtMO3FParam",
     "ExtMO2FParam"
   })
 
-#' @importFrom checkmate qassert
-setMethod("invRho", "H2ExtMO3FParam",
-  function(object, value) {
-    qassert(value, "N2[0,1]")
-    invAlpha(object, 4 * value / (3 + value))
-  })
 
-#' @importFrom checkmate qassert
-setMethod("invTau", "H2ExtMO3FParam",
-  function(object, value) {
-    qassert(value, "N2[0,1]")
-    invAlpha(object, 2 * value / (1 + value))
-  })
+#' @describeIn H2ExtMO3FParam-class Display the object.
+#' @aliases show,H2ExtMO3FParam-method
+#'
+#' @param object A [CalibrationParam-class]-object.
+#'
+#' @importFrom utils capture.output
+#' @importFrom purrr map compose flatten_chr
+#'
+#' @export
+setMethod("show", "H2ExtMO3FParam",
+  function(object) {
+    cat(sprintf("An object of class %s\n", classLabel(class(object))))
+    cat(sprintf("Composition: %s = %s\n", getDimension(object),
+      paste(getComposition(object), collapse = " + ")))
+    to_vector <- function(x) {
+      paste0("(", paste(x, collapse = ", "), ")")
+    }
+    cat("Parameter:\n")
+    cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+    cat(sprintf("* %s: %s\n", "Rho", to_vector(format(getRho(object)))))
+    cat(sprintf("* %s: %s\n", "Tau", to_vector(format(getTau(object)))))
+    cat(sprintf("* %s: %s\n", "Alpha", to_vector(format(getAlpha(object)))))
+    cat("Internal parameter:\n")
+    cat(sprintf("* %s: %s\n", "Nu", to_vector(format(getNu(object)))))
+    cat(sprintf("* %s: %s\n", "Fraction", format(getFraction(object))))
+    cat("Models:\n")
+    cat("* Global model\n")
+    writeLines(paste0("\t", capture.output(show(as(getGlobalModel(object), getModelName(object))))))
+    cat("* Partition models:\n")
+    to_list_item <- function(x) {
+      out <- rep("  ", length(x))
+      out[[1]] <- "- "
+
+      paste0(out, x)
+    }
+    getPartitionModels(object) %>%
+      map(compose(to_list_item, ~capture.output(show(.)), ~as(., getModelName(object)))) %>%
+      flatten_chr %>%
+      paste0("\t", .) %>%
+      writeLines
+
+    invisible(NULL)
+    })
 
 
 
 #' @rdname H2ExtMO3FParam-class
 #'
-#' @section Cuadras-Augé calibration parameter class:
-#' Corresponds to a Lévy subordinators which are a convex combination of
-#' a pure-killing subordinator and a pure-drift subordinator.
-#' \itemize{
-#'   \item \eqn{\psi(x) = \nu + (1 - \nu) x}
-#'   \item \eqn{\alpha = \nu}
-#' }
+#' @inheritSection ExtMO2FParam-class Cuadras-Augé calibration parameter class
 #'
 #' @export CuadrasAugeH2ExtMO3FParam
 CuadrasAugeH2ExtMO3FParam <- setClass("CuadrasAugeH2ExtMO3FParam", # nolint
@@ -204,19 +355,15 @@ setMethod("getModelName", "CuadrasAugeH2ExtMO3FParam",
 setMethod("invAlpha", "CuadrasAugeH2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2[0,1]")
-    adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
+    fraction <- getFraction(object)
+    adjacent_differences(value) / c(fraction, 1 - fraction)
   })
 
 
 
 #' @rdname H2ExtMO3FParam-class
 #'
-#' @section Alpha-stable calibration parameter class:
-#' Corresponds to \eqn{\alpha}-stable subordinators.
-#' \itemize{
-#'   \item \eqn{\psi(x) = x^\nu}
-#'   \item \eqn{\nu = \log_2(2 - \alpha)} and \eqn{\alpha = 2 - 2^\nu}
-#' }
+#' @inheritSection ExtMO2FParam-class Alpha-stable calibration parameter class
 #'
 #' @export AlphaStableH2ExtMO3FParam
 AlphaStableH2ExtMO3FParam <- setClass("AlphaStableH2ExtMO3FParam", # nolint
@@ -233,7 +380,8 @@ setMethod("getModelName", "AlphaStableH2ExtMO3FParam",
 setMethod("invAlpha", "AlphaStableH2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2[0,1]")
-    value <- adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
+    fraction <- getFraction(object)
+    value <- adjacent_differences(value) / c(fraction, 1 - fraction)
     log2(2 - value)
 
   })
@@ -242,13 +390,7 @@ setMethod("invAlpha", "AlphaStableH2ExtMO3FParam",
 
 #' @rdname H2ExtMO3FParam-class
 #'
-#' @section Poisson calibration parameter class:
-#' Corresponds to Lévy subordinators which are a convex combination of
-#' Poisson subordinators with jump size `nu` and pure-drift subordinators.
-#' \itemize{
-#'   \item \eqn{\psi(x) = \operatorname{e}^{-\nu}x + (1 - \operatorname{e}^{-x \nu})}
-#'  \item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\eta})}
-#' }
+#' @inheritSection ExtMO2FParam-class Poisson calibration parameter class
 #'
 #' @export PoissonH2ExtMO3FParam
 PoissonH2ExtMO3FParam <- setClass("PoissonH2ExtMO3FParam", # nolint
@@ -265,7 +407,8 @@ setMethod("getModelName", "PoissonH2ExtMO3FParam",
 setMethod("invAlpha", "PoissonH2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2[0,1]")
-    value <- adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
+    fraction <- getFraction(object)
+    value <- adjacent_differences(value) / c(fraction, 1 - fraction)
     -log(1 - sqrt(value))
   })
 
@@ -273,15 +416,7 @@ setMethod("invAlpha", "PoissonH2ExtMO3FParam",
 
 #' @rdname H2ExtMO3FParam-class
 #'
-#' @section Exponential calibration parameter class:
-#' Corresponds to Lévy subordinator which is a convex combination of
-#' Exponential-jump compound Poisson processes with rate `nu` and unit-intensity
-#' and a pure-drift subordinators.
-#' \itemize{
-#'   \item \eqn{\psi(x) = (1 - 1 / (1 + \nu))x + 1 / (x + \nu)}
-#'   \item \eqn{\nu = 0.5 \cdot (-3 + \sqrt{1 + 8 / \alpha})}
-#'     and \eqn{\alpha = 2 / (1 + \nu) - 1 / (2 + \nu)}
-#' }
+#' @inheritSection ExtMO2FParam-class Exponential calibration parameter class
 #'
 #' @export ExponentialH2ExtMO3FParam
 ExponentialH2ExtMO3FParam <- setClass("ExponentialH2ExtMO3FParam", # nolint
@@ -298,6 +433,7 @@ setMethod("getModelName", "ExponentialH2ExtMO3FParam",
 setMethod("invAlpha", "ExponentialH2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2[0,1]")
-    value <- adjacent_differences(value) / c(object@fraction, 1 - object@fraction)
+    fraction <- getFraction(object)
+    value <- adjacent_differences(value) / c(fraction, 1 - fraction)
     0.5 * (-3 + sqrt(1 + 8 / value))
   })

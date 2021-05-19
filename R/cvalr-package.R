@@ -2,7 +2,10 @@
 #' @useDynLib cvalr, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 ## usethis namespace: end
+#' @importFrom magrittr %>%
 NULL
+
+if(getRversion() >= "2.15.1") utils::globalVariables(c(".")) # nolint
 
 #' cvalr: Credit derivative valuation in R
 #'

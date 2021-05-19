@@ -105,79 +105,94 @@ expected_cdo_equation(
 )
 }
 \arguments{
-\item{object}{The calibration parameter object.}
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 
 \item{...}{Pass-through parameter.}
 
-\item{times}{Point-in-time.}
+\item{times}{A non-negative numeric vector of timepoints.}
 
-\item{g}{Transformation function.}
+\item{g}{A payoff transformation function.}
 
 \item{method}{Calculation method (either \code{"default"} or the name of the
 class whose implementation should be used).}
 
-\item{pd_args}{Parameter for \code{\link[=probability_distribution]{probability_distribution()}}.}
+\item{pd_args}{A list of parameters for \code{\link[=probability_distribution]{probability_distribution()}}.}
 
-\item{recovery_rate}{The recovery rate of the portfolio CDS/CDO.}
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
+of the portfolio CDS/CDO.}
 
-\item{lower}{Lower attachment point of the CDO tranche.}
+\item{lower}{Non-negative number between zero and one for the lower attachment point
+of the CDO tranche.}
 
-\item{upper}{Upper attachment point of the CDO tranche.}
+\item{upper}{Non-negative number between \code{lower} and one for the upper attachment point
+of the CDO tranche.}
 
-\item{discount_factors}{Discount factors for \code{times}}
+\item{discount_factors}{Non-negative numeric vector for the discount factors for the timepoints.}
 
-\item{coupon}{Running coupon der CDO tranche.}
+\item{coupon}{Numeric number for the running coupon of the portfolio CDS / CDO tranche.}
 
-\item{upfront}{Upfront payment der CDO tranche.}
+\item{upfront}{Numeric number for the upfront payment of the portfolio CDS / CDO tranche.}
 }
 \description{
-A virtual superclass for all calibration parameters for multivariate
-(portfolio) credit models.
-}
-\details{
-It is assumed that the expected value of the credit derivative
-payment streams can be represented as a function of \emph{expected losses} and
-other non-model dependent quantities.
-\emph{Expected losses} are the expected values of the average default counting
-process \eqn{L} under a transformation \eqn{g} on times \eqn{t_1, \ldots, t_n},
-i.e. \eqn{E[g(L_{t_1})], \ldots, E[g(L_{t_n})]}.
-
-A \code{CalibrationParam} object is supposed to be used to abstract the calculation
-of these \emph{expected losses} in functions which calculate the fair value of the
-option with the asset pricing theorem.
+\code{CalibrationParam} provides a simple interface to calculate \emph{expected values}
+and \emph{pricing equations} for \emph{portfolio CDS'} and \emph{CDO's} with different
+models.
 }
 \section{Functions}{
 \itemize{
-\item \code{simulate_dt}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
-\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_dt}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{simulate_adcp}: simulates the default counting process \eqn{L} and returns a matrix \code{x} with
-\code{nrow(x) == n_sim} and \code{ncol(x) == length(times)} if \code{length(times) > 1L}
-and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_adcp}: simulates the \emph{average default counting process} and returns a
+matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
 
-\item \code{simulate_adcp,CalibrationParam-method}: simulates the default times \eqn{(\tau_1, \ldots, \tau_d)} and returns a
-matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} if
-\code{dim(object) > 1L} and a vector \code{x} with \code{length(x) == n_sim} otherwise.
+\item \code{simulate_adcp,CalibrationParam-method}: simulates the \emph{average default counting process} and returns a
+matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
 
-\item \code{probability_distribution}: returns the probability vector for the average default count process \eqn{L}.
+\item \code{probability_distribution}: calculates the \emph{probability vector} for the \emph{average default count process}
+and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, length(times))}.
 
-\item \code{expected_value}: returns the expected value for the average default count process \eqn{L} at
-a specific time-point.
+\item \code{expected_value}: calculates the \emph{expected value} for the loss based on the \emph{average default
+count process} for given timepoints and returns a vector \code{x} with
+\code{length(x) == length(times)}.
 
-\item \code{expected_pcds_loss}: returns the expected portfolio CDS loss for a specific time-point.
+\item \code{expected_value,CalibrationParam-method}: calculates the \emph{expected value} for the loss based on the \emph{average default
+count process} for given timepoints and returns a vector \code{x} with
+\code{length(x) == length(times)}.
 
-\item \code{expected_cdo_loss}: returns the expected CDO loss for a specific time-point.
+\item \code{expected_pcds_loss}: calculates the \emph{expected value} for the \emph{portfolio CDS loss} based on the
+\emph{average default count process} for given timepoints and returns a vector
+\code{x} with \code{length(x) == length(times)}.
 
-\item \code{expected_pcds_equation}: returns the expected portfolio CDS fair-value equation.
+\item \code{expected_pcds_loss,CalibrationParam-method}: calculates the \emph{expected value} for the \emph{portfolio CDS loss} based on the
+\emph{average default count process} for given timepoints and returns a vector
+\code{x} with \code{length(x) == length(times)}.
 
-\item \code{expected_cdo_equation}: returns the expected CDO fair-value equation.
+\item \code{expected_cdo_loss}: calculates the \emph{expected value} for the \emph{CDO loss} based on the \emph{average
+default count process} for given timepoints and returns a vector \code{x} with
+\code{length(x) == length(times)}.
+
+\item \code{expected_cdo_loss,CalibrationParam-method}: calculates the \emph{expected value} for the \emph{CDO loss} based on the \emph{average
+default count process} for given timepoints and returns a vector \code{x} with
+\code{length(x) == length(times)}.
+
+\item \code{expected_pcds_equation}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
+
+\item \code{expected_pcds_equation,CalibrationParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
+
+\item \code{expected_cdo_equation}: calculates the \emph{payoff equation} for a \emph{CDO} (vectorized w.r.t. the
+argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
+
+\item \code{expected_cdo_equation,CalibrationParam-method}: calculates the \emph{payoff equation} for a \emph{CDO} (vectorized w.r.t. the
+argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{dim}}{The dimension (number of portfolio items)}
+\item{\code{dim}}{The dimension (number of portfolio items).}
 }}
 
 \section{Probability distribution}{
@@ -193,24 +208,27 @@ i.e. the values
 \section{Expected value}{
 
 The \emph{expectated value} of the \emph{average default counting process} \eqn{L}
-under transformations can be calculated with \code{\link[=expected_value]{expected_value()}}; i.e. the
+under a payoff-transformation can be calculated with \code{\link[=expected_value]{expected_value()}}; i.e. the
 value
 \deqn{
   \mathbb{E}[g(L_t)] , \quad t \geq 0.
 }
-For a portfolio CDS choose \eqn{g(x) = (1 - R) x} and for a CDO tranche with
+For a \emph{portfolio CDS} choose \eqn{g(x) = (1 - R) x} and for a \emph{CDO} tranche with
 attachment points \eqn{l < u} and choose
 \eqn{g(x) = min{\{ \max{\{ (1 - R) x - l, 0 \}}, u - l \}}}, where \eqn{R} is
 the recovery rate.
+\itemize{
+\item \code{\link[=expected_value]{expected_value()}} can be used for general payoff-transformations of the
+\emph{average default counting process}.
+\item \code{\link[=expected_pcds_loss]{expected_pcds_loss()}} and \code{\link[=expected_cdo_loss]{expected_cdo_loss()}} are convenience-wrappers
+for \emph{portfolio CDS} and \emph{CDO} payoff-transformations.
+}
 }
 
 \examples{
-parm <- ExMarkovParam(
- ex_qmatrix = matrix(
-   c(-0.07647059, 0, 0, 0.05294118, -0.05, 0, 0.02352941, 0.05, 0),
-   nrow = 3L, ncol = 3L))
-simulate_adcp(parm, 1, n_sim = 5e1)
-simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 5e1)
+parm <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), d = 5L))
+simulate_adcp(parm, 1, n_sim = 10L)
+simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 10L)
 
 expected_value(CuadrasAugeExtMO2FParam(
   dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
@@ -266,4 +284,7 @@ expected_cdo_equation(
 \linkS4class{ExMarkovParam} \linkS4class{ExMOParam} \linkS4class{ExtMOParam}
 \linkS4class{CuadrasAugeExtMO2FParam} \linkS4class{AlphaStableExtMO2FParam}
 \linkS4class{PoissonExtMO2FParam} \linkS4class{ExponentialExtMO2FParam}
+\linkS4class{ExtArch2FParam} \linkS4class{ClaytonExtArch2FParam}
+\linkS4class{FrankExtArch2FParam} \linkS4class{GumbelExtArch2FParam}
+\linkS4class{JoeExtArch2FParam} \code{\link[=expected_pcds_loss]{expected_pcds_loss()}}, \code{\link[=expected_cdo_loss]{expected_cdo_loss()}}
 }

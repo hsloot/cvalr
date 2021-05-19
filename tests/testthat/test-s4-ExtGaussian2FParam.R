@@ -13,7 +13,7 @@ test_that("`ExtGaussian2FParam`-class is correctly initialized", {
   setDimension(parm) <- d
   setLambda(parm) <- lambda
   setNu(parm) <- nu
-  expect_true(validObject(parm))
+  expect_error(validObject(parm), NA)
   expect_equal(getDimension(parm), d)
   expect_equal(getLambda(parm), lambda)
   expect_equal(getNu(parm), nu)
@@ -25,20 +25,59 @@ test_that("`ExtGaussian2FParam`-class is correctly initialized", {
   expect_equal(parm, ExtGaussian2FParam(d, lambda, tau = tau))
 })
 
+test_that("`ExtGaussian2FParam`-class setters can be used in arbitrary order", { # nolint
+  parm <- ExtGaussian2FParam(d, lambda, nu)
+
+  parm2 <- ExtGaussian2FParam()
+  setDimension(parm2) <- d
+  setLambda(parm2) <- lambda
+  setRho(parm2) <- rho
+  expect_equal(parm, parm2)
+
+  parm2 <- ExtGaussian2FParam()
+  setDimension(parm2) <- d
+  setLambda(parm2) <- lambda
+  setTau(parm2) <- tau
+  expect_equal(parm, parm2)
+
+  parm2 <- ExtGaussian2FParam()
+  setDimension(parm2) <- d
+  setNu(parm2) <- nu
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- ExtGaussian2FParam()
+  setLambda(parm2) <- lambda
+  setDimension(parm2) <- d
+  setNu(parm2) <- nu
+  expect_equal(parm, parm2)
+
+  parm2 <- ExtGaussian2FParam()
+  setNu(parm2) <- nu
+  setDimension(parm2) <- d
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- ExtGaussian2FParam()
+  setLambda(parm2) <- lambda
+  setNu(parm2) <- nu
+  setDimension(parm2) <- d
+  expect_equal(parm, parm2)
+
+  parm2 <- ExtGaussian2FParam()
+  setNu(parm2) <- nu
+  setLambda(parm2) <- lambda
+  setDimension(parm2) <- d
+  expect_equal(parm, parm2)
+})
 
 test_that("`simulate_dt` works as expected for `ExtGaussian2FParam`", {
   # HELPER START
-  rfn <- function(n, d, lambda, nu) {
+  rfn <- function(parm, n) {
     qassert(n, "X1(0,)")
-    qassert(d, "X1(0,)")
-    qassert(lambda, "N1(0,)")
-    qassert(nu, "N1[-1,1]")
-    cop <- copula::normalCopula(param = nu, dim = d, dispstr = "ex")
-    out <- stats::qexp(
-      copula::rCopula(n, cop), rate = lambda, lower.tail = FALSE)
-    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
-
-    out
+    copula::normalCopula(param = getNu(parm), dim = getDimension(parm), dispstr = "ex") %>%
+      copula::rCopula(n, .) %>%
+      qexp(rate = getLambda(parm), lower.tail = FALSE)
   }
   # HELPER END
 
@@ -51,7 +90,7 @@ test_that("`simulate_dt` works as expected for `ExtGaussian2FParam`", {
     x, lower = 0, finite = TRUE, any.missing = FALSE, len = d)
 
   set.seed(1623)
-  y <- rfn(1L, d, lambda, nu)
+  y <- rfn(parm, 1L)
   expect_equal(x, y)
 
   # n and d are larger than 1
@@ -65,38 +104,37 @@ test_that("`simulate_dt` works as expected for `ExtGaussian2FParam`", {
     x, lower = 0, finite = TRUE)
 
   set.seed(1623)
-  y <- rfn(n, d, lambda, nu)
+  y <- rfn(parm, n)
   expect_equal(x, y)
 })
 
 
 test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`", {
   # HELPER START
-  pfn <- function(t, d, lambda, nu) {
-    qassert(t, "N+[0,)")
-    qassert(d, "X1(0,)")
-    qassert(lambda, "N1(0,)")
-    qassert(nu, "N1[-1,1]")
+  pfn <- function(parm, times) {
+    qassert(times, "N+[0,)")
 
-    out <- matrix(nrow = d+1L, ncol = length(t))
-    for (j in seq_along(t)) {
-      if (0 == t[j]) {
+    d <- getDimension(parm)
+    lambda <- getLambda(parm)
+    nu <- getNu(parm)
+    out <- matrix(nrow = d+1L, ncol = length(times))
+    for (j in seq_along(times)) {
+      if (0 == times[j]) {
         out[, j] <- c(1, rep(0, d))
-      } else if (Inf == t[j]) {
+      } else if (Inf == times[j]) {
         out[, j] <- c(rep(0, d), 1)
       } else {
         for (k in 0L:d) {
-          integrand_fn <- function(x) {
-            p <- pnorm((qnorm(pexp(t[j], rate = lambda)) - sqrt(nu) * x) / (sqrt(1 - nu)))
+          int_fn <- function(x) {
+            p <- pnorm((qnorm(pexp(times[j], rate = lambda)) - sqrt(nu) * x) / (sqrt(1 - nu)))
             v_multiply_binomial_coefficient(p^k * (1 - p) ^ (d-k) * dnorm(x), d, k)
           }
-          integral <- integrate(
-            integrand_fn, lower = -Inf, upper = Inf, rel.tol = .Machine$double.eps^0.5)
-          out[k+1L, j] <- integral$value
+          int_res <- integrate(
+            int_fn, lower = -Inf, upper = Inf, rel.tol = .Machine$double.eps^0.5)
+          out[k+1L, j] <- int_res$value
         }
       }
     }
-    if (isTRUE(nrow(out) == 1L || ncol(out) == 1L)) out <- as.vector(out)
 
     out
   }
@@ -110,7 +148,7 @@ test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`
   expect_numeric(
     x, lower = 0, upper = 1, finite = TRUE, any.missing = FALSE, len = d+1L)
   expect_equal(sum(x), 1)
-  expect_equal(x, pfn(times[[1]], d, lambda, nu))
+  expect_equal(x, pfn(parm, times[[1]]))
 
   # length of `times` is larger than 1
   x <- probability_distribution(parm, times)
@@ -119,7 +157,7 @@ test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`
   expect_numeric(
     x, lower = 0, upper = 1, finite = TRUE, any.missing = FALSE)
   expect_equal(apply(x, 2, sum), rep(1, ncol(x)))
-  expect_equal(x, pfn(times, d, lambda, nu))
+  expect_equal(x, pfn(parm, times))
 
   # specify class explicitly
   expect_equal(x, probability_distribution(parm, times, method = "ExtGaussian2FParam"))
@@ -128,12 +166,11 @@ test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`
 
 test_that("`expected_pcds_loss` works as expected for `ExtGaussian2FParam", {
   # HELPER START
-  epcdslfn <- function(t, lambda, recovery_rate) {
-    qassert(t, "N+[0,)")
-    qassert(lambda, "N1(0,)")
+  epcdslfn <- function(parm, times, recovery_rate) {
+    qassert(times, "N+[0,)")
     qassert(recovery_rate, "N1[0,1]")
 
-    (1 - recovery_rate) * pexp(t, rate = lambda)
+    (1 - recovery_rate) * pexp(times, rate = getLambda(parm))
   }
   # HELPER END
 
@@ -144,24 +181,24 @@ test_that("`expected_pcds_loss` works as expected for `ExtGaussian2FParam", {
   x <- expected_pcds_loss(parm, times, recovery_rate = recovery_rate)
   expect_numeric(x, any.missing = FALSE, lower = 0, upper = 1,
     len = length(times), sorted = TRUE)
-  expect_equal(x, epcdslfn(times, lambda, recovery_rate))
+  expect_equal(x, epcdslfn(parm, times, recovery_rate))
 })
 
 
 test_that("`expected_cdo_loss` works as expected for `ExtGaussian2FParam`", {
   # HELPER START
-  ecdolfn <- function(t, lambda, nu, recovery_rate, lower, upper) {
-    qassert(t, "N+[0,)")
-    qassert(lambda, "N1(0,)")
-    qassert(nu, "N1[-1,1]")
+  ecdolfn <- function(parm, times, recovery_rate, lower, upper) {
+    qassert(times, "N+[0,)")
     qassert(recovery_rate, "N1[0,1]")
     qassert(lower, "N1[0,1]")
     qassert(upper, "N1[0,1]")
+    lambda <- getLambda(parm)
+    nu <- getNu(parm)
 
     cop <- copula::normalCopula(param = -sqrt(1 - nu), dim = 2L, dispstr = "ex")
-    u <- cbind(1 - pmin(lower / (1 - recovery_rate), 1), pexp(t, rate = lambda))
-    l <- cbind(1 - pmin(upper / (1 - recovery_rate), 1), pexp(t, rate = lambda))
-    (1 - recovery_rate) * (copula::pCopula(u, cop) - copula::pCopula(l, cop))
+    u_left <- cbind(1 - pmin(lower / (1 - recovery_rate), 1), pexp(times, rate = lambda))
+    u_right <- cbind(1 - pmin(upper / (1 - recovery_rate), 1), pexp(times, rate = lambda))
+    (1 - recovery_rate) * (copula::pCopula(u_left, cop) - copula::pCopula(u_right, cop))
   }
   # HELPER END
 
@@ -174,5 +211,5 @@ test_that("`expected_cdo_loss` works as expected for `ExtGaussian2FParam`", {
   x <- expected_cdo_loss(parm, times, recovery_rate, lower, upper)
   expect_numeric(x, any.missing = FALSE, lower = 0, upper = 1,
     len = length(times), sorted = TRUE)
-  expect_equal(x, ecdolfn(times, lambda, nu, recovery_rate, lower, upper))
+  expect_equal(x, ecdolfn(parm, times, recovery_rate, lower, upper))
 })

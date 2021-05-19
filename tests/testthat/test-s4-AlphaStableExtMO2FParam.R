@@ -17,10 +17,9 @@ test_that("`AlphaStableExtMO2FParam`-class is correctly initialized", {
   expect_s4_class(parm, "AlphaStableExtMO2FParam")
 
   setDimension(parm) <- d
-  setBernsteinFunction(parm) <- bf
   setLambda(parm) <- lambda
   setNu(parm) <- nu
-  expect_true(validObject(parm))
+  expect_error(validObject(parm), NA)
   expect_equal(getDimension(parm), d)
   expect_equal(getExQMatrix(parm), ex_qmatrix)
   expect_equal(getExIntensities(parm), ex_intensities)
@@ -38,4 +37,50 @@ test_that("`AlphaStableExtMO2FParam`-class is correctly initialized", {
   expect_equal(as(parm, "ExtMOParam"), ExtMOParam(d, bf))
   expect_equal(as(parm, "ExMOParam"), ExMOParam(ex_intensities))
   expect_equal(as(parm, "ExMarkovParam"), ExMarkovParam(ex_qmatrix))
+})
+
+test_that("`AlphaStableExtMO2FParam`-class setters can be used in arbitrary order", { # nolint
+  parm <- AlphaStableExtMO2FParam(d, lambda, nu)
+
+  parm2 <- AlphaStableExtMO2FParam()
+  setDimension(parm2) <- d
+  setLambda(parm2) <- lambda
+  setRho(parm2) <- rho
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableExtMO2FParam()
+  setDimension(parm2) <- d
+  setLambda(parm2) <- lambda
+  setTau(parm2) <- tau
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableExtMO2FParam()
+  setDimension(parm2) <- d
+  setNu(parm2) <- nu
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableExtMO2FParam()
+  setLambda(parm2) <- lambda
+  setDimension(parm2) <- d
+  setNu(parm2) <- nu
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableExtMO2FParam()
+  setNu(parm2) <- nu
+  setDimension(parm2) <- d
+  setLambda(parm2) <- lambda
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableExtMO2FParam()
+  setLambda(parm2) <- lambda
+  setNu(parm2) <- nu
+  setDimension(parm2) <- d
+  expect_equal(parm, parm2)
+
+  parm2 <- AlphaStableExtMO2FParam()
+  setNu(parm2) <- nu
+  setLambda(parm2) <- lambda
+  setDimension(parm2) <- d
+  expect_equal(parm, parm2)
 })

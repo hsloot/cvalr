@@ -3,6 +3,9 @@
 \docType{class}
 \name{H2ExtMO3FParam-class}
 \alias{H2ExtMO3FParam-class}
+\alias{initialize,H2ExtMO3FParam-method}
+\alias{initialize,H2ExtMO3FParam,ANY-method}
+\alias{show,H2ExtMO3FParam-method}
 \alias{CuadrasAugeH2ExtMO3FParam-class}
 \alias{CuadrasAugeH2ExtMO3FParam}
 \alias{AlphaStableH2ExtMO3FParam-class}
@@ -11,33 +14,100 @@
 \alias{PoissonH2ExtMO3FParam}
 \alias{ExponentialH2ExtMO3FParam-class}
 \alias{ExponentialH2ExtMO3FParam}
-\title{Two-factor H2-extendible Marshall--Olkin calibration parameter classes}
+\title{Three-factor H2-extendible Marshall--Olkin calibration parameter}
+\usage{
+\S4method{initialize}{H2ExtMO3FParam}(.Object, composition, lambda, nu, fraction, rho, tau, alpha)
+
+\S4method{show}{H2ExtMO3FParam}(object)
+}
+\arguments{
+\item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
+
+\item{composition}{An integerish vector with the composition.}
+
+\item{lambda}{Marginal intensity.}
+
+\item{nu}{(Internal) \emph{Outer} and \emph{inner} bivariate dependence parameter.}
+
+\item{fraction}{(Internal) proportion associated with the global model, see details.}
+
+\item{rho}{\emph{Outer} and \emph{inner} bivariate Spearman's Rho.}
+
+\item{tau}{\emph{Outer} and \emph{inner} bivariate Kendall's Tau.}
+
+\item{alpha}{\emph{Outer} and \emph{inner} bivariate lower tail-dependence coefficient.}
+
+\item{object}{A \linkS4class{CalibrationParam}-object.}
+}
 \description{
-Calibration parameter class with three parameters for the general 2-level
-hierarchically-etendiblew model from the Marshall--Olkin class.
+\linkS4class{CalibrationParam} for the H2-extendible Marshall-Olkin \emph{(average) default counting
+process} model with 3 parameter. Extends \linkS4class{H2ExtMOParam} and related to
+\linkS4class{ExtMO2FParam}.
 }
 \details{
-For all implemented families, the parameters \code{nu}can be replaced by
-\emph{Spearman's Rho} \code{rho}, \emph{Kendall's Tau} \code{tau}, or the \emph{(lower) tail
-dependence coefficient} \code{alpha}.
-For all implemented families, the possible range for \code{rho}, \code{tau}, and
-\code{alpha}, is between zero and one with the restriction that the global
-parameter has to be smaller or equal than the corresponding component
-parameter. Additionally, we support only that parameters of the same type are
-provided, i.e. \code{rho}. The parameters have a one-to-one mapping to \code{nu}.
+The model is defined by the assumption that the \emph{multivariate default times} \eqn{\tau = (\tau_1,
+\ldots, \tau_d)} are H2-extendible Marshall-Olkin, see \linkS4class{H2ExtMOParam} for the details. This
+class provides an interface for easy-to-use, 3-factor families for this model. For all
+implemented families, the \emph{marginal rate} can be specified by \code{lambda} and the \emph{(internal)
+dependence parameters} (model specific) of the global model and the component models can be
+specified by \code{nu}. The dependence parameter \code{nu} should not be set by the user; instead they
+should provide either \code{rho} (\emph{Spearman's Rho}), \code{tau} (\emph{Kendall's Tau}), or \code{alpha} (\emph{lower
+tail-dependence coefficient}).
+The parameters \code{rho}, \code{tau}, or \code{alpha} should be between zero and one, of length 2, and
+non-decreasing; the first value represents the \emph{outer dependence} between components of different
+partition elements and the second value represents the \emph{inner dependence} between components of
+the same partition element. Setting either of the three dependence parameters implicitely sets
+the \code{fraction}-slot, too.
+The link between lower tail-dependence coefficient \eqn{\alpha} and
+Spearman's Rho and Kendall's Tau is (all calculations are component-wise)
+\itemize{
+\item \eqn{\alpha = 4 \rho / (3 + \rho)} and \eqn{\rho = 3 \alpha / (4 - \alpha)}
+\item \eqn{\alpha = 2 \tau / (1 + \tau)} and \eqn{\tau = \alpha / (2 - \alpha)}
 }
+Consider \eqn{\tilde{\alpha}} to be the vector of the actual lower TDC of the global and the
+component model and \eqn{\kappa} to be the \code{fraction} parameter. Then:
+\deqn{
+  \alpha_1 = \kappa \tilde{\alpha}_1,
+    \alpha_2 = \kappa \tilde{\alpha}_1 + (1 - \kappa) \tilde{\alpha}_2
+}
+and
+\deqn{
+  \tilde{\alpha}_1 = \frac{\alpha_1}{\kappa},
+    \tilde{\alpha_2} = \frac{\alpha_2 - \alpha_1}{1 - \kappa} .
+}
+In particular, the boundaries \eqn{\tilde{\alpha}_i \in [0, 1]} impose the restrictions
+\deqn{
+  \alpha_1 \leq \kappa \leq \alpha_1 + (1 - \alpha_2).
+}
+For the families deriving from \linkS4class{H2ExtMO3FParam} we choose the default value for fraction to
+be the midpoint of the admissible interval, i.e.
+\deqn{
+  \kappa
+    = \frac{2 \alpha_1 + 1 - \alpha_2}{2} .
+}
+
+For details on the underlying extendible models, see \linkS4class{ExtMO2FParam}.
+}
+\section{Functions}{
+\itemize{
+\item \code{initialize,H2ExtMO3FParam-method}: Constructor
+
+\item \code{show,H2ExtMO3FParam-method}: Display the object.
+}}
+
 \section{Slots}{
 
 \describe{
-\item{\code{lambda}}{The marginal rate}
+\item{\code{lambda}}{A non-negative number for the marginal rate.}
 
-\item{\code{nu}}{Model-specific dependence parameters for the global- and the
-component-models.}
+\item{\code{nu}}{A numeric vector of length 2 for the model specific dependence parameters (global and
+component specific; range depends on specific model). Use \code{rho}, \code{tau}, or \code{alpha} in the
+constructor to set dependence parameter.}
 }}
 
 \section{Cuadras-Augé calibration parameter class}{
 
-Corresponds to a Lévy subordinators which are a convex combination of
+Corresponds to a Lévy subordinator which is a convex combination of
 a pure-killing subordinator and a pure-drift subordinator.
 \itemize{
 \item \eqn{\psi(x) = \nu + (1 - \nu) x}
@@ -47,7 +117,7 @@ a pure-killing subordinator and a pure-drift subordinator.
 
 \section{Alpha-stable calibration parameter class}{
 
-Corresponds to \eqn{\alpha}-stable subordinators.
+Corresponds to an \eqn{\alpha}-stable subordinator.
 \itemize{
 \item \eqn{\psi(x) = x^\nu}
 \item \eqn{\nu = \log_2(2 - \alpha)} and \eqn{\alpha = 2 - 2^\nu}
@@ -56,23 +126,29 @@ Corresponds to \eqn{\alpha}-stable subordinators.
 
 \section{Poisson calibration parameter class}{
 
-Corresponds to Lévy subordinators which are a convex combination of
-Poisson subordinators with jump size \code{nu} and pure-drift subordinators.
+Corresponds to a Lévy subrodinator which is a convex combination of a
+Poisson subordinator with jump size \code{nu} and a pure-drift subordinator.
 \itemize{
 \item \eqn{\psi(x) = \operatorname{e}^{-\nu}x + (1 - \operatorname{e}^{-x \nu})}
-\item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\eta})}
+\item \eqn{\nu = -log(1 - sqrt(\alpha))} and \eqn{\alpha = (1 - \operatorname{e}^{-\nu})^2}
 }
 }
 
 \section{Exponential calibration parameter class}{
 
-Corresponds to Lévy subordinator which is a convex combination of
-Exponential-jump compound Poisson processes with rate \code{nu} and unit-intensity
-and a pure-drift subordinators.
+Corresponds to a Lévy subordinator which is a convex combination of an
+Exponential-jump compound Poisson process with rate \code{nu} and unit-intensity
+and a pure-drift subordinator.
 \itemize{
-\item \eqn{\psi(x) = (1 - 1 / (1 + \nu))x + 1 / (x + \nu)}
+\item \eqn{\psi(x) = (1 - 1 / (1 + \nu))x + x   / (x + \nu)}
 \item \eqn{\nu = 0.5 \cdot (-3 + \sqrt{1 + 8 / \alpha})}
-and \eqn{\alpha = 2 / (1 + \nu) - 1 / (2 + \nu)}
+and \eqn{\alpha = 2 / (1 + \nu) - 2 / (2 + \nu)}
 }
 }
 
+\examples{
+CuadrasAugeH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+AlphaStableH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+PoissonH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, tau = c(3e-1, 5e-1))
+ExponentialH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, alpha = c(3e-1, 5e-1))
+}
