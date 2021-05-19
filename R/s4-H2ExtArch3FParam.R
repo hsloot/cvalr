@@ -112,7 +112,8 @@ setReplaceMethod("setCopula", "H2ExtArch3FParam", {
 #' @importFrom purrr map
 #' @importFrom checkmate test_numeric qtest assert_numeric qassert
 setMethod("constructCopula", "H2ExtArch3FParam",
-  function(object, family = getFamily(object), nu = getNu(object), composition = getComposition(object)) {
+  function(object,
+           family = getFamily(object), nu = getNu(object), composition = getComposition(object)) {
     assert_choice(family, c("Clayton", "Frank", "Gumbel", "Joe"))
     out <- getCopula(object)
     if (!missing(family) || !missing(nu) || !missing(composition)) {
@@ -136,7 +137,9 @@ setReplaceMethod("setFamily", "H2ExtArch3FParam",
     assert_choice(value, c("Clayton", "Frank", "Gumbel", "Joe"))
     object@family <- value
     copula <- constructCopula(object)
-    if (test_class(copula, "outer_nacopula") && test_choice(copula@copula@name, getFamily(object))) {
+    if (
+        test_class(copula, "outer_nacopula") &&
+        test_choice(copula@copula@name, getFamily(object))) {
       setCopula(object) <- copula
     }
     invisible(object)
@@ -149,7 +152,9 @@ setReplaceMethod("setComposition", "H2ExtArch3FParam",
     qassert(dim, "X1[2,)")
     object <- callNextMethod()
     copula <- constructCopula(object)
-    if (test_class(copula, "outer_nacopula") && test_choice(copula@copula@name, getFamily(object))) {
+    if (
+        test_class(copula, "outer_nacopula") &&
+        test_choice(copula@copula@name, getFamily(object))) {
       setCopula(object) <- copula
     }
 
@@ -168,7 +173,9 @@ setReplaceMethod("setNu", "H2ExtArch3FParam",
     qassert(value, "N2")
     object@nu <- value
     copula <- constructCopula(object)
-    if (test_class(copula, "outer_nacopula") && test_choice(copula@copula@name, getFamily(object))) {
+    if (
+        test_class(copula, "outer_nacopula") &&
+        test_choice(copula@copula@name, getFamily(object))) {
       setCopula(object) <- copula
     }
 
