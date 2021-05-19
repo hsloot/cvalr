@@ -4,8 +4,8 @@ NULL
 #' Three-factor H2-extendible Gaussian calibration parameter
 #'
 #' [CalibrationParam-class] for the H2-extendible Gaussian copula with Exponential margin model for
-#' the *(average) default counting process*  with 3 parameter. Extends [H2ExCalibration-class] and
-#' related to [ExtGaussian2FParam-class].
+#' the *(average) default counting process*  with 3 parameter. Extends [H2ExCalibrationParam-class]
+#' and related to [ExtGaussian2FParam-class].
 #'
 #' @slot lambda A non-negative number for the marginal rate.
 #' @slot nu A numeric vector of length 2 for the model specific dependence parameters (global and
@@ -13,7 +13,7 @@ NULL
 #'   set dependence parameter.
 #'
 #' @details
-#' The model is defined by the assumptoin that the *multivariate default times* \eqn{\tau = (\tau_1,
+#' The model is defined by the assumption that the *multivariate default times* \eqn{\tau = (\tau_1,
 #' \ldots, \tau_d)} are from a H2-extendible Gaussian copula model with Exponential margins.
 #' The model is specified by three parameters (in addition to the composition): The *marginal rate*
 #' `lambda` and the (internal) *outer* and *inner dependency parameters* `nu` (Pearson correlation).
@@ -243,7 +243,7 @@ setMethod("simulate_dt", "H2ExtGaussian3FParam",
 setMethod("show", "H2ExtGaussian3FParam",
  function(object) {
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
-   cat(sprintf("Partition: %s = %s\n", getDimension(object),
+   cat(sprintf("Composition: %s = %s\n", getDimension(object),
      paste(getComposition(object), collapse = " + ")))
    to_vector <- function(x) {
      paste0("(", paste(x, collapse = ", "), ")")
@@ -254,4 +254,6 @@ setMethod("show", "H2ExtGaussian3FParam",
    cat(sprintf("* %s: %s\n", "Tau", to_vector(format(getTau(object)))))
    cat("Internal parameter:\n")
    cat(sprintf("* %s: %s\n", "Nu", to_vector(format(getNu(object)))))
+
+   invisible(NULL)
   })

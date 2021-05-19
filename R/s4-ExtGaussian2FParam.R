@@ -380,4 +380,6 @@ setMethod("show", "ExtGaussian2FParam",
    cat(sprintf("* %s: %s\n", "Tau", format(getTau(object))))
    cat("Internal parameter:\n")
    cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
+
+   invisible(NULL)
   })

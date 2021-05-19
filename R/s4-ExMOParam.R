@@ -141,7 +141,9 @@ setMethod("show", "ExMOParam",
     cat(sprintf("An object of class %s\n", classLabel(class(object))))
     cat(sprintf("Dimension: %i\n", getDimension(object)))
     cat("(Scaled) intensity vector:\n")
-    print(getExIntensities(object))
+    capture.output(print(getExIntensities(object))) %>%
+      paste0("\t", .) %>%
+      writeLines
 
     invisible(NULL)
   })

@@ -36,6 +36,8 @@
 \item{tau}{\emph{Outer} and \emph{inner} bivariate Kendall's Tau.}
 
 \item{alpha}{\emph{Outer} and \emph{inner} bivariate lower tail-dependence coefficient.}
+
+\item{object}{A \linkS4class{CalibrationParam}-object.}
 }
 \description{
 \linkS4class{CalibrationParam} for the H2-extendible Marshall-Olkin \emph{(average) default counting

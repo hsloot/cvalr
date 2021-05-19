@@ -23,7 +23,7 @@
 \alias{JoeH2ExtArch3FParam}
 \alias{initialize,JoeH2ExtArch3FParam-method}
 \alias{initialize,JoeH2ExtArch3FParam,ANY-method}
-\title{Three-factor H2-extendible Archimedean calibration parameter classes}
+\title{Three-factor H2-extendible Archimedean calibration parameter}
 \usage{
 \S4method{initialize}{H2ExtArch3FParam}(
   .Object,
@@ -72,17 +72,24 @@
 \item{n_sim}{Number of samples.}
 }
 \description{
-Calibration parameter classes with three parameters for the 2-level
-hierarchically-extendible Archimedean families with exponential margins.
+\linkS4class{CalibrationParam} for the H2-extendible Archimedean copula with Exponential margin model
+for the \emph{(average) default counting process}  with 3 parameter. Extends
+\linkS4class{H2ExCalibrationParam} and related to \linkS4class{ExtArch2FParam}.
 }
 \details{
-For all implemented families, the parameters \code{nu} can be replaced by
-\emph{Spearman's Rho} \code{rho} or \emph{Kendall's Tau} \code{tau}.
-For all implemented families, the possible range for \code{rho} and \code{tau} is
-between zero and one with the restriction that the global parameter has to be
-smaller or equal than the corresponding component parameter. Additionally, we
-support only that parameters of the same type are provided, i.e. \code{rho}. The
-parameters have a one-to-one mapping to \code{nu}.
+The model is defined by the assumption that the \emph{multivariate default times} \eqn{\tau = (\tau_1,
+\ldots, \tau_d)} are from a H2-extendible Archimedean copula model with Exponential margins. Per
+default, the Archimedean copula is used as a survival copula, except for the Clayton-family.
+The model is specified by three parameters (in addition to the composition): The \emph{marginal rate}
+\code{lambda} and the (internal) \emph{outer} and \emph{inner dependency parameters} \code{nu} (see
+\linkS4class{outer_nacopula}). The dependency parameter \code{nu} should not be set by the uesr; instead
+they should provide either \code{rho} (\emph{Spearman's Rho}) or \code{tau} (\emph{Kendall's Tau}).
+The parameters \code{rho} or \code{tau} should be between zero and one, of length 2, and non-decreasing;
+the first value represents the \emph{outer dependence} between components of different partition
+elements and the second value represents the \emph{inner dependence} between components of the same
+partition element.
+
+For details on the underlying extendible model, see \linkS4class{ExtArch2FParam}.
 }
 \section{Functions}{
 \itemize{
@@ -104,48 +111,25 @@ matrix \code{x} with \code{nrow(x) == n_sim} and \code{ncol(x) == dim(object)} i
 \section{Slots}{
 
 \describe{
-\item{\code{lambda}}{The marginal rate}
+\item{\code{lambda}}{A non-negative number for the marginal rate.}
 
-\item{\code{nu}}{Model-specific dependence parameters for the global- and the
-component-models.}
-
-\item{\code{partition}}{Partition of the components (only adjacent grouping allowed)}
+\item{\code{nu}}{A numeric vector of length 2 for the model specific dependence parameters (global and
+component specific; range depends on specific model). Use \code{rho} or \code{tau} in the constructor to
+set dependence parameter.}
 }}
 
 \examples{
 H2ExtArch3FParam(
-  composition = c(3L, 3L, 4L, 5L),
-  lambda = 8e-2, tau = c(0.3, 0.5),
-  survival = FALSE, family = "Clayton")
-H2ExtArch3FParam(
-  composition = c(3L, 3L, 4L, 5L),
-  lambda = 8e-2, tau = c(0.3, 0.5),
-  survival = TRUE, family = "Gumbel")
+  composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1), survival = TRUE)
 
-parm <- FrankH2ExtArch3FParam(
-  composition = c(2L, 4L, 2L),
-  lambda = 8e-2, rho = c(0.2, 0.7))
-simulate_dt(parm, n_sim = 5e1)
+parm <- FrankH2ExtArch3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(2e-1, 7e-1))
+simulate_dt(parm, n_sim = 5L)
 
-ClaytonH2ExtArch3FParam(
-  composition = c(3L, 3L, 4L, 5L),
-  lambda = 8e-2, tau = c(0.3, 0.5))
-ClaytonH2ExtArch3FParam(
-  composition = c(3L, 3L, 4L, 5L),
-  lambda = 8e-2, rho = c(0.3, 0.5))
-FrankH2ExtArch3FParam(
-  composition = c(3L, 3L, 4L, 5L),
-  lambda = 8e-2, tau = c(0.3, 0.5))
-FrankH2ExtArch3FParam(
-  composition = c(3L, 3L, 4L, 5L),
-  lambda = 8e-2, rho = c(0.3, 0.5))
-GumbelH2ExtArch3FParam(
-  composition = c(3L, 3L, 4L, 5L),
-  lambda = 8e-2, tau = c(0.3, 0.5))
-GumbelH2ExtArch3FParam(
-  composition = c(3L, 3L, 4L, 5L),
-  lambda = 8e-2, rho = c(0.3, 0.5))
-JoeH2ExtArch3FParam(
-  composition = c(3L, 3L, 4L, 5L),
-  lambda = 8e-2, tau = c(0.3, 0.5))
+ClaytonH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
+ClaytonH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+FrankH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
+FrankH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+GumbelH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
+GumbelH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+JoeH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 }

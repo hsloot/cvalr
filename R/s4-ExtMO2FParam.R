@@ -422,6 +422,8 @@ setMethod("show", "ExtMO2FParam",
    cat(sprintf("* %s: %s\n", "Alpha", format(getAlpha(object))))
    cat("Internal parameter:\n")
    cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
+
+   invisible(NULL)
   })
 
 

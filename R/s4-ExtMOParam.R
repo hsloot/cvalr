@@ -129,7 +129,9 @@ setMethod("show", "ExtMOParam",
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
    cat(sprintf("Dimension: %i\n", getDimension(object)))
    cat("Bernstein function:\n")
-   print(getBernsteinFunction(object))
+   capture.output(print(getBernsteinFunction(object))) %>%
+     paste0("\t", .) %>%
+     writeLines
 
    invisible(NULL)
  })

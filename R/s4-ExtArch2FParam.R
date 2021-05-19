@@ -374,6 +374,8 @@ setMethod("show", "ExtArch2FParam",
    cat("Internal parameter:\n")
    cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
    cat(sprintf("* %s: %s\n", "Survival copula", ifelse(getSurvival(object), "Yes", "No")))
+
+   invisible(NULL)
  })
 
 

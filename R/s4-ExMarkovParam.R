@@ -192,7 +192,9 @@ setMethod("show", "ExMarkovParam",
     cat(sprintf("An object of class %s\n", classLabel(class(object))))
     cat(sprintf("Dimension: %i\n", getDimension(object)))
     cat("Generator matrix:\n")
-    print.table(getExQMatrix(object), zero.print = "")
+    capture.output(print.table(getExQMatrix(object), zero.print = "")) %>%
+      paste0("\t", .) %>%
+      writeLines
 
     invisible(NULL)
   })

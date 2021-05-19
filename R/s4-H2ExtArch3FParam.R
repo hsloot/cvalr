@@ -1,24 +1,31 @@
-#' @include s4-H2ExCalibrationParam.R s4-H2ExtMO3FParam.R checkmate.R
+#' @include s4-H2ExCalibrationParam.R s4-H2ExtMO3FParam.R s4-H2ExtGaussian3FParam.R checkmate.R
 NULL
 
-#' Three-factor H2-extendible Archimedean calibration parameter classes
+#' Three-factor H2-extendible Archimedean calibration parameter
 #'
-#' Calibration parameter classes with three parameters for the 2-level
-#' hierarchically-extendible Archimedean families with exponential margins.
+#' [CalibrationParam-class] for the H2-extendible Archimedean copula with Exponential margin model
+#' for the *(average) default counting process*  with 3 parameter. Extends
+#' [H2ExCalibrationParam-class] and related to [ExtArch2FParam-class].
 #'
-#' @slot lambda The marginal rate
-#' @slot nu Model-specific dependence parameters for the global- and the
-#'   component-models.
-#' @slot partition Partition of the components (only adjacent grouping allowed)
+#' @slot lambda A non-negative number for the marginal rate.
+#' @slot nu A numeric vector of length 2 for the model specific dependence parameters (global and
+#'   component specific; range depends on specific model). Use `rho` or `tau` in the constructor to
+#'   set dependence parameter.
 #'
 #' @details
-#' For all implemented families, the parameters `nu` can be replaced by
-#' *Spearman's Rho* `rho` or *Kendall's Tau* `tau`.
-#' For all implemented families, the possible range for `rho` and `tau` is
-#' between zero and one with the restriction that the global parameter has to be
-#' smaller or equal than the corresponding component parameter. Additionally, we
-#' support only that parameters of the same type are provided, i.e. `rho`. The
-#' parameters have a one-to-one mapping to `nu`.
+#' The model is defined by the assumption that the *multivariate default times* \eqn{\tau = (\tau_1,
+#' \ldots, \tau_d)} are from a H2-extendible Archimedean copula model with Exponential margins. Per
+#' default, the Archimedean copula is used as a survival copula, except for the Clayton-family.
+#' The model is specified by three parameters (in addition to the composition): The *marginal rate*
+#' `lambda` and the (internal) *outer* and *inner dependency parameters* `nu` (see
+#' [outer_nacopula-class]). The dependency parameter `nu` should not be set by the uesr; instead
+#' they should provide either `rho` (*Spearman's Rho*) or `tau` (*Kendall's Tau*).
+#' The parameters `rho` or `tau` should be between zero and one, of length 2, and non-decreasing;
+#' the first value represents the *outer dependence* between components of different partition
+#' elements and the second value represents the *inner dependence* between components of the same
+#' partition element.
+#'
+#' For details on the underlying extendible model, see [ExtArch2FParam-class].
 #'
 #' @export H2ExtArch3FParam
 H2ExtArch3FParam <- setClass("H2ExtArch3FParam", # nolint
@@ -26,6 +33,51 @@ H2ExtArch3FParam <- setClass("H2ExtArch3FParam", # nolint
   slots = c(lambda = "numeric", nu = "numeric", family = "character",
     survival = "logical", copula = "outer_nacopula"))
 
+
+setMethod("getModelName", "H2ExtArch3FParam",
+  function(object) {
+    "ExtArch2FParam"
+  })
+
+setMethod("getFamily", "outer_nacopula",
+  function(object) {
+    object@copula@name
+  })
+
+setMethod("getDimension", "outer_nacopula",
+  function(object) {
+    dim(object)
+  })
+
+setMethod("getComposition", "outer_nacopula",
+  function(object) {
+    map_int(object@childCops, dim)
+  })
+
+#' @importFrom copula getTheta
+setMethod("getNu", "outer_nacopula",
+  function(object) {
+    c(getTheta(object@copula), getTheta(object@childCops[[1]]@copula))
+  })
+
+setMethod("getFamily", "H2ExtArch3FParam",
+  function(object) {
+    object@family
+  })
+
+setMethod("getSurvival", "H2ExtArch3FParam",
+  function(object) {
+    object@survival
+  })
+
+#' @importFrom checkmate qassert
+setReplaceMethod("setSurvival", "H2ExtArch3FParam",
+  function(object, value) {
+    qassert(value, "B1")
+    object@survival <- value
+
+    invisible(object)
+  })
 
 setMethod("getLambda", "H2ExtArch3FParam",
   function(object) {
@@ -40,42 +92,169 @@ setReplaceMethod("setLambda", "H2ExtArch3FParam",
     invisible(object)
   })
 
+setMethod("getCopula", "H2ExtArch3FParam",
+  function(object) {
+    object@copula
+  })
+
+#' @importFrom checkmate assert check_class
+setReplaceMethod("setCopula", "H2ExtArch3FParam", {
+  function(object, value) {
+    assert(combine = "and",
+      check_class(value, "outer_nacopula"), check_choice(value@copula@name, getFamily(object)))
+    object@copula <- value
+
+    invisible(object)
+  }
+})
+
+#' @importFrom copula onacopulaL
+#' @importFrom purrr map
+#' @importFrom checkmate test_numeric qtest assert_numeric qassert
+setMethod("constructCopula", "H2ExtArch3FParam",
+  function(object, family = getFamily(object), nu = getNu(object), composition = getComposition(object)) {
+    assert_choice(family, c("Clayton", "Frank", "Gumbel", "Joe"))
+    out <- getCopula(object)
+    if (!missing(family) || !missing(nu) || !missing(composition)) {
+      assert_numeric(nu, any.missing = FALSE, finite = TRUE, len = 2L, sorted = TRUE)
+      qassert(composition, "X+[1,)")
+      qassert(sum(composition), "X1[2,)")
+      nac_list <- list(nu[[1]], c(), map(getPartition(object), ~list(nu[[2]], .)))
+      out <- onacopulaL(family, nac_list)
+    } else if (
+        test_numeric(nu, any.missing = FALSE, finite = TRUE, len = 2L, sorted = TRUE) &&
+        qtest(composition, "X+[1,)") && qtest(sum(composition), "X1[2,)")) {
+      nac_list <- list(nu[[1]], c(), map(getPartition(object), ~list(nu[[2]], .)))
+      out <- onacopulaL(family, nac_list)
+    }
+
+    out
+  })
+
+setReplaceMethod("setFamily", "H2ExtArch3FParam",
+  function(object, value) {
+    assert_choice(value, c("Clayton", "Frank", "Gumbel", "Joe"))
+    object@family <- value
+    copula <- constructCopula(object)
+    if (test_class(copula, "outer_nacopula") && test_choice(copula@copula@name, getFamily(object))) {
+      setCopula(object) <- copula
+    }
+    invisible(object)
+  })
+
+setReplaceMethod("setComposition", "H2ExtArch3FParam",
+  function(object, value) {
+    qassert(value, "X+[1,)")
+    dim <- sum(value)
+    qassert(dim, "X1[2,)")
+    object <- callNextMethod()
+    copula <- constructCopula(object)
+    if (test_class(copula, "outer_nacopula") && test_choice(copula@copula@name, getFamily(object))) {
+      setCopula(object) <- copula
+    }
+
+    invisible(object)
+  })
+
 setMethod("getNu", "H2ExtArch3FParam",
   function(object) {
     object@nu
   })
-#' @importFrom copula onacopulaL
+
 #' @importFrom purrr map
 #' @importFrom checkmate qassert
 setReplaceMethod("setNu", "H2ExtArch3FParam",
   function(object, value) {
     qassert(value, "N2")
     object@nu <- value
-    object@copula <- onacopulaL(
-      family = object@family,
-      nacList = list(value[[1]], c(), map(getPartition(object), ~list(value[[2]], .))))
+    copula <- constructCopula(object)
+    if (test_class(copula, "outer_nacopula") && test_choice(copula@copula@name, getFamily(object))) {
+      setCopula(object) <- copula
+    }
 
     invisible(object)
+  })
+
+#' @importFrom copula rho
+#' @importFrom purrr map
+#' @importFrom checkmate assert_numeric
+setMethod("calcNu2Rho", "H2ExtArch3FParam",
+  function(object, value) {
+    assert_numeric(value, any.missing = FALSE, len = 2L, sorted = TRUE)
+    map_dbl(value, ~rho(archmCopula(getFamily(object), .)))
   })
 
 #' @importFrom copula rho
 #' @importFrom purrr map_dbl
 setMethod("getRho", "H2ExtArch3FParam",
   function(object) {
-    rho <- function(x) {
-      copula::rho(archmCopula(family = object@family, param = x@theta, dim = 2))
-    }
-    c(rho(object@copula@copula), rho(object@copula@childCops[[1]]@copula))
+    calcNu2Rho(object, getNu(object))
+  })
+
+#' @importFrom copula iRho
+#' @importFrom purrr map
+#' @importFrom checkmate assert_numeric
+setMethod("calcRho2Nu", "H2ExtArch3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    map_dbl(value, ~iRho(archmCopula(getFamily(object)), .))
+  })
+
+#' @importFrom checkmate assert_numeric
+setMethod("invRho", "H2ExtArch3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    calcRho2Nu(object, value)
+  })
+
+#' @importFrom checkmate assert_numeric
+setReplaceMethod("setRho", "H2ExtArch3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    setNu(object) <- invRho(object, value)
+
+    invisible(object)
+  })
+
+#' @importFrom copula tau
+#' @importFrom purrr map
+#' @importFrom checkmate assert_numeric
+setMethod("calcNu2Tau", "H2ExtArch3FParam",
+  function(object, value) {
+    assert_numeric(value, any.missing = FALSE, len = 2L, sorted = TRUE)
+    map_dbl(value, ~tau(archmCopula(getFamily(object), .)))
   })
 
 #' @importFrom copula rho
 #' @importFrom purrr map_dbl
 setMethod("getTau", "H2ExtArch3FParam",
   function(object) {
-    tau <- function(x) {
-      copula::tau(archmCopula(family = object@family, param = x@theta, dim = 2))
-    }
-    c(tau(object@copula@copula), tau(object@copula@childCops[[1]]@copula))
+    calcNu2Tau(object, getNu(object))
+  })
+
+#' @importFrom copula iTau
+#' @importFrom purrr map
+#' @importFrom checkmate assert_numeric
+setMethod("calcTau2Nu", "H2ExtArch3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    map_dbl(value, ~iTau(archmCopula(getFamily(object)), .))
+  })
+
+#' @importFrom checkmate assert_numeric
+setMethod("invTau", "H2ExtArch3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    calcTau2Nu(object, value)
+  })
+
+#' @importFrom checkmate assert_numeric
+setReplaceMethod("setTau", "H2ExtArch3FParam",
+  function(object, value) {
+    assert_numeric(value, lower = 0, upper = 1, any.missing = FALSE, len = 2L, sorted = TRUE)
+    setNu(object) <- invTau(object, value)
+
+    invisible(object)
   })
 
 
@@ -85,11 +264,8 @@ setValidity("H2ExtArch3FParam",
     qassert(object@lambda, "N1(0,)")
     qassert(object@nu, "N2(0,)")
     qassert(object@survival, "B1")
-    assert_true(object@dim == dim(object@copula))
-    assert_true(
-      check_equal(
-        object@nu,
-        c(object@copula@copula@theta, object@copula@childCops[[1]]@copula@theta)))
+    assert_true(object@dim == getDimension(object@copula))
+    assert_true(check_equal(object@nu, getNu(object@copula)))
 
     invisible(TRUE)
   })
@@ -112,13 +288,7 @@ setValidity("H2ExtArch3FParam",
 #'
 #' @examples
 #' H2ExtArch3FParam(
-#'   composition = c(3L, 3L, 4L, 5L),
-#'   lambda = 8e-2, tau = c(0.3, 0.5),
-#'   survival = FALSE, family = "Clayton")
-#' H2ExtArch3FParam(
-#'   composition = c(3L, 3L, 4L, 5L),
-#'   lambda = 8e-2, tau = c(0.3, 0.5),
-#'   survival = TRUE, family = "Gumbel")
+#'   composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1), survival = TRUE)
 #'
 #' @importFrom utils head
 #' @importFrom copula archmCopula onacopulaL iRho iTau
@@ -129,30 +299,19 @@ setMethod("initialize", "H2ExtArch3FParam",
       lambda = 1e-1, nu = c(0.2, 0.3), rho = NULL, tau = NULL,
       survival = TRUE,
       family = c("Clayton", "Frank", "Gumbel", "Joe")) {
-    family <- match.arg(family)
-    .Object@family <- family
-    .Object@survival <- survival
-    acopula <- archmCopula(family = family)
+    setFamily(.Object) <- match.arg(family)
+    setSurvival(.Object) <- survival
     if (!missing(composition) && !missing(lambda) &&
           (!missing(nu) || !missing(rho) || !missing(tau))) {
-      if (missing(nu)) {
-        if (!is.null(rho)) {
-          nu <- map_dbl(rho, ~copula::iRho(acopula, .))
-        } else if (!is.null(tau)) {
-          nu <- map_dbl(tau, ~copula::iTau(acopula, .))
-        }
-      }
-
-      dim <- sum(composition)
       setComposition(.Object) <- composition
-      .Object@lambda <- lambda
-      .Object@nu <- nu
-
-      partition <- map2(c(0, cumsum(head(composition, -1L))), composition, ~{
-          .x + 1:.y
-        })
-      .Object@copula <- onacopulaL(
-        family = family, list(nu[[1]], c(), map(partition, ~list(nu[[2]], .))))
+      setLambda(.Object) <- lambda
+      if (!missing(nu)) {
+        setNu(.Object) <- nu
+      } else if (!missing(rho)) {
+        setRho(.Object) <- rho
+      } else if (!missing(tau)) {
+        setTau(.Object) <- tau
+      }
 
       validObject(.Object)
     }
@@ -161,26 +320,30 @@ setMethod("initialize", "H2ExtArch3FParam",
   })
 
 
-setMethod("getModelName", "H2ExtArch3FParam",
-  function(object) {
-    "ExtArch2FParam"
-  })
+#' @describeIn H2ExtGaussian3FParam-class Display the object.
+#' @aliases show,H2ExtGaussian3FParam-method
+#'
+#' @inheritParams methods::show
+#'
+#' @export
+setMethod("show", "H2ExtArch3FParam",
+ function(object) {
+   cat(sprintf("An object of class %s\n", classLabel(class(object))))
+   cat(sprintf("Composition: %s = %s\n", getDimension(object),
+     paste(getComposition(object), collapse = " + ")))
+   to_vector <- function(x) {
+     paste0("(", paste(x, collapse = ", "), ")")
+   }
+   cat("Parameter:\n")
+   cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+   if (isTRUE("Joe" != getFamily(object))) {
+     cat(sprintf("* %s: %s\n", "Rho", to_vector(format(getRho(object)))))
+   }
+   cat(sprintf("* %s: %s\n", "Tau", to_vector(format(getTau(object)))))
+   cat("Internal parameter:\n")
+   cat(sprintf("* %s: %s\n", "Nu", to_vector(format(getNu(object)))))
 
-#' @importFrom copula iRho
-#' @importFrom purrr map_dbl
-#' @importFrom checkmate qassert
-setMethod("invRho", "H2ExtArch3FParam",
-  function(object, value) {
-    qassert(value, "N2[0,1]")
-    map_dbl(value, ~copula::iRho(object@copula@copula, .))
-  })
-
-#' @importFrom copula iTau
-#' @importFrom checkmate qassert
-setMethod("invTau", "H2ExtArch3FParam",
-  function(object, value) {
-    qassert(value, "N2[0,1]")
-    copula::iTau(object@copula@copula, value)
+   invisible(NULL)
   })
 
 
@@ -194,22 +357,16 @@ setMethod("invTau", "H2ExtArch3FParam",
 #' @param n_sim Number of samples.
 #'
 #' @examples
-#' parm <- FrankH2ExtArch3FParam(
-#'   composition = c(2L, 4L, 2L),
-#'   lambda = 8e-2, rho = c(0.2, 0.7))
-#' simulate_dt(parm, n_sim = 5e1)
+#' parm <- FrankH2ExtArch3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(2e-1, 7e-1))
+#' simulate_dt(parm, n_sim = 5L)
 #'
 #' @importFrom stats qexp
 #' @importFrom copula rCopula
 #' @include utils.R
 setMethod("simulate_dt", "H2ExtArch3FParam",
   function(object, ..., n_sim = 1e4) {
-    out <- qexp(
-      rCopula(n_sim, object@copula),
-      rate = object@lambda, lower.tail = !object@survival
-    )
-
-    simplify2vector(out)
+    rCopula(n_sim, getCopula(object)) %>%
+      qexp(rate = getLambda(object), lower.tail = !getSurvival(object))
   })
 
 
@@ -229,12 +386,8 @@ ClaytonH2ExtArch3FParam <- setClass("ClaytonH2ExtArch3FParam", # nolint
 #' @param ... Pass-through parameters.
 #'
 #' @examples
-#' ClaytonH2ExtArch3FParam(
-#'   composition = c(3L, 3L, 4L, 5L),
-#'   lambda = 8e-2, tau = c(0.3, 0.5))
-#' ClaytonH2ExtArch3FParam(
-#'   composition = c(3L, 3L, 4L, 5L),
-#'   lambda = 8e-2, rho = c(0.3, 0.5))
+#' ClaytonH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
+#' ClaytonH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 setMethod("initialize", "ClaytonH2ExtArch3FParam",
   function(.Object, ..., survival = FALSE) { # nolint
     invisible(callNextMethod(.Object, ..., survival = survival, family = "Clayton"))
@@ -263,12 +416,8 @@ FrankH2ExtArch3FParam <- setClass("FrankH2ExtArch3FParam", # nolint
 #' @param ... Pass-through parameters.
 #'
 #' @examples
-#' FrankH2ExtArch3FParam(
-#'   composition = c(3L, 3L, 4L, 5L),
-#'   lambda = 8e-2, tau = c(0.3, 0.5))
-#' FrankH2ExtArch3FParam(
-#'   composition = c(3L, 3L, 4L, 5L),
-#'   lambda = 8e-2, rho = c(0.3, 0.5))
+#' FrankH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
+#' FrankH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 setMethod("initialize", "FrankH2ExtArch3FParam",
   function(.Object, ..., survival = TRUE) { # nolint
     invisible(callNextMethod(.Object, ..., survival = survival, family = "Frank"))
@@ -297,12 +446,8 @@ GumbelH2ExtArch3FParam <- setClass("GumbelH2ExtArch3FParam", # nolint
 #' @param ... Pass-through parameters.
 #'
 #' @examples
-#' GumbelH2ExtArch3FParam(
-#'   composition = c(3L, 3L, 4L, 5L),
-#'   lambda = 8e-2, tau = c(0.3, 0.5))
-#' GumbelH2ExtArch3FParam(
-#'   composition = c(3L, 3L, 4L, 5L),
-#'   lambda = 8e-2, rho = c(0.3, 0.5))
+#' GumbelH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
+#' GumbelH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 setMethod("initialize", "GumbelH2ExtArch3FParam",
   function(.Object, ..., survival = TRUE) { # nolint
     invisible(callNextMethod(.Object, ..., survival = survival, family = "Gumbel"))
@@ -331,9 +476,7 @@ JoeH2ExtArch3FParam <- setClass("JoeH2ExtArch3FParam", # nolint
 #' @param ... Pass-through parameters.
 #'
 #' @examples
-#' JoeH2ExtArch3FParam(
-#'   composition = c(3L, 3L, 4L, 5L),
-#'   lambda = 8e-2, tau = c(0.3, 0.5))
+#' JoeH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 setMethod("initialize", "JoeH2ExtArch3FParam",
   function(.Object, ..., survival = TRUE) { # nolint
     invisible(callNextMethod(.Object, ..., survival = survival, family = "Joe"))

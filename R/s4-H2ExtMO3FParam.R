@@ -1,4 +1,4 @@
-#' @include s4-H2ExtMOParam.R checkmate.R
+#' @include s4-H2ExtMOParam.R s4-ExtMO2FParam.R checkmate.R
 NULL
 
 #' Three-factor H2-extendible Marshall--Olkin calibration parameter
@@ -293,6 +293,8 @@ setMethod("getModelName", "H2ExtMO3FParam",
 #' @describeIn H2ExtMO3FParam-class Display the object.
 #' @aliases show,H2ExtMO3FParam-method
 #'
+#' @param object A [CalibrationParam-class]-object.
+#'
 #' @importFrom utils capture.output
 #' @importFrom purrr map compose flatten_chr
 #'
@@ -300,7 +302,7 @@ setMethod("getModelName", "H2ExtMO3FParam",
 setMethod("show", "H2ExtMO3FParam",
   function(object) {
     cat(sprintf("An object of class %s\n", classLabel(class(object))))
-    cat(sprintf("Partition: %s = %s\n", getDimension(object),
+    cat(sprintf("Composition: %s = %s\n", getDimension(object),
       paste(getComposition(object), collapse = " + ")))
     to_vector <- function(x) {
       paste0("(", paste(x, collapse = ", "), ")")

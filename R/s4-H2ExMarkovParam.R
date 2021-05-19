@@ -201,7 +201,7 @@ setMethod("simulate_dt", "H2ExMarkovParam",
 setMethod("show", "H2ExMarkovParam",
   function(object) {
     cat(sprintf("An object of class %s\n", classLabel(class(object))))
-    cat(sprintf("Partition: %s = %s\n", getDimension(object),
+    cat(sprintf("Composition: %s = %s\n", getDimension(object),
       paste(getComposition(object), collapse = " + ")))
     cat(sprintf("Fraction: %s\n", format(getFraction(object))))
     cat("Models:\n")
