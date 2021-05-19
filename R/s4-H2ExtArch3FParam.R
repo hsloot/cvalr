@@ -501,6 +501,6 @@ setMethod("getModelName", "JoeH2ExtArch3FParam",
 
 setReplaceMethod("setRho", "JoeH2ExtArch3FParam",
   function(object, value) {
-    stop(paste0("Spearman's Rho not implemented for family ", 
+    stop(paste0("Spearman's Rho not implemented for family ",
       getFamily(object), "H2ExtArch3FParam"))
   })
