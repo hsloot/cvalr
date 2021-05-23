@@ -1,7 +1,11 @@
-#' @importFrom methods setClass setValidity setGeneric setMethod
-#'   setReplaceMethod validObject is as new callNextMethod show classLabel
+#' @importFrom methods setClass setValidity setGeneric setMethod setReplaceMethod
+#'   validObject is as new callNextMethod show classLabel
 #' @include checkmate.R
 NULL
+
+# nolint start
+ERR_MSG_DIM <- "`dim` must be scalar integer >= 2"
+# nolint end
 
 #' Virtual super-class for calibration parameters
 #'
@@ -50,10 +54,12 @@ setReplaceMethod("setDimension", "CalibrationParam",
   })
 
 
-#' @importFrom checkmate qassert
+#' @importFrom checkmate qtest
 setValidity("CalibrationParam",
   function(object) {
-    qassert(object@dim, "I1[2,)")
+    if (!qtest(object@dim, "I1[2,)")) {
+      return(ERR_MSG_DIM)
+    }
 
     invisible(TRUE)
   })

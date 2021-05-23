@@ -1,6 +1,10 @@
 #' @include s4-CalibrationParam.R checkmate.R
 NULL
 
+# nolint start
+ERR_MSG_COMPOSITION <- "`Composition` must be a valid composition of `dim`"
+# nolint end
+
 #' Virtual super-class for H2-exchangeable calibration parameters
 #'
 #' [H2ExCalibrationParam-class] provides a simple interface to calculate
@@ -69,8 +73,10 @@ setMethod("getPartition", "H2ExCalibrationParam",
 #' @importFrom checkmate qassert assert_choice
 setValidity("H2ExCalibrationParam",
   function(object) {
-    qassert(object@composition, "I+[1,)")
-    assert_choice(sum(object@composition), object@dim)
+    if (!(qtest(object@composition, "I+[1,)") &&
+        test_choice(sum(object@composition), getDimension(object)))) {
+      return(ERR_MSG_COMPOSITION)
+    }
 
     invisible(TRUE)
   })

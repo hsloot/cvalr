@@ -1,3 +1,7 @@
+# cvalr 0.2.1
+
+- Fix validity methods
+
 # cvalr 0.2
 
 - Code refactoring and tests added

@@ -1,6 +1,10 @@
 #' @include s4-ExMOParam.R checkmate.R
 NULL
 
+# nolint start
+ERR_MSG_BF <- "`bf` must be a valid object that inherits from `BernsteinFunction`"
+# nolint end
+
 #' Extendible Marshall--Olkin calibration parameter
 #'
 #' @description
@@ -34,7 +38,7 @@ NULL
 #' @export ExtMOParam
 ExtMOParam <- setClass("ExtMOParam", # nolint
   contains = "ExMOParam",
-  slots = c(bf = "BernsteinFunction"))
+  slots = c(bf = "ANY"))
 
 #' @importFrom rmo exIntensities
 #' @importFrom checkmate test_class qassert
@@ -82,11 +86,15 @@ setReplaceMethod("setBernsteinFunction", "ExtMOParam",
 
 #' @importFrom checkmate assert_class
 setValidity("ExtMOParam",
- function(object) {
-   assert_class(object@bf, "BernsteinFunction")
+  function(object) {
+    if (!(
+        test_class(object@bf, "BernsteinFunction") &&
+          isTRUE(validObject(object@bf, test = TRUE)))) {
+      return(ERR_MSG_BF)
+    }
 
-   invisible(TRUE)
- })
+    invisible(TRUE)
+  })
 
 
 #' @describeIn ExtMOParam-class Constructor
@@ -98,6 +106,7 @@ setValidity("ExtMOParam",
 #' @param bf Bernstein function.
 #'
 #' @examples
+#' ExtMOParam()
 #' ExtMOParam(
 #'   dim = 2,
 #'   bf = rmo::ScaledBernsteinFunction(
@@ -127,11 +136,15 @@ setMethod("initialize", "ExtMOParam",
 setMethod("show", "ExtMOParam",
  function(object) {
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
-   cat(sprintf("Dimension: %i\n", getDimension(object)))
-   cat("Bernstein function:\n")
-   capture.output(print(getBernsteinFunction(object))) %>%
-     paste0("\t", .) %>%
-     writeLines
+   if (isTRUE(validObject(object, test = TRUE))) {
+     cat(sprintf("Dimension: %i\n", getDimension(object)))
+     cat("Bernstein function:\n")
+     capture.output(print(getBernsteinFunction(object))) %>%
+       paste0("\t", .) %>%
+       writeLines
+   } else {
+     cat("\t (invalid or not initialized)\n")
+   }
 
    invisible(NULL)
  })

@@ -1,6 +1,11 @@
 #' @include s4-H2ExCalibrationParam.R checkmate.R
 NULL
 
+# nolint start
+ERR_MSG_FRACTION <- "`fraction` must be in [0,1]"
+ERR_MSG_MODELS <- "`models` has wrong type"
+# nolint end
+
 #' H2-exchangeable Markovian calibration parameter
 #'
 #' [CalibrationParam-class] for the H2-exchangeable Markovian *(average) default counting process*
@@ -104,17 +109,24 @@ setMethod("getPartitionModels", "H2ExMarkovParam",
 
 
 #' @importFrom methods is
-#' @importFrom purrr map_lgl map_int walk
-#' @importFrom checkmate qassert assert_true assert_list
-setValidity("H2ExMarkovParam",
+#' @importFrom purrr map_lgl map2_lgl map_int walk
+#' @importFrom checkmate qtest test_choice test_list
+setValidity("H2ExMarkovParam", # nolint
   function(object) {
-    qassert(object@fraction, "N1(0,1)")
-    assert_list(
-      object@models, types = getModelName(object), any.missing = FALSE,
-      len = length(object@composition) + 1L)
-    walk(object@models, validObject)
-    assert_true(getDimension(object@models[[1]]) == object@dim)
-    assert_true(all(map_int(object@models[-1], getDimension) == object@composition))
+    if (!qtest(object@fraction, "N1(0,1)")) {
+      return(ERR_MSG_FRACTION)
+    }
+    if (!(
+        test_list(object@models, types = getModelName(object), any.missing = FALSE,
+          len = length(getComposition(object)) + 1L) &&
+        all(map_lgl(object@models, ~isTRUE(validObject(., test = TRUE)))) &&
+        test_choice(getDimension(getGlobalModel(object)), getDimension(object)) &&
+        test_choice(length(getPartitionModels(object)), length(getComposition(object))) &&
+        all(map2_lgl(getPartitionModels(object), getComposition(object), ~{
+          getDimension(.x) == .y
+        })))) {
+      return(ERR_MSG_MODELS)
+    }
 
     invisible(TRUE)
   })
@@ -131,6 +143,7 @@ setValidity("H2ExMarkovParam",
 #' @param ... Pass-through parameters.
 #'
 #' @examples
+#' H2ExMarkovParam()
 #' composition <- c(2L, 4L, 2L)
 #' d <- sum(composition)
 #' model_global <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), d))
@@ -201,24 +214,29 @@ setMethod("simulate_dt", "H2ExMarkovParam",
 setMethod("show", "H2ExMarkovParam",
   function(object) {
     cat(sprintf("An object of class %s\n", classLabel(class(object))))
-    cat(sprintf("Composition: %s = %s\n", getDimension(object),
-      paste(getComposition(object), collapse = " + ")))
-    cat(sprintf("Fraction: %s\n", format(getFraction(object))))
-    cat("Models:\n")
-    cat("* Global model\n")
-    writeLines(paste0("\t", capture.output(show(as(getGlobalModel(object), getModelName(object))))))
-    cat("* Partition models:\n")
-    to_list_item <- function(x) {
-      out <- rep("  ", length(x))
-      out[[1]] <- "- "
+    if (isTRUE(validObject(object, test = TRUE))) {
+      cat(sprintf("Composition: %s = %s\n", getDimension(object),
+        paste(getComposition(object), collapse = " + ")))
+      cat(sprintf("Fraction: %s\n", format(getFraction(object))))
+      cat("Models:\n")
+      cat("* Global model\n")
+      writeLines(
+        paste0("\t", capture.output(show(as(getGlobalModel(object), getModelName(object))))))
+      cat("* Partition models:\n")
+      to_list_item <- function(x) {
+        out <- rep("  ", length(x))
+        out[[1]] <- "- "
 
-      paste0(out, x)
+        paste0(out, x)
+      }
+      getPartitionModels(object) %>%
+        map(compose(to_list_item, ~capture.output(show(.)), ~as(., getModelName(object)))) %>%
+        flatten_chr %>%
+        paste0("\t", .) %>%
+        writeLines
+    } else {
+      cat("\t (invalid or not initialized)\n")
     }
-    getPartitionModels(object) %>%
-      map(compose(to_list_item, ~capture.output(show(.)), ~as(., getModelName(object)))) %>%
-      flatten_chr %>%
-      paste0("\t", .) %>%
-      writeLines
 
     invisible(NULL)
     })

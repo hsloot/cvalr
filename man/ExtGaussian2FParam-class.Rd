@@ -178,6 +178,7 @@ distribution function for rate \eqn{\lambda}.
 }
 
 \examples{
+ExtGaussian2FParam()
 ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 parm <- ExtGaussian2FParam(5L, 8e-2, rho = 4e-1)
 simulate_dt(parm, n_sim = 5L)

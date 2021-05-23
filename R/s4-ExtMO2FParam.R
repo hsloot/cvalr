@@ -1,6 +1,13 @@
 #' @include s4-ExtMOParam.R checkmate.R
 NULL
 
+# nolint start
+ERR_MSG_LAMBDA <- "`lambda` must be positive scalar double"
+ERR_MSG_NU1 <- "`nu` must be scalar double"
+ERR_MSG_NU1_INTERVAL <- paste(ERR_MSG_NU1, "in interval %s")
+ERR_MSG_BF_TYPE <- "`bf` is of wrong type"
+# nolint end
+
 #' Two-factor extendible Marshall-Olkin calibration parameters
 #'
 #' @description
@@ -292,18 +299,24 @@ setReplaceMethod("setTau", "ExtMO2FParam",
 
 
 #' @importFrom rmo valueOf ScaledBernsteinFunction
-#' @importFrom checkmate assert qassert check_choice check_class
+#' @importFrom checkmate qtest test_class test_choice
 #' @include checkmate.R
-setValidity("ExtMO2FParam",
+setValidity("ExtMO2FParam", # nolint
   function(object) {
-    qassert(object@lambda, "N1(0,)")
-    qassert(object@nu, "N1")
-    assert(combine = "and",
-      check_class(object@bf, "ScaledBernsteinFunction"),
-      check_choice(object@bf@scale, object@lambda),
-      check_equal(1, valueOf(object@bf@original, 1, 0L)),
-      check_equal(
-        object@nu, invAlpha(object, 2 - valueOf(object@bf@original, 2, 0L))))
+    if (!qtest(object@lambda, "N1(0,)")) {
+      return(ERR_MSG_LAMBDA)
+    }
+    if (!qtest(object@nu, "N1")) {
+      return(ERR_MSG_NU1)
+    }
+    bf <- getBernsteinFunction(object)
+    if (!(
+        test_class(bf, "ScaledBernsteinFunction") && isTRUE(validObject(bf, test = TRUE)) &&
+          test_choice(bf@scale, getLambda(object)) &&
+          test_equal(1, valueOf(bf@original, 1, 0L)) &&
+          test_equal(getNu(object), invAlpha(object, 2 - valueOf(bf@original, 2, 0L))))) {
+      return(ERR_MSG_BF_TYPE)
+    }
 
     invisible(TRUE)
   })
@@ -322,9 +335,13 @@ setValidity("ExtMO2FParam",
 #' @param alpha Bivariate lower tail-dependence coefficient.
 #'
 #' @examples
+#' CuadrasAugeExtMO2FParam()
 #' CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' AlphaStableExtMO2FParam()
 #' AlphaStableExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' PoissonExtMO2FParam()
 #' PoissonExtMO2FParam(dim = 5L, lambda = 8e-2, tau = 4e-1)
+#' ExponentialExtMO2FParam()
 #' ExponentialExtMO2FParam(dim = 5L, lambda = 8e-2, alpha = 4e-1)
 setMethod("initialize", signature = "ExtMO2FParam", # nolint
   definition = function(.Object, # nolint
@@ -414,16 +431,20 @@ setMethod("expected_pcds_loss", "ExtMO2FParam",
 setMethod("show", "ExtMO2FParam",
  function(object) {
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
-   cat(sprintf("Dimension: %i\n", getDimension(object)))
-   cat("Parameter:\n")
-   cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
-   cat(sprintf("* %s: %s\n", "Rho", format(getRho(object))))
-   cat(sprintf("* %s: %s\n", "Tau", format(getTau(object))))
-   cat(sprintf("* %s: %s\n", "Alpha", format(getAlpha(object))))
-   cat("Internal parameter:\n")
-   cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
+   if (isTRUE(validObject(object, test = TRUE))) {
+     cat(sprintf("Dimension: %i\n", getDimension(object)))
+     cat("Parameter:\n")
+     cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+     cat(sprintf("* %s: %s\n", "Rho", format(getRho(object))))
+     cat(sprintf("* %s: %s\n", "Tau", format(getTau(object))))
+     cat(sprintf("* %s: %s\n", "Alpha", format(getAlpha(object))))
+     cat("Internal parameter:\n")
+     cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
+   } else {
+     cat("\t (invalid or not initialized)\n")
+   }
 
-   invisible(NULL)
+   invisible(TRUE)
   })
 
 
@@ -444,15 +465,19 @@ CuadrasAugeExtMO2FParam <- setClass("CuadrasAugeExtMO2FParam", # nolint
 
 #' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions LinearBernsteinFunction
 #'   ConstantBernsteinFunction
-#' @importFrom checkmate assert check_choice check_class qassert
+#' @importFrom checkmate qtest test_class
 setValidity("CuadrasAugeExtMO2FParam",
   function(object) {
-    assert(combine = "and",
-      check_choice(object@bf@scale, object@lambda),
-      check_class(object@bf@original, "SumOfBernsteinFunctions"),
-      check_class(object@bf@original@first, "LinearBernsteinFunction"),
-      check_class(object@bf@original@second, "ConstantBernsteinFunction"))
-    qassert(object@nu, "N1[0,1]")
+    if (!qtest(object@nu, "N1[0,1]")) {
+      return(sprintf(ERR_MSG_NU1_INTERVAL, "[0,1]"))
+    }
+    bf <- getBernsteinFunction(object)
+    if (!(
+        test_class(bf@original, "SumOfBernsteinFunctions") &&
+          test_class(bf@original@first, "LinearBernsteinFunction") &&
+          test_class(bf@original@second, "ConstantBernsteinFunction"))) {
+      return(ERR_MSG_BF_TYPE)
+    }
 
     invisible(TRUE)
   })
@@ -509,13 +534,16 @@ AlphaStableExtMO2FParam <- setClass("AlphaStableExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
 
 #' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions AlphaStableBernsteinFunction
-#' @importFrom checkmate assert check_choice check_class qassert
+#' @importFrom checkmate qtest test_class
 setValidity("AlphaStableExtMO2FParam",
   function(object) {
-    assert(combine = "and",
-      check_choice(object@bf@scale, object@lambda),
-      check_class(object@bf@original, "AlphaStableBernsteinFunction"))
-    qassert(object@nu, "N1(0,1)")
+    if (!qtest(object@nu, "N1(0,1)")) {
+      return(sprintf(ERR_MSG_NU1_INTERVAL, classLabel(class(object)), "(0,1)"))
+    }
+    bf <- getBernsteinFunction(object)
+    if (!test_class(bf@original, "AlphaStableBernsteinFunction")) {
+      return(sprintf(ERR_MSG_BF_TYPE, classLabel(class(object))))
+    }
 
     invisible(TRUE)
   })
@@ -572,17 +600,21 @@ PoissonExtMO2FParam <- setClass("PoissonExtMO2FParam", # nolint
 
 #' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions LinearBernsteinFunction
 #'   PoissonBernsteinFunction
-#' @importFrom checkmate assert check_choice check_class qassert qassert
+#' @importFrom checkmate qtest test_class
 setValidity("PoissonExtMO2FParam",
   function(object) {
-    assert(combine = "and",
-      check_choice(object@bf@scale, object@lambda),
-      check_class(object@bf@original, "SumOfBernsteinFunctions"),
-      check_class(object@bf@original@first, "LinearBernsteinFunction"),
-      check_class(object@bf@original@second, "PoissonBernsteinFunction"))
-    qassert(object@nu, "N1[0,)")
+    if (!qtest(object@nu, "N1[0,)")) {
+      return(sprintf(ERR_MSG_NU1_INTERVAL, classLabel(class(object)), "[0,)"))
+    }
+    bf <- getBernsteinFunction(object)
+    if (!(
+        test_class(bf@original, "SumOfBernsteinFunctions") &&
+        test_class(bf@original@first, "LinearBernsteinFunction") &&
+        test_class(bf@original@second, "PoissonBernsteinFunction"))) {
+      return(sprintf(ERR_MSG_BF_TYPE, classLabel(class(object))))
+    }
 
-      invisible(TRUE)
+    invisible(TRUE)
   })
 
 
@@ -641,15 +673,19 @@ ExponentialExtMO2FParam <- setClass("ExponentialExtMO2FParam", # nolint
 
 #' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions LinearBernsteinFunction
 #'   ExponentialBernsteinFunction
-#' @importFrom checkmate assert check_choice check_class qassert
+#' @importFrom checkmate qtest test_class
 setValidity("ExponentialExtMO2FParam",
   function(object) {
-    assert(combine = "and",
-      check_choice(object@bf@scale, object@lambda),
-      check_class(object@bf@original, "SumOfBernsteinFunctions"),
-      check_class(object@bf@original@first, "LinearBernsteinFunction"),
-      check_class(object@bf@original@second, "ExponentialBernsteinFunction"))
-    qassert(object@nu, "N1(0,)")
+    if (!qtest(object@nu, "N1(0,)")) {
+      return(sprintf(ERR_MSG_NU1_INTERVAL, classLabel(class(object)), "(0,)"))
+    }
+    bf <- getBernsteinFunction(object)
+    if (!(
+        test_class(bf@original, "SumOfBernsteinFunctions") &&
+        test_class(bf@original@first, "LinearBernsteinFunction") &&
+        test_class(bf@original@second, "ExponentialBernsteinFunction"))) {
+      return(sprintf(ERR_MSG_BF_TYPE, classLabel(class(object))))
+    }
 
     invisible(TRUE)
   })

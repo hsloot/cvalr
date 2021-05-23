@@ -73,6 +73,7 @@ The parameter are implicitly defined by a +Bernstein function* \eqn{\psi}
 }}
 
 \examples{
+ExtMOParam()
 ExtMOParam(
   dim = 2,
   bf = rmo::ScaledBernsteinFunction(
