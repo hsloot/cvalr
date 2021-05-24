@@ -1,6 +1,10 @@
 #' @include s4-ExtMO2FParam.R checkmate.R
 NULL
 
+# nolint start
+ERR_MSG_COPULA_TYPE <- "`copula` is of wrong type"
+# nolint end
+
 #' Two-factor extendible Archimedean calibration parameter classes
 #'
 #' @description
@@ -210,15 +214,23 @@ setReplaceMethod("setSurvival", "ExtArch2FParam",
 
 
 #' @importFrom copula getTheta
-#' @importFrom checkmate qassert assert_true
-setValidity("ExtArch2FParam",
+#' @importFrom checkmate qtest test_class test_choice
+setValidity("ExtArch2FParam", # nolint
   function(object) {
-    assert_choice(object@family, c("Clayton", "Frank", "Gumbel", "Joe"))
-    qassert(object@lambda, "N1(0,)")
-    qassert(object@nu, "N1")
-    assert_true(object@dim == getDimension(object@copula))
-    assert_true(object@nu == getTheta(object@copula))
-    qassert(object@survival, "B1")
+    if (!qtest(object@lambda, "N1(0,)")) {
+      return(sprintf(ERR_MSG_LAMBDA, classLabel(class(object))))
+    }
+    if (!qtest(object@nu, "N1")) {
+      return(sprintf(ERR_MSG_NU1_INTERVAL, classLabel(class(object)), "[0,1]"))
+    }
+    if (!(
+        qtest(object@survival, "B1") &&
+        test_class(object@copula, "archmCopula") &&
+        test_choice(object@family, c("Clayton", "Frank", "Gumbel", "Joe")) &&
+        test_choice(getDimension(object@copula), getDimension(object)) &&
+        test_choice(getNu(object@copula), getNu(object)))) {
+      return(ERR_MSG_COPULA_TYPE)
+    }
 
     invisible(TRUE)
   })
@@ -364,16 +376,20 @@ setMethod("expected_pcds_loss", "ExtArch2FParam",
 setMethod("show", "ExtArch2FParam",
  function(object) {
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
-   cat(sprintf("Dimension: %i\n", getDimension(object)))
-   cat("Parameter:\n")
-   cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
-   if (isTRUE(getFamily(object) != "Joe")) {
-     cat(sprintf("* %s: %s\n", "Rho", format(getRho(object))))
+   if (isTRUE(validObject(object, test = TRUE))) {
+     cat(sprintf("Dimension: %i\n", getDimension(object)))
+     cat("Parameter:\n")
+     cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+     if (isTRUE(getFamily(object) != "Joe")) {
+       cat(sprintf("* %s: %s\n", "Rho", format(getRho(object))))
+     }
+     cat(sprintf("* %s: %s\n", "Tau", format(getTau(object))))
+     cat("Internal parameter:\n")
+     cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
+     cat(sprintf("* %s: %s\n", "Survival copula", ifelse(getSurvival(object), "Yes", "No")))
+   } else {
+     cat("\t (invalid or not initialized)\n")
    }
-   cat(sprintf("* %s: %s\n", "Tau", format(getTau(object))))
-   cat("Internal parameter:\n")
-   cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
-   cat(sprintf("* %s: %s\n", "Survival copula", ifelse(getSurvival(object), "Yes", "No")))
 
    invisible(NULL)
  })
@@ -404,6 +420,7 @@ setValidity("ClaytonExtArch2FParam",
 #' @param ... Pass-through parameters.
 #'
 #' @examples
+#' ClaytonExtArch2FParam()
 #' ClaytonExtArch2FParam(5L, 8e-2, rho = 4e-1)
 #' ClaytonExtArch2FParam(5L, 8e-2, tau = 4e-1)
 setMethod("initialize", "ClaytonExtArch2FParam",
@@ -445,6 +462,7 @@ setValidity("FrankExtArch2FParam",
 #' @param ... Pass-through parameters.
 #'
 #' @examples
+#' FrankExtArch2FParam()
 #' FrankExtArch2FParam(5L, 8e-2, rho = 4e-1)
 #' FrankExtArch2FParam(5L, 8e-2, tau = 4e-1)
 setMethod("initialize", "FrankExtArch2FParam",
@@ -486,6 +504,7 @@ setValidity("GumbelExtArch2FParam",
 #' @param ... Pass-through parameters.
 #'
 #' @examples
+#' GumbelExtArch2FParam()
 #' GumbelExtArch2FParam(5L, 8e-2, rho = 4e-1)
 #' GumbelExtArch2FParam(5L, 8e-2, tau = 4e-1)
 setMethod("initialize", "GumbelExtArch2FParam",
@@ -527,6 +546,7 @@ setValidity("JoeExtArch2FParam",
 #' @param ... Pass-through parameters.
 #'
 #' @examples
+#' JoeExtArch2FParam()
 #' JoeExtArch2FParam(5L, 8e-2, tau = 4e-1)
 setMethod("initialize", "JoeExtArch2FParam",
   function(.Object, ..., survival = TRUE) { # nolint

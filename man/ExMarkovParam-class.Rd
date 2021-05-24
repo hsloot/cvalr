@@ -110,6 +110,7 @@ The probability of \eqn{j > i} portfolio items being defaulted at time
 }
 
 \examples{
+ExMarkovParam()
 ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 parm <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 simulate_dt(parm, n_sim = 5L)

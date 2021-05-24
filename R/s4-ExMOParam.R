@@ -1,6 +1,10 @@
 #' @include s4-ExMarkovParam.R checkmate.R
 NULL
 
+# nolint start
+ERR_MSG_EXINTENSITIES <- "`ex_intensities` must be (scaled) exchangeable MO intensity vector"
+# nolint end
+
 #' Exchangeable Marshall--Olkin calibration parameter
 #'
 #' @description
@@ -60,12 +64,15 @@ setReplaceMethod("setExIntensities", "ExMOParam",
   })
 
 
-#' @importFrom checkmate qassert assert_numeric
+#' @importFrom checkmate qtest test_numeric
 setValidity("ExMOParam",
   function(object) {
-    assert_numeric(
-      object@ex_intensities, lower = 0, finite = TRUE, any.missing = FALSE, len = object@dim)
-    qassert(max(object@ex_intensities), "N1(0,)")
+    if (!(test_numeric(
+          object@ex_intensities, lower = 0, finite = TRUE, any.missing = FALSE,
+          len = getDimension(object)) &&
+        qtest(max(object@ex_intensities), "N1(0,)"))) {
+      return(ERR_MSG_EXINTENSITIES)
+    }
 
     invisible(TRUE)
   })
@@ -80,6 +87,7 @@ setValidity("ExMOParam",
 #'   Marshall-Olkin distribution (see [rmo::exIntensities()]).
 #'
 #' @examples
+#' ExMOParam()
 #' ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 setMethod("initialize", "ExMOParam",
   definition = function(.Object, ex_intensities) { # nolint
@@ -139,11 +147,16 @@ setMethod("simulate_dt", "ExMOParam",
 setMethod("show", "ExMOParam",
   function(object) {
     cat(sprintf("An object of class %s\n", classLabel(class(object))))
-    cat(sprintf("Dimension: %i\n", getDimension(object)))
-    cat("(Scaled) intensity vector:\n")
-    capture.output(print(getExIntensities(object))) %>%
-      paste0("\t", .) %>%
-      writeLines
+    if (isTRUE(validObject(object, test = TRUE))) {
+      cat(sprintf("Dimension: %i\n", getDimension(object)))
+      cat("(Scaled) intensity vector:\n")
+      capture.output(print(getExIntensities(object))) %>%
+        paste0("\t", .) %>%
+        writeLines
+    } else {
+      cat("\t (invalid or not initialized)\n")
+    }
+
 
     invisible(NULL)
   })

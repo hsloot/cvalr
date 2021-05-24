@@ -151,9 +151,13 @@ and \eqn{\alpha = 2 / (1 + \nu) - 2 / (2 + \nu)}
 }
 
 \examples{
+CuadrasAugeExtMO2FParam()
 CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+AlphaStableExtMO2FParam()
 AlphaStableExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+PoissonExtMO2FParam()
 PoissonExtMO2FParam(dim = 5L, lambda = 8e-2, tau = 4e-1)
+ExponentialExtMO2FParam()
 ExponentialExtMO2FParam(dim = 5L, lambda = 8e-2, alpha = 4e-1)
 expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
   times = 0.25, recovery_rate = 0.4)

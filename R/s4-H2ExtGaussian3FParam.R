@@ -151,11 +151,16 @@ setReplaceMethod("setTau", "H2ExtGaussian3FParam",
   })
 
 
-#' @importFrom checkmate qassert assert_numeric
+#' @importFrom checkmate qtest test_numeric
 setValidity("H2ExtGaussian3FParam",
   function(object) {
-    qassert(object@lambda, "N1(0,)")
-    assert_numeric(object@nu, lower = 0, upper = 1, any.missing = TRUE, len = 2L, sorted = TRUE)
+    if (!qtest(object@lambda, "N1(0,)")) {
+      return(ERR_MSG_LAMBDA)
+    }
+    if (!test_numeric(object@nu, lower = 0, upper = 1, any.missing = TRUE,
+        len = 2L, sorted = TRUE)) {
+      return(sprintf(ERR_MSG_NU2_INTERVAL, "(0,)"))
+    }
 
     invisible(TRUE)
   })
@@ -172,6 +177,7 @@ setValidity("H2ExtGaussian3FParam",
 #' @param nu (Internal) *Outer* and *inner* bivariate dependence parameter.
 #'
 #' @examples
+#' H2ExtGaussian3FParam()
 #' H2ExtGaussian3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 #' H2ExtGaussian3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 setMethod("initialize", "H2ExtGaussian3FParam",
@@ -243,17 +249,21 @@ setMethod("simulate_dt", "H2ExtGaussian3FParam",
 setMethod("show", "H2ExtGaussian3FParam",
  function(object) {
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
-   cat(sprintf("Composition: %s = %s\n", getDimension(object),
-     paste(getComposition(object), collapse = " + ")))
-   to_vector <- function(x) {
-     paste0("(", paste(x, collapse = ", "), ")")
+   if (isTRUE(validObject(object, test = TRUE))) {
+     cat(sprintf("Composition: %s = %s\n", getDimension(object),
+       paste(getComposition(object), collapse = " + ")))
+     to_vector <- function(x) {
+       paste0("(", paste(x, collapse = ", "), ")")
+     }
+     cat("Parameter:\n")
+     cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+     cat(sprintf("* %s: %s\n", "Rho", to_vector(format(getRho(object)))))
+     cat(sprintf("* %s: %s\n", "Tau", to_vector(format(getTau(object)))))
+     cat("Internal parameter:\n")
+     cat(sprintf("* %s: %s\n", "Nu", to_vector(format(getNu(object)))))
+   } else {
+     cat("\t (invalid or not initialized)\n")
    }
-   cat("Parameter:\n")
-   cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
-   cat(sprintf("* %s: %s\n", "Rho", to_vector(format(getRho(object)))))
-   cat(sprintf("* %s: %s\n", "Tau", to_vector(format(getTau(object)))))
-   cat("Internal parameter:\n")
-   cat(sprintf("* %s: %s\n", "Nu", to_vector(format(getNu(object)))))
 
    invisible(NULL)
   })

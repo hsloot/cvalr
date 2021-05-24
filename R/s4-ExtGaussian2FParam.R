@@ -106,8 +106,12 @@ setReplaceMethod("setTau", "ExtGaussian2FParam",
 #' @importFrom checkmate qassert
 setValidity("ExtGaussian2FParam",
   function(object) {
-    qassert(object@lambda, "N1(0,)")
-    qassert(object@nu, "N1[0,1]")
+    if (!qtest(object@lambda, "N1(0,)")) {
+      return(ERR_MSG_LAMBDA)
+    }
+    if (!qtest(object@nu, "N1")) {
+      return(sprintf(ERR_MSG_NU1_INTERVAL, "[0,1]"))
+    }
 
     invisible(TRUE)
   })
@@ -125,6 +129,7 @@ setValidity("ExtGaussian2FParam",
 #' @param tau Bivariate Kendall's Tau.
 #'
 #' @examples
+#' ExtGaussian2FParam()
 #' ExtGaussian2FParam(dim = 2L, lambda = 0.05, rho = 0.4)
 setMethod("initialize", signature = "ExtGaussian2FParam",
   definition = function(.Object, # nolint
@@ -373,13 +378,17 @@ setMethod("expected_cdo_loss", "ExtGaussian2FParam",
 setMethod("show", "ExtGaussian2FParam",
  function(object) {
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
-   cat(sprintf("Dimension: %i\n", getDimension(object)))
-   cat("Parameter:\n")
-   cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
-   cat(sprintf("* %s: %s\n", "Rho", format(getRho(object))))
-   cat(sprintf("* %s: %s\n", "Tau", format(getTau(object))))
-   cat("Internal parameter:\n")
-   cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
+   if (isTRUE(validObject(object, test = TRUE))) {
+     cat(sprintf("Dimension: %i\n", getDimension(object)))
+     cat("Parameter:\n")
+     cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+     cat(sprintf("* %s: %s\n", "Rho", format(getRho(object))))
+     cat(sprintf("* %s: %s\n", "Tau", format(getTau(object))))
+     cat("Internal parameter:\n")
+     cat(sprintf("* %s: %s\n", "Nu", format(getNu(object))))
+   } else {
+     cat("\t (invalid or not initialized)\n")
+   }
 
    invisible(NULL)
   })

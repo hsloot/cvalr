@@ -63,6 +63,7 @@ The default times are sampled using the stochastic representation described in d
 }
 
 \examples{
+H2ExMarkovParam()
 composition <- c(2L, 4L, 2L)
 d <- sum(composition)
 model_global <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), d))

@@ -83,6 +83,7 @@ The default times are sampled using \code{\link[rmo:rexmo_markovian]{rmo::rexmo_
 }
 
 \examples{
+ExMOParam()
 ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 parm <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 simulate_dt(parm, n_sim = 5L)

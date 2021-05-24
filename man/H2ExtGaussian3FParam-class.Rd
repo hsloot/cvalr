@@ -106,6 +106,7 @@ results are transformed using \code{\link[stats:Exponential]{stats::qexp()}}.
 }
 
 \examples{
+H2ExtGaussian3FParam()
 H2ExtGaussian3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 H2ExtGaussian3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 parm <- H2ExtGaussian3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(2e-1, 7e-1))

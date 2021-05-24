@@ -9,10 +9,14 @@ checkEqual <- function(x, y, ..., tolerance = .Machine$double.eps^0.5) { # nolin
   invisible(TRUE)
 }
 
+testEqual <- function(x, y, ..., tolerance = .Machine$double.eps^0.5) { # nolint
+  isTRUE(checkEqual(x, y, ..., tolerance = tolerance))
+}
+test_equal <- testEqual
+
 check_equal <- checkEqual
 assertEqual <- checkmate::makeAssertionFunction(checkEqual) # nolint
 assert_equal <- assertEqual
-
 
 #' @importFrom checkmate check_matrix makeAssertionFunction
 #' @include RcppExports.R

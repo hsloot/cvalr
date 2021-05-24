@@ -165,11 +165,15 @@ expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
 expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
   method = "CalibrationParam", pd_args = list(n_sim = 1e2L))
 
+ClaytonExtArch2FParam()
 ClaytonExtArch2FParam(5L, 8e-2, rho = 4e-1)
 ClaytonExtArch2FParam(5L, 8e-2, tau = 4e-1)
+FrankExtArch2FParam()
 FrankExtArch2FParam(5L, 8e-2, rho = 4e-1)
 FrankExtArch2FParam(5L, 8e-2, tau = 4e-1)
+GumbelExtArch2FParam()
 GumbelExtArch2FParam(5L, 8e-2, rho = 4e-1)
 GumbelExtArch2FParam(5L, 8e-2, tau = 4e-1)
+JoeExtArch2FParam()
 JoeExtArch2FParam(5L, 8e-2, tau = 4e-1)
 }

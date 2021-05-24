@@ -1,6 +1,10 @@
 #' @include s4-CalibrationParam.R checkmate.R
 NULL
 
+# nolint start
+ERR_MSG_EXQMATRIX <- "`ex_qmatrix` must be upper-triangular Markov generator-matrix"
+# nolint end
+
 #' Exchangeable Markovian calibration parameter
 #'
 #' @description
@@ -46,10 +50,15 @@ setReplaceMethod("setExQMatrix", "ExMarkovParam",
   })
 
 
-#' @include checkmate.R
+#' @importFrom checkmate test_matrix
+#' @include RcppExports.R
 setValidity("ExMarkovParam",
   function(object) {
-    assert_exqmatrix(object@ex_qmatrix, nrows = object@dim + 1L, ncols = object@dim + 1L)
+    if (!(test_matrix(
+          object@ex_qmatrix, mode = "numeric", any.missing = FALSE, all.missing = FALSE) &&
+        is_exqmatrix(object@ex_qmatrix, tol = .Machine$double.eps^0.5))) {
+      return(ERR_MSG_EXQMATRIX)
+    }
 
     invisible(TRUE)
   })
@@ -64,6 +73,7 @@ setValidity("ExMarkovParam",
 #'   [rmo::exQMatrix()]).
 #'
 #' @examples
+#' ExMarkovParam()
 #' ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 setMethod("initialize", "ExMarkovParam",
   function(.Object, ex_qmatrix) { # nolint
@@ -190,11 +200,15 @@ setMethod("probability_distribution", "ExMarkovParam",
 setMethod("show", "ExMarkovParam",
   function(object) {
     cat(sprintf("An object of class %s\n", classLabel(class(object))))
-    cat(sprintf("Dimension: %i\n", getDimension(object)))
-    cat("Generator matrix:\n")
-    capture.output(print.table(getExQMatrix(object), zero.print = "")) %>%
-      paste0("\t", .) %>%
-      writeLines
+    if (isTRUE(validObject(object, test = TRUE))) {
+      cat(sprintf("Dimension: %i\n", getDimension(object)))
+      cat("Generator matrix:\n")
+      capture.output(print.table(getExQMatrix(object), zero.print = "")) %>%
+        paste0("\t", .) %>%
+        writeLines
+    } else {
+      cat("\t (invalid or not initialized)\n")
+    }
 
     invisible(NULL)
   })

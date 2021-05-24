@@ -147,8 +147,12 @@ and \eqn{\alpha = 2 / (1 + \nu) - 2 / (2 + \nu)}
 }
 
 \examples{
+CuadrasAugeH2ExtMO3FParam()
 CuadrasAugeH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+AlphaStableH2ExtMO3FParam()
 AlphaStableH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+PoissonH2ExtMO3FParam()
 PoissonH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, tau = c(3e-1, 5e-1))
+ExponentialH2ExtMO3FParam()
 ExponentialH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, alpha = c(3e-1, 5e-1))
 }

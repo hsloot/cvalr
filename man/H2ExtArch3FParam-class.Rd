@@ -131,11 +131,15 @@ H2ExtArch3FParam(
 parm <- FrankH2ExtArch3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(2e-1, 7e-1))
 simulate_dt(parm, n_sim = 5L)
 
+ClaytonH2ExtArch3FParam()
 ClaytonH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 ClaytonH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+FrankH2ExtArch3FParam()
 FrankH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 FrankH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+GumbelH2ExtArch3FParam()
 GumbelH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 GumbelH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+JoeH2ExtArch3FParam()
 JoeH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 }

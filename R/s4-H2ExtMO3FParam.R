@@ -1,6 +1,11 @@
 #' @include s4-H2ExtMOParam.R s4-ExtMO2FParam.R checkmate.R
 NULL
 
+# nolint start
+ERR_MSG_NU2 <- "`nu` must be scalar double"
+ERR_MSG_NU2_INTERVAL <- paste(ERR_MSG_NU2, "in interval %s^2")
+# nolint end
+
 #' Three-factor H2-extendible Marshall--Olkin calibration parameter
 #'
 #' [CalibrationParam-class] for the H2-extendible Marshall-Olkin *(average) default counting
@@ -231,11 +236,15 @@ setReplaceMethod("setTau", "H2ExtMO3FParam",
 
 
 
-#' @importFrom checkmate qassert
+#' @importFrom checkmate qtest test_numeric
 setValidity("H2ExtMO3FParam",
   function(object) {
-    qassert(object@lambda, "N1(0,)")
-    qassert(object@nu, "N2(0,)")
+    if (!qtest(object@lambda, "N1(0,)")) {
+      return(ERR_MSG_LAMBDA)
+    }
+    if (!qtest(object@nu, "N2(0,)")) {
+      return(sprintf(ERR_MSG_NU2_INTERVAL, "(0,)"))
+    }
 
     invisible(TRUE)
   })
@@ -254,9 +263,13 @@ setValidity("H2ExtMO3FParam",
 #' @param fraction (Internal) proportion associated with the global model, see details.
 #'
 #' @examples
+#' CuadrasAugeH2ExtMO3FParam()
 #' CuadrasAugeH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+#' AlphaStableH2ExtMO3FParam()
 #' AlphaStableH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+#' PoissonH2ExtMO3FParam()
 #' PoissonH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, tau = c(3e-1, 5e-1))
+#' ExponentialH2ExtMO3FParam()
 #' ExponentialH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, alpha = c(3e-1, 5e-1))
 setMethod("initialize", "H2ExtMO3FParam", # nolint
   function(.Object, # nolint
@@ -302,34 +315,39 @@ setMethod("getModelName", "H2ExtMO3FParam",
 setMethod("show", "H2ExtMO3FParam",
   function(object) {
     cat(sprintf("An object of class %s\n", classLabel(class(object))))
-    cat(sprintf("Composition: %s = %s\n", getDimension(object),
-      paste(getComposition(object), collapse = " + ")))
-    to_vector <- function(x) {
-      paste0("(", paste(x, collapse = ", "), ")")
-    }
-    cat("Parameter:\n")
-    cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
-    cat(sprintf("* %s: %s\n", "Rho", to_vector(format(getRho(object)))))
-    cat(sprintf("* %s: %s\n", "Tau", to_vector(format(getTau(object)))))
-    cat(sprintf("* %s: %s\n", "Alpha", to_vector(format(getAlpha(object)))))
-    cat("Internal parameter:\n")
-    cat(sprintf("* %s: %s\n", "Nu", to_vector(format(getNu(object)))))
-    cat(sprintf("* %s: %s\n", "Fraction", format(getFraction(object))))
-    cat("Models:\n")
-    cat("* Global model\n")
-    writeLines(paste0("\t", capture.output(show(as(getGlobalModel(object), getModelName(object))))))
-    cat("* Partition models:\n")
-    to_list_item <- function(x) {
-      out <- rep("  ", length(x))
-      out[[1]] <- "- "
+    if (isTRUE(validObject(object, test = TRUE))) {
+      cat(sprintf("Composition: %s = %s\n", getDimension(object),
+        paste(getComposition(object), collapse = " + ")))
+      to_vector <- function(x) {
+        paste0("(", paste(x, collapse = ", "), ")")
+      }
+      cat("Parameter:\n")
+      cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+      cat(sprintf("* %s: %s\n", "Rho", to_vector(format(getRho(object)))))
+      cat(sprintf("* %s: %s\n", "Tau", to_vector(format(getTau(object)))))
+      cat(sprintf("* %s: %s\n", "Alpha", to_vector(format(getAlpha(object)))))
+      cat("Internal parameter:\n")
+      cat(sprintf("* %s: %s\n", "Nu", to_vector(format(getNu(object)))))
+      cat(sprintf("* %s: %s\n", "Fraction", format(getFraction(object))))
+      cat("Models:\n")
+      cat("* Global model\n")
+      writeLines(
+        paste0("\t", capture.output(show(as(getGlobalModel(object), getModelName(object))))))
+      cat("* Partition models:\n")
+      to_list_item <- function(x) {
+        out <- rep("  ", length(x))
+        out[[1]] <- "- "
 
-      paste0(out, x)
+        paste0(out, x)
+      }
+      getPartitionModels(object) %>%
+        map(compose(to_list_item, ~capture.output(show(.)), ~as(., getModelName(object)))) %>%
+        flatten_chr %>%
+        paste0("\t", .) %>%
+        writeLines
+    } else {
+      cat("\t (invalid or not initialized)\n")
     }
-    getPartitionModels(object) %>%
-      map(compose(to_list_item, ~capture.output(show(.)), ~as(., getModelName(object)))) %>%
-      flatten_chr %>%
-      paste0("\t", .) %>%
-      writeLines
 
     invisible(NULL)
     })

@@ -97,7 +97,7 @@ setMethod("getCopula", "H2ExtArch3FParam",
     object@copula
   })
 
-#' @importFrom checkmate assert check_class
+#' @importFrom checkmate assert check_class check_choice
 setReplaceMethod("setCopula", "H2ExtArch3FParam", {
   function(object, value) {
     assert(combine = "and",
@@ -265,14 +265,23 @@ setReplaceMethod("setTau", "H2ExtArch3FParam",
   })
 
 
-#' @importFrom checkmate qassert
-setValidity("H2ExtArch3FParam",
+#' @importFrom checkmate qtest test_class test_choice
+setValidity("H2ExtArch3FParam", # nolint
   function(object) {
-    qassert(object@lambda, "N1(0,)")
-    qassert(object@nu, "N2(0,)")
-    qassert(object@survival, "B1")
-    assert_true(object@dim == getDimension(object@copula))
-    assert_true(check_equal(object@nu, getNu(object@copula)))
+    if (!qtest(object@lambda, "N1(0,)")) {
+      return(ERR_MSG_LAMBDA)
+    }
+    if (!qtest(object@nu, "N2(0,)")) {
+      return(sprintf(ERR_MSG_NU2_INTERVAL, "(0,)"))
+    }
+    if (!(
+        qtest(object@survival, "B1") &&
+        test_class(object@copula, "outer_nacopula") &&
+        test_choice(object@family, c("Clayton", "Frank", "Gumbel", "Joe")) &&
+        test_choice(getDimension(object@copula), getDimension(object)) &&
+        test_equal(getNu(object@copula), getNu(object)))) {
+      return(ERR_MSG_COPULA_TYPE)
+    }
 
     invisible(TRUE)
   })
@@ -336,19 +345,23 @@ setMethod("initialize", "H2ExtArch3FParam",
 setMethod("show", "H2ExtArch3FParam",
  function(object) {
    cat(sprintf("An object of class %s\n", classLabel(class(object))))
-   cat(sprintf("Composition: %s = %s\n", getDimension(object),
-     paste(getComposition(object), collapse = " + ")))
-   to_vector <- function(x) {
-     paste0("(", paste(x, collapse = ", "), ")")
+   if (isTRUE(validObject(object, test = TRUE))) {
+     cat(sprintf("Composition: %s = %s\n", getDimension(object),
+       paste(getComposition(object), collapse = " + ")))
+     to_vector <- function(x) {
+       paste0("(", paste(x, collapse = ", "), ")")
+     }
+     cat("Parameter:\n")
+     cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
+     if (isTRUE("Joe" != getFamily(object))) {
+       cat(sprintf("* %s: %s\n", "Rho", to_vector(format(getRho(object)))))
+     }
+     cat(sprintf("* %s: %s\n", "Tau", to_vector(format(getTau(object)))))
+     cat("Internal parameter:\n")
+     cat(sprintf("* %s: %s\n", "Nu", to_vector(format(getNu(object)))))
+   } else {
+     cat("\t (invalid or not initialized)\n")
    }
-   cat("Parameter:\n")
-   cat(sprintf("* %s: %s\n", "Lambda", format(getLambda(object))))
-   if (isTRUE("Joe" != getFamily(object))) {
-     cat(sprintf("* %s: %s\n", "Rho", to_vector(format(getRho(object)))))
-   }
-   cat(sprintf("* %s: %s\n", "Tau", to_vector(format(getTau(object)))))
-   cat("Internal parameter:\n")
-   cat(sprintf("* %s: %s\n", "Nu", to_vector(format(getNu(object)))))
 
    invisible(NULL)
   })
@@ -397,6 +410,7 @@ ClaytonH2ExtArch3FParam <- setClass("ClaytonH2ExtArch3FParam", # nolint
 #' @param ... Pass-through parameters.
 #'
 #' @examples
+#' ClaytonH2ExtArch3FParam()
 #' ClaytonH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 #' ClaytonH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 setMethod("initialize", "ClaytonH2ExtArch3FParam",
@@ -427,6 +441,7 @@ FrankH2ExtArch3FParam <- setClass("FrankH2ExtArch3FParam", # nolint
 #' @param ... Pass-through parameters.
 #'
 #' @examples
+#' FrankH2ExtArch3FParam()
 #' FrankH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 #' FrankH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 setMethod("initialize", "FrankH2ExtArch3FParam",
@@ -457,6 +472,7 @@ GumbelH2ExtArch3FParam <- setClass("GumbelH2ExtArch3FParam", # nolint
 #' @param ... Pass-through parameters.
 #'
 #' @examples
+#' GumbelH2ExtArch3FParam()
 #' GumbelH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 #' GumbelH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 setMethod("initialize", "GumbelH2ExtArch3FParam",
@@ -487,6 +503,7 @@ JoeH2ExtArch3FParam <- setClass("JoeH2ExtArch3FParam", # nolint
 #' @param ... Pass-through parameters.
 #'
 #' @examples
+#' JoeH2ExtArch3FParam()
 #' JoeH2ExtArch3FParam(composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 setMethod("initialize", "JoeH2ExtArch3FParam",
   function(.Object, ..., survival = TRUE) { # nolint
