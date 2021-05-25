@@ -1,3 +1,8 @@
+# cvalr 0.2.2
+
+- Implement missing `expected_pcds_loss` methods
+- Include continuous benchmark integration on Github
+
 # cvalr 0.2.1
 
 - Fix validity methods
