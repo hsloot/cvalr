@@ -5,6 +5,7 @@
 \alias{H2ExtMO3FParam-class}
 \alias{initialize,H2ExtMO3FParam-method}
 \alias{initialize,H2ExtMO3FParam,ANY-method}
+\alias{expected_pcds_loss,H2ExtMO3FParam-method}
 \alias{show,H2ExtMO3FParam-method}
 \alias{CuadrasAugeH2ExtMO3FParam-class}
 \alias{CuadrasAugeH2ExtMO3FParam}
@@ -17,6 +18,14 @@
 \title{Three-factor H2-extendible Marshall--Olkin calibration parameter}
 \usage{
 \S4method{initialize}{H2ExtMO3FParam}(.Object, composition, lambda, nu, fraction, rho, tau, alpha)
+
+\S4method{expected_pcds_loss}{H2ExtMO3FParam}(
+  object,
+  times,
+  recovery_rate,
+  ...,
+  method = c("default", "H2ExtMO3FParam", "CalibrationParam")
+)
 
 \S4method{show}{H2ExtMO3FParam}(object)
 }
@@ -38,6 +47,17 @@
 \item{alpha}{\emph{Outer} and \emph{inner} bivariate lower tail-dependence coefficient.}
 
 \item{object}{A \linkS4class{CalibrationParam}-object.}
+
+\item{times}{A non-negative numeric vector of timepoints.}
+
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
+of the portfolio CDS/CDO.}
+
+\item{...}{arguments to specify properties of the new object, to
+      be passed to \code{initialize()}.}
+
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
 }
 \description{
 \linkS4class{CalibrationParam} for the H2-extendible Marshall-Olkin \emph{(average) default counting
@@ -92,6 +112,8 @@ For details on the underlying extendible models, see \linkS4class{ExtMO2FParam}.
 \itemize{
 \item \code{initialize,H2ExtMO3FParam-method}: Constructor
 
+\item \code{expected_pcds_loss,H2ExtMO3FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
+
 \item \code{show,H2ExtMO3FParam-method}: Display the object.
 }}
 
@@ -104,6 +126,18 @@ For details on the underlying extendible models, see \linkS4class{ExtMO2FParam}.
 component specific; range depends on specific model). Use \code{rho}, \code{tau}, or \code{alpha} in the
 constructor to set dependence parameter.}
 }}
+
+\section{Expected portfolio CDS loss}{
+
+The \emph{expected portfolio CDS loss} for \emph{recovery rate} \eqn{R} is calculated
+using that
+\deqn{
+  \mathbb{E}[g(L_t)]
+    = (1 - R) \cdot F(t)
+}
+with \eqn{g(x) = (1 - R) \cdot x} and \eqn{F} being the Exponential
+distribution function for rate \eqn{\lambda}.
+}
 
 \section{Cuadras-Augé calibration parameter class}{
 
@@ -155,4 +189,14 @@ PoissonH2ExtMO3FParam()
 PoissonH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 ExponentialH2ExtMO3FParam()
 ExponentialH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, alpha = c(3e-1, 5e-1))
+parm <- AlphaStableH2ExtMO3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
+expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+  method = "CalibrationParam")
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+  method = "CalibrationParam",
+  pd_args = list(method = "CalibrationParam", seed = 1623,
+    sim_args = list(n_sim = 1e2L)))
+
 }
