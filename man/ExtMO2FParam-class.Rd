@@ -8,6 +8,7 @@
 \alias{expected_pcds_loss,ExtMO2FParam-method}
 \alias{CuadrasAugeExtMO2FParam-class}
 \alias{CuadrasAugeExtMO2FParam}
+\alias{simulate_dt,CuadrasAugeExtMO2FParam-method}
 \alias{AlphaStableExtMO2FParam-class}
 \alias{AlphaStableExtMO2FParam}
 \alias{PoissonExtMO2FParam-class}
@@ -24,6 +25,13 @@
   recovery_rate,
   ...,
   method = c("default", "ExtMO2FParam", "CalibrationParam")
+)
+
+\S4method{simulate_dt}{CuadrasAugeExtMO2FParam}(
+  object,
+  ...,
+  method = c("default", "CuadrasAugeExtMO2FParam", "ExMOParam", "ExMarkovParam"),
+  n_sim = 10000L
 )
 }
 \arguments{
@@ -51,8 +59,10 @@ of the portfolio CDS/CDO.}
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
 
-\item{method}{Calculation method (either \code{"default"} or the name of the
+\item{method}{Simulation method (either \code{"default"} or the name of the
 class whose implementation should be used).}
+
+\item{n_sim}{Number of samples.}
 }
 \description{
 \linkS4class{CalibrationParam}-class with two parameters for the extendible
@@ -85,6 +95,9 @@ Spearman's Rho and Kendall's Tau is
 \item \code{expected_pcds_loss,ExtMO2FParam-method}: calculates the \emph{expected value} for the \emph{portfolio CDS loss} based on the
 \emph{average default count process} for given timepoints and returns a vector
 \code{x} with \code{length(x) == length(times)}.
+
+\item \code{simulate_dt,CuadrasAugeExtMO2FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
 }}
 
 \section{Slots}{
@@ -117,6 +130,11 @@ a pure-killing subordinator and a pure-drift subordinator.
 \item \eqn{\psi(x) = \nu + (1 - \nu) x}
 \item \eqn{\alpha = \nu}
 }
+}
+
+\section{Simulation}{
+
+The default times are sampled using \code{\link[rmo:rmo_esm_cuadras_auge]{rmo::rcamo_esm()}}.
 }
 
 \section{Alpha-stable calibration parameter class}{
@@ -172,5 +190,8 @@ expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
   times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
   pd_args = list(method = "CalibrationParam", seed = 1623,
   sim_args = list(method = "ExMarkovParam", n_sim = 1e2L)))
+
+parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+simulate_dt(parm, n_sim = 5L)
 
 }

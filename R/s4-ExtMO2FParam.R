@@ -518,6 +518,43 @@ setReplaceMethod("setNu", "CuadrasAugeExtMO2FParam",
     callNextMethod()
   })
 
+#' @describeIn ExtMO2FParam-class
+#'    simulates the vector of *default times* and returns a matrix `x` with
+#'    `dim(x) == c(n_sim, getDimension(object))`.
+#' @aliases simulate_dt,CuadrasAugeExtMO2FParam-method
+#'
+#' @inheritParams simulate_dt
+#' @param method Simulation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#' @param n_sim Number of samples.
+#'
+#' @section Simulation:
+#' The default times are sampled using [rmo::rcamo_esm()].
+#'
+#'
+#' @examples
+#' parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' simulate_dt(parm, n_sim = 5L)
+#'
+#' @importFrom rmo rcamo_esm
+#' @include utils.R
+#'
+#' @export
+setMethod("simulate_dt", "CuadrasAugeExtMO2FParam",
+  function(object, ...,
+      method = c("default", "CuadrasAugeExtMO2FParam", "ExMOParam", "ExMarkovParam"),
+      n_sim = 1e4L) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method || "CuadrasAugeExtMO2FParam" == method)) {
+      out <- rcamo_esm(
+        n_sim, getDimension(object),
+        getLambda(object) * (1 - getNu(object)), getLambda(object) * getNu(object))
+    } else {
+      out <- callNextMethod(object, ..., method = method, n_sim = n_sim)
+    }
+
+    out
+  })
 
 
 #' @rdname ExtMO2FParam-class
