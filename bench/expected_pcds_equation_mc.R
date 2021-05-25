@@ -1,5 +1,5 @@
-#+ r load-all
-pkgload::load_all()
+#+ r load-package
+library(cvalr)
 
 #+ r config-and-setup
 pd_args <- list(method = "CalibrationParam", sim_args = list(n_sim = 1e4))

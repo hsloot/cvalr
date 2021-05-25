@@ -1,5 +1,5 @@
-#+ r load-all
-pkgload::load_all()
+#+ r load-package
+library(cvalr)
 
 #+ r config-and-setup
 times <- seq(0.25, 5, by = 0.25)
