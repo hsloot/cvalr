@@ -38,7 +38,12 @@
   family = c("Clayton", "Frank", "Gumbel", "Joe")
 )
 
-\S4method{simulate_dt}{ExtArch2FParam}(object, ..., method = c("default", "ExtArch2fParam"), n_sim = 10L)
+\S4method{simulate_dt}{ExtArch2FParam}(
+  object,
+  ...,
+  method = c("default", "ExtArch2fParam"),
+  n_sim = 10000L
+)
 
 \S4method{expected_pcds_loss}{ExtArch2FParam}(
   object,

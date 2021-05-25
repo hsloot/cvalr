@@ -226,7 +226,7 @@ setMethod("initialize", "H2ExtGaussian3FParam",
 #' @importFrom stats qexp
 #' @include utils.R
 setMethod("simulate_dt", "H2ExtGaussian3FParam",
-  function(object, ..., n_sim = 1e4) {
+  function(object, ..., n_sim = 1e4L) {
     d <- getDimension(object)
     lambda <- getLambda(object)
     nu <- getNu(object)

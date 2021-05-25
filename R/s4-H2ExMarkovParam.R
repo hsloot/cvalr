@@ -172,6 +172,7 @@ setMethod("initialize", "H2ExMarkovParam",
 #'    simulates the vector of *default times* and returns a matrix `x` with
 #'    `dim(x) == c(n_sim, getDimension(object))`.
 #' @aliases simulate_dt,H2ExMarkovParam-method
+#' @param n_sim Number of samples.
 #'
 #' @inheritParams simulate_dt
 #'
@@ -193,10 +194,10 @@ setMethod("initialize", "H2ExMarkovParam",
 #'
 #' @include utils.R
 setMethod("simulate_dt", "H2ExMarkovParam",
-  function(object, ...) {
+  function(object, ..., n_sim = 1e4L) {
     fraction <- getFraction(object)
-    dt_global <- simulate_dt(getGlobalModel(object), ...)
-    dt_partition <- map(getPartitionModels(object), simulate_dt, ...) %>%
+    dt_global <- simulate_dt(getGlobalModel(object), ..., n_sim = n_sim)
+    dt_partition <- map(getPartitionModels(object), simulate_dt, ..., n_sim = n_sim) %>%
       reduce(cbind) %>%
       `dimnames<-`(NULL)
 

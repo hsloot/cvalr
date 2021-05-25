@@ -180,7 +180,7 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 #' @export
 setMethod("simulate_dt", "ExtGaussian2FParam",
   function(object, ...,
-      method = c("default", "ExtGaussian2FParam"), n_sim = 1e1L) {
+      method = c("default", "ExtGaussian2FParam"), n_sim = 1e4L) {
     method <- match.arg(method)
     normalCopula(param = getNu(object), dim = getDimension(object), dispstr = "ex") %>%
       rCopula(n_sim, .) %>%

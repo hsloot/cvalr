@@ -124,7 +124,7 @@ setMethod("initialize", "ExMOParam",
 #' @export
 setMethod("simulate_dt", "ExMOParam",
   function(object, ...,
-      method = c("default", "ExMOParam", "ExMarkovParam"), n_sim = 1e1L) {
+      method = c("default", "ExMOParam", "ExMarkovParam"), n_sim = 1e4L) {
     method <- match.arg(method)
     if (isTRUE("default" == method)) {
       method <- "ExMOParam"

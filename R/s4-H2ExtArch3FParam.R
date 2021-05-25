@@ -388,7 +388,7 @@ setMethod("show", "H2ExtArch3FParam",
 #' @importFrom copula rCopula
 #' @include utils.R
 setMethod("simulate_dt", "H2ExtArch3FParam",
-  function(object, ..., n_sim = 1e4) {
+  function(object, ..., n_sim = 1e4L) {
     rCopula(n_sim, getCopula(object)) %>%
       qexp(rate = getLambda(object), lower.tail = !getSurvival(object))
   })

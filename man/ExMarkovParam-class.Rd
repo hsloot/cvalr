@@ -23,7 +23,12 @@
 
 \S4method{initialize}{ExMarkovParam}(.Object, ex_qmatrix)
 
-\S4method{simulate_dt}{ExMarkovParam}(object, ..., method = c("default", "ExMarkovParam"), n_sim = 10L)
+\S4method{simulate_dt}{ExMarkovParam}(
+  object,
+  ...,
+  method = c("default", "ExMarkovParam"),
+  n_sim = 10000L
+)
 
 \S4method{probability_distribution}{ExMarkovParam}(
   object,
