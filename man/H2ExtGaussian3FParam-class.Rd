@@ -8,6 +8,7 @@
 \alias{initialize,H2ExtGaussian3FParam-method}
 \alias{initialize,H2ExtGaussian3FParam,ANY-method}
 \alias{simulate_dt,H2ExtGaussian3FParam-method}
+\alias{expected_pcds_loss,H2ExtGaussian3FParam-method}
 \alias{show,H2ExtGaussian3FParam-method}
 \alias{show,H2ExtArch3FParam-method}
 \title{Three-factor H2-extendible Gaussian calibration parameter}
@@ -22,6 +23,14 @@
 )
 
 \S4method{simulate_dt}{H2ExtGaussian3FParam}(object, ..., n_sim = 10000L)
+
+\S4method{expected_pcds_loss}{H2ExtGaussian3FParam}(
+  object,
+  times,
+  recovery_rate,
+  ...,
+  method = c("default", "H2ExtGaussian3FParam", "CalibrationParam")
+)
 
 \S4method{show}{H2ExtGaussian3FParam}(object)
 
@@ -46,6 +55,14 @@
       be passed to \code{initialize()}.}
 
 \item{n_sim}{Number of samples.}
+
+\item{times}{A non-negative numeric vector of timepoints.}
+
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
+of the portfolio CDS/CDO.}
+
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
 }
 \description{
 \linkS4class{CalibrationParam} for the H2-extendible Gaussian copula with Exponential margin model for
@@ -81,6 +98,8 @@ For details on the underlying extendible model, see \linkS4class{ExtGaussian2FPa
 \item \code{simulate_dt,H2ExtGaussian3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
+\item \code{expected_pcds_loss,H2ExtGaussian3FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
+
 \item \code{show,H2ExtGaussian3FParam-method}: Display the object.
 
 \item \code{show,H2ExtArch3FParam-method}: Display the object.
@@ -105,11 +124,33 @@ copula whose correlation matrix reflect the inner- and outer-dependency paramete
 results are transformed using \code{\link[stats:Exponential]{stats::qexp()}}.
 }
 
+\section{Expected portfolio CDS loss}{
+
+The \emph{expected portfolio CDS loss} for \emph{recovery rate} \eqn{R} is calculated
+using that
+\deqn{
+  \mathbb{E}[g(L_t)]
+    = (1 - R) \cdot F(t)
+}
+with \eqn{g(x) = (1 - R) \cdot x} and \eqn{F} being the Exponential
+distribution function for rate \eqn{\lambda}.
+}
+
 \examples{
 H2ExtGaussian3FParam()
 H2ExtGaussian3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 H2ExtGaussian3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, tau = c(3e-1, 5e-1))
 parm <- H2ExtGaussian3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(2e-1, 7e-1))
 simulate_dt(parm, n_sim = 5L)
+
+parm <- H2ExtGaussian3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
+expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+  method = "CalibrationParam")
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+  method = "CalibrationParam",
+  pd_args = list(method = "CalibrationParam", seed = 1623,
+    sim_args = list(n_sim = 1e2L)))
 
 }

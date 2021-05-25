@@ -6,6 +6,7 @@
 \alias{H2ExtArch3FParam}
 \alias{initialize,H2ExtArch3FParam-method}
 \alias{initialize,H2ExtArch3FParam,ANY-method}
+\alias{expected_pcds_loss,H2ExtArch3FParam-method}
 \alias{simulate_dt,H2ExtArch3FParam-method}
 \alias{ClaytonH2ExtArch3FParam-class}
 \alias{ClaytonH2ExtArch3FParam}
@@ -34,6 +35,14 @@
   tau = NULL,
   survival = TRUE,
   family = c("Clayton", "Frank", "Gumbel", "Joe")
+)
+
+\S4method{expected_pcds_loss}{H2ExtArch3FParam}(
+  object,
+  times,
+  recovery_rate,
+  ...,
+  method = c("default", "H2ExtArch3FParam", "CalibrationParam")
 )
 
 \S4method{simulate_dt}{H2ExtArch3FParam}(object, ..., n_sim = 10000L)
@@ -67,7 +76,15 @@
 
 \item{object}{A \linkS4class{CalibrationParam}-object.}
 
+\item{times}{A non-negative numeric vector of timepoints.}
+
+\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
+of the portfolio CDS/CDO.}
+
 \item{...}{Pass-through parameters.}
+
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
 
 \item{n_sim}{Number of samples.}
 }
@@ -94,6 +111,8 @@ For details on the underlying extendible model, see \linkS4class{ExtArch2FParam}
 \section{Functions}{
 \itemize{
 \item \code{initialize,H2ExtArch3FParam-method}: Constructor
+
+\item \code{expected_pcds_loss,H2ExtArch3FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
 
 \item \code{simulate_dt,H2ExtArch3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
@@ -124,9 +143,31 @@ The default times are sampled in a two-stage procedure: First a sample is drawn 
 parameters; then the results are transformed using \code{\link[stats:Exponential]{stats::qexp()}}.
 }
 
+\section{Expected portfolio CDS loss}{
+
+The \emph{expected portfolio CDS loss} for \emph{recovery rate} \eqn{R} is calculated
+using that
+\deqn{
+  \mathbb{E}[g(L_t)]
+    = (1 - R) \cdot F(t)
+}
+with \eqn{g(x) = (1 - R) \cdot x} and \eqn{F} being the Exponential
+distribution function for rate \eqn{\lambda}.
+}
+
 \examples{
 H2ExtArch3FParam(
   composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1), survival = TRUE)
+
+parm <- ClaytonH2ExtArch3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
+expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+  method = "CalibrationParam")
+expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+  method = "CalibrationParam",
+  pd_args = list(method = "CalibrationParam", seed = 1623,
+    sim_args = list(n_sim = 1e2L)))
 
 parm <- FrankH2ExtArch3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(2e-1, 7e-1))
 simulate_dt(parm, n_sim = 5L)

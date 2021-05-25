@@ -336,6 +336,47 @@ setMethod("initialize", "H2ExtArch3FParam",
   })
 
 
+#' @describeIn H2ExtArch3FParam-class
+#'   returns the expected portfolio CDS loss for a specific time-point.
+#' @aliases expected_pcds_loss,H2ExtArch3FParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
+#' @inheritSection ExtMO2FParam-class Expected portfolio CDS loss
+#'
+#' @examples
+#' parm <- ClaytonH2ExtArch3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
+#' expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
+#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
+#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+#'   method = "CalibrationParam")
+#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
+#'   method = "CalibrationParam",
+#'   pd_args = list(method = "CalibrationParam", seed = 1623,
+#'     sim_args = list(n_sim = 1e2L)))
+#'
+#' @importFrom stats pexp
+#' @importFrom checkmate qassert
+#'
+#' @export
+setMethod("expected_pcds_loss", "H2ExtArch3FParam",
+  function(object, times, recovery_rate, ...,
+      method = c("default", "H2ExtArch3FParam", "CalibrationParam")) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method || "H2ExtArch3FParam" == method)) {
+      qassert(times, "N+[0,)")
+      qassert(recovery_rate, "N1[0,1]")
+      out <- (1 - recovery_rate) * pexp(times, rate = getLambda(object))
+    } else {
+      out <- callNextMethod(object, times, recovery_rate, ..., method = method)
+    }
+
+    out
+  })
+
+
 #' @describeIn H2ExtGaussian3FParam-class Display the object.
 #' @aliases show,H2ExtGaussian3FParam-method
 #'
