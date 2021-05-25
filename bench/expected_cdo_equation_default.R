@@ -54,7 +54,7 @@ bench::mark(
     parm_poextmo2f, times, discount_factors, recovery_rate, lower, upper, coupon, upfront),
   ExponentialExtMO2FParam = expected_cdo_equation(
     parm_exextmo2f, times, discount_factors, recovery_rate, lower, upper, coupon, upfront),
-  ExtGaussianMO2FParam = expected_cdo_equation(
+  ExtGaussian2FParam = expected_cdo_equation(
     parm_extga2f, times, discount_factors, recovery_rate, lower, upper, coupon, upfront),
   ClaytonExtArch2FParam = expected_cdo_equation(
     parm_clextar2f, times, discount_factors, recovery_rate, lower, upper, coupon, upfront),
@@ -72,7 +72,7 @@ bench::mark(
     parm_poh2extmo3f, times, discount_factors, recovery_rate, lower, upper, coupon, upfront),
   ExponentialH2ExtMO3FParam = expected_cdo_equation(
     parm_exh2extmo3f, times, discount_factors, recovery_rate, lower, upper, coupon, upfront),
-  H2ExtGaussianMO3FParam = expected_cdo_equation(
+  H2ExtGaussian3FParam = expected_cdo_equation(
     parm_h2extga3f, times, discount_factors, recovery_rate, lower, upper, coupon, upfront),
   ClaytonH2ExtArch3FParam = expected_cdo_equation(
     parm_clh2extar3f, times, discount_factors, recovery_rate, lower, upper, coupon, upfront),
