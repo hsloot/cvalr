@@ -12,7 +12,7 @@
 \usage{
 \S4method{initialize}{H2ExMarkovParam}(.Object, fraction, models)
 
-\S4method{simulate_dt}{H2ExMarkovParam}(object, ...)
+\S4method{simulate_dt}{H2ExMarkovParam}(object, ..., n_sim = 10000L)
 
 \S4method{show}{H2ExMarkovParam}(object)
 }
@@ -27,6 +27,8 @@
 \item{object}{A \linkS4class{CalibrationParam}-object.}
 
 \item{...}{Pass-through parameters.}
+
+\item{n_sim}{Number of samples.}
 }
 \description{
 \linkS4class{CalibrationParam} for the H2-exchangeable Markovian \emph{(average) default counting process}

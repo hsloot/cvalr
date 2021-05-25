@@ -36,7 +36,7 @@
   family = c("Clayton", "Frank", "Gumbel", "Joe")
 )
 
-\S4method{simulate_dt}{H2ExtArch3FParam}(object, ..., n_sim = 10000)
+\S4method{simulate_dt}{H2ExtArch3FParam}(object, ..., n_sim = 10000L)
 
 \S4method{initialize}{ClaytonH2ExtArch3FParam}(.Object, ..., survival = FALSE)
 

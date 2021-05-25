@@ -113,7 +113,7 @@ setMethod("initialize", "ExMarkovParam",
 #' @export
 setMethod("simulate_dt", "ExMarkovParam",
   function(object, ...,
-      method = c("default", "ExMarkovParam"), n_sim = 1e1L) {
+      method = c("default", "ExMarkovParam"), n_sim = 1e4L) {
     method <- match.arg(method)
     d <- getDimension(object)
     ex_qmatrix <- getExQMatrix(object)

@@ -21,7 +21,7 @@
   tau = NULL
 )
 
-\S4method{simulate_dt}{H2ExtGaussian3FParam}(object, ..., n_sim = 10000)
+\S4method{simulate_dt}{H2ExtGaussian3FParam}(object, ..., n_sim = 10000L)
 
 \S4method{show}{H2ExtGaussian3FParam}(object)
 

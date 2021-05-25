@@ -33,7 +33,8 @@ LinkingTo:
 Suggests:
     testthat (>= 3.0.0),
     covr,
-    rmarkdown
+    rmarkdown,
+    bench
 Config/testthat/edition: 3
 Collate:
     'RcppExports.R'
