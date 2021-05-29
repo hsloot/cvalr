@@ -14,3 +14,4 @@
 ^vignettes/Portfolio-CDS-and-CDO-tranches\.Rmd$
 ^codemeta\.json$
 ^bench$
+^other$
