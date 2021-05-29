@@ -6,6 +6,7 @@
 \alias{initialize,ExtMO2FParam-method}
 \alias{initialize,ExtMO2FParam,ANY-method}
 \alias{expected_pcds_loss,ExtMO2FParam-method}
+\alias{show,ExtMO2FParam-method}
 \alias{CuadrasAugeExtMO2FParam-class}
 \alias{CuadrasAugeExtMO2FParam}
 \alias{simulate_dt,CuadrasAugeExtMO2FParam-method}
@@ -26,6 +27,8 @@
   ...,
   method = c("default", "ExtMO2FParam", "CalibrationParam")
 )
+
+\S4method{show}{ExtMO2FParam}(object)
 
 \S4method{simulate_dt}{CuadrasAugeExtMO2FParam}(
   object,
@@ -95,6 +98,8 @@ Spearman's Rho and Kendall's Tau is
 \item \code{expected_pcds_loss,ExtMO2FParam-method}: calculates the \emph{expected value} for the \emph{portfolio CDS loss} based on the
 \emph{average default count process} for given timepoints and returns a vector
 \code{x} with \code{length(x) == length(times)}.
+
+\item \code{show,ExtMO2FParam-method}: Display the object.
 
 \item \code{simulate_dt,CuadrasAugeExtMO2FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.

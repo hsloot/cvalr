@@ -10,6 +10,7 @@
 \alias{probability_distribution,ExtGaussian2FParam-method}
 \alias{expected_pcds_loss,ExtGaussian2FParam-method}
 \alias{expected_cdo_loss,ExtGaussian2FParam-method}
+\alias{show,ExtGaussian2FParam-method}
 \title{Two-factor extendible Gaussian calibration parameters}
 \usage{
 \S4method{initialize}{ExtGaussian2FParam}(.Object, dim, lambda, nu, rho, tau)
@@ -45,6 +46,8 @@
   ...,
   method = c("default", "ExtGaussian2FParam", "CalibrationParam")
 )
+
+\S4method{show}{ExtGaussian2FParam}(object)
 }
 \arguments{
 \item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
@@ -115,6 +118,8 @@ and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, le
 \item \code{expected_pcds_loss,ExtGaussian2FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
 
 \item \code{expected_cdo_loss,ExtGaussian2FParam-method}: returns the expected CDO loss for a specific time-point.
+
+\item \code{show,ExtGaussian2FParam-method}: Display the object.
 }}
 
 \section{Slots}{

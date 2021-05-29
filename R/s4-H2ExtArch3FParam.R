@@ -377,8 +377,8 @@ setMethod("expected_pcds_loss", "H2ExtArch3FParam",
   })
 
 
-#' @describeIn H2ExtGaussian3FParam-class Display the object.
-#' @aliases show,H2ExtGaussian3FParam-method
+#' @describeIn H2ExtArch3FParam-class Display the object.
+#' @aliases show,H2ExtArch3FParam-method
 #'
 #' @inheritParams methods::show
 #'

@@ -7,6 +7,7 @@
 \alias{initialize,H2ExtArch3FParam-method}
 \alias{initialize,H2ExtArch3FParam,ANY-method}
 \alias{expected_pcds_loss,H2ExtArch3FParam-method}
+\alias{show,H2ExtArch3FParam-method}
 \alias{simulate_dt,H2ExtArch3FParam-method}
 \alias{ClaytonH2ExtArch3FParam-class}
 \alias{ClaytonH2ExtArch3FParam}
@@ -44,6 +45,8 @@
   ...,
   method = c("default", "H2ExtArch3FParam", "CalibrationParam")
 )
+
+\S4method{show}{H2ExtArch3FParam}(object)
 
 \S4method{simulate_dt}{H2ExtArch3FParam}(object, ..., n_sim = 10000L)
 
@@ -113,6 +116,8 @@ For details on the underlying extendible model, see \linkS4class{ExtArch2FParam}
 \item \code{initialize,H2ExtArch3FParam-method}: Constructor
 
 \item \code{expected_pcds_loss,H2ExtArch3FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
+
+\item \code{show,H2ExtArch3FParam-method}: Display the object.
 
 \item \code{simulate_dt,H2ExtArch3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.

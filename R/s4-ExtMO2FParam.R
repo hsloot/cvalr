@@ -422,7 +422,7 @@ setMethod("expected_pcds_loss", "ExtMO2FParam",
   })
 
 
-#' @describeIn ExtMOParam-class Display the object.
+#' @describeIn ExtMO2FParam-class Display the object.
 #' @aliases show,ExtMO2FParam-method
 #'
 #' @inheritParams methods::show

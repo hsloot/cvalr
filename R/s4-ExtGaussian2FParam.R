@@ -369,7 +369,7 @@ setMethod("expected_cdo_loss", "ExtGaussian2FParam",
   })
 
 
-#' @describeIn ExtMOParam-class Display the object.
+#' @describeIn ExtGaussian2FParam-class Display the object.
 #' @aliases show,ExtGaussian2FParam-method
 #'
 #' @inheritParams methods::show
