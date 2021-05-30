@@ -78,3 +78,45 @@ test_that("`simulate_dt` works as expected for `H2ExMarkovParam`-class", {
   y <- rfn(parm, n)
   expect_equal(x, y)
 })
+
+
+test_that("`probability_distribution` works as expected for `H2ExMarkovParam`", {
+  # HELPER START
+  pfn <- function(parm, times) {
+    qassert(times, "N+[0,)")
+    out <- map(times, ~{
+      .t <- .
+      pvecs <-  purrr::map(getPartitionModels(parm), ~{
+        expm::expm(.t * (1 - getFraction(parm)) * getExQMatrix(.))[1L, , drop = TRUE]
+      })
+      pvec <- purrr::reduce(pvecs, ~convolve(.x, rev(.y), type = "open"))
+      as.vector(t(pvec) %*% expm::expm(.t * getFraction(parm) * getExQMatrix(getGlobalModel(parm))))
+    }) %>%
+    purrr::map(matrix, nrow = getDimension(parm) + 1L, ncol = 1L) %>%
+    purrr::reduce(cbind) %>%
+    `dimnames<-`(NULL)
+  }
+  # HELPER END
+
+  parm <- H2ExMarkovParam(fraction, models)
+  times <- seq(0, 5, by = 25e-2)
+
+  # length of `times` is 1
+  x <- probability_distribution(parm, times[[1]])
+  expect_numeric(
+    x, lower = 0, upper = 1, finite = TRUE, any.missing = FALSE, len = d+1L)
+  expect_equal(sum(x), 1)
+  expect_equal(x, pfn(parm, times[[1]]))
+
+  # length of `times` is larger than 1
+  x <- probability_distribution(parm, times)
+  expect_matrix(
+    x, mode = "numeric", any.missing = FALSE, nrows = d+1L, ncols = length(times))
+  expect_numeric(
+    x, lower = 0, upper = 1, finite = TRUE, any.missing = FALSE)
+  expect_equal(apply(x, 2, sum), rep(1, ncol(x)))
+  expect_equal(x, pfn(parm, times))
+
+  # specify class explicitly
+  expect_equal(x, probability_distribution(parm, times, method = "H2ExMarkovParam"))
+})

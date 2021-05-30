@@ -1,3 +1,7 @@
+# cvalr 0.2.3
+
+- Implement missing `probability_distribution` method for `H2ExMarkovParam`-class
+
 # cvalr 0.2.2
 
 - Implement missing `expected_pcds_loss` methods
