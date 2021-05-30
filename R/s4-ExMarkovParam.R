@@ -175,18 +175,15 @@ setMethod("probability_distribution", "ExMarkovParam",
   function(object, times, ...,
       method = c("default", "ExMarkovParam", "CalibrationParam")) {
     method <- match.arg(method)
-    if (isTRUE("default" == method)) {
-      method <- "ExMarkovParam"
-    }
-    if (!isTRUE("ExMarkovParam" == method)) {
-      out <- callNextMethod(object, times, ..., method = method)
-    } else {
+    if (isTRUE("default" == method || "ExMarkovParam" == method)) {
       qassert(times, "N+[0,)")
       ex_qmatrix <- getExQMatrix(object)
       out <- map(times, ~expm(. * ex_qmatrix)[1L, ]) %>%
         reduce(cbind) %>%
         `dimnames<-`(NULL) %>%
         matrix(nrow = getDimension(object) + 1L, ncol = length(times))
+    } else  {
+      out <- callNextMethod(object, times, ..., method = method)
     }
 
     out

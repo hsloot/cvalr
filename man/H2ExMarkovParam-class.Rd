@@ -7,12 +7,20 @@
 \alias{initialize,H2ExMarkovParam-method}
 \alias{initialize,H2ExMarkovParam,ANY-method}
 \alias{simulate_dt,H2ExMarkovParam-method}
+\alias{probability_distribution,H2ExMarkovParam-method}
 \alias{show,H2ExMarkovParam-method}
 \title{H2-exchangeable Markovian calibration parameter}
 \usage{
 \S4method{initialize}{H2ExMarkovParam}(.Object, fraction, models)
 
 \S4method{simulate_dt}{H2ExMarkovParam}(object, ..., n_sim = 10000L)
+
+\S4method{probability_distribution}{H2ExMarkovParam}(
+  object,
+  times,
+  ...,
+  method = c("default", "H2ExMarkovParam", "CalibrationParam")
+)
 
 \S4method{show}{H2ExMarkovParam}(object)
 }
@@ -29,6 +37,11 @@
 \item{...}{Pass-through parameters.}
 
 \item{n_sim}{Number of samples.}
+
+\item{times}{A non-negative numeric vector of timepoints.}
+
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
 }
 \description{
 \linkS4class{CalibrationParam} for the H2-exchangeable Markovian \emph{(average) default counting process}
@@ -47,6 +60,9 @@ independent \linkS4class{ExMarkovParam} models. The inverse scaling factors are 
 \item \code{simulate_dt,H2ExMarkovParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
+\item \code{probability_distribution,H2ExMarkovParam-method}: calculates the \emph{probability vector} for the \emph{average default count process}
+and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, length(times))}.
+
 \item \code{show,H2ExMarkovParam-method}: Display the object.
 }}
 
@@ -62,6 +78,23 @@ independent \linkS4class{ExMarkovParam} models. The inverse scaling factors are 
 \section{Simulation}{
 
 The default times are sampled using the stochastic representation described in details.
+}
+
+\section{Probability distribution}{
+
+The probability of \eqn{j > i} portfolio items being defaulted at time
+\eqn{t > s} conditioned on \eqn{i} portfolio items being defaulted at time
+\eqn{s} is
+\deqn{
+  \mathbb{P}(Z_t = j \mid Z_s = i)
+    = \sum_{i + i_0 + i_1 + \cdots + i_J = j}
+      \delta_{i}^\top \operatorname{e}^{(t-s) Q^{(1)}} \delta_{i_1} \cdot
+        \delta_{i_1}^\top \operatorname{e}^{(t-s) Q^{(2)}} \delta_{i_2} \cdot \cdots \cdot
+        \delta_{i_{J-1}}^\top \operatorname{e}^{(t-s) Q^{(J)}} \delta_{i_J} \cdot
+        \delta_{i_J}^\top \operatorname{e}^{(t-s) Q^{(0)}} \delta_{i_0} ,
+}
+where \eqn{Q^{(i)}, \ldots, Q^{(J)}} are the Markovian generator matrices of the partition models
+and \eqn{Q^{(0)}} is the Markovian generator matrix of the global model.
 }
 
 \examples{
@@ -84,5 +117,14 @@ model_partition <- purrr::map(composition, ~{
 models <- c(list(model_global), model_partition)
 parm <- H2ExMarkovParam(fraction = 0.4, models = models)
 simulate_dt(parm, n_sim = 5e1)
+
+probability_distribution(CuadrasAugeH2ExtMO3FParam(
+  composition = c(2L, 4L, 2L), lambda = 0.05, rho = c(3e-1, 6e-1)), 0.3)
+probability_distribution(AlphaStableH2ExtMO3FParam(
+  composition = c(2L, 4L, 2L), lambda = 0.05, rho = c(3e-1, 6e-1)), 0.3)
+probability_distribution(PoissonH2ExtMO3FParam(
+  composition = c(2L, 4L, 2L), lambda = 0.05, rho = c(3e-1, 6e-1)), 0.3)
+probability_distribution(ExponentialH2ExtMO3FParam(
+  composition = c(2L, 4L, 2L), lambda = 0.05, rho = c(3e-1, 6e-1)), 0.3)
 
 }

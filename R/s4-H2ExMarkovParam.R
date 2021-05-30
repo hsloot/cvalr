@@ -205,6 +205,77 @@ setMethod("simulate_dt", "H2ExMarkovParam",
   })
 
 
+#' @describeIn H2ExMarkovParam-class
+#'   calculates the *probability vector* for the *average default count process*
+#'   and returns a matrix `x` with `dim(x) == c(getDimension(object)+1L, length(times))`.
+#' @aliases probability_distribution,H2ExMarkovParam-method
+#'
+#' @inheritParams probability_distribution
+#' @param method Calculation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#'
+#' @examples
+#' probability_distribution(CuadrasAugeH2ExtMO3FParam(
+#'   composition = c(2L, 4L, 2L), lambda = 0.05, rho = c(3e-1, 6e-1)), 0.3)
+#' probability_distribution(AlphaStableH2ExtMO3FParam(
+#'   composition = c(2L, 4L, 2L), lambda = 0.05, rho = c(3e-1, 6e-1)), 0.3)
+#' probability_distribution(PoissonH2ExtMO3FParam(
+#'   composition = c(2L, 4L, 2L), lambda = 0.05, rho = c(3e-1, 6e-1)), 0.3)
+#' probability_distribution(ExponentialH2ExtMO3FParam(
+#'   composition = c(2L, 4L, 2L), lambda = 0.05, rho = c(3e-1, 6e-1)), 0.3)
+#'
+#' @section Probability distribution:
+#' The probability of \eqn{j > i} portfolio items being defaulted at time
+#' \eqn{t > s} conditioned on \eqn{i} portfolio items being defaulted at time
+#' \eqn{s} is
+#' \deqn{
+#'   \mathbb{P}(Z_t = j \mid Z_s = i)
+#'     = \sum_{i + i_0 + i_1 + \cdots + i_J = j}
+#'       \delta_{i}^\top \operatorname{e}^{(t-s) Q^{(1)}} \delta_{i_1} \cdot
+#'         \delta_{i_1}^\top \operatorname{e}^{(t-s) Q^{(2)}} \delta_{i_2} \cdot \cdots \cdot
+#'         \delta_{i_{J-1}}^\top \operatorname{e}^{(t-s) Q^{(J)}} \delta_{i_J} \cdot
+#'         \delta_{i_J}^\top \operatorname{e}^{(t-s) Q^{(0)}} \delta_{i_0} ,
+#' }
+#' where \eqn{Q^{(i)}, \ldots, Q^{(J)}} are the Markovian generator matrices of the partition models
+#' and \eqn{Q^{(0)}} is the Markovian generator matrix of the global model.
+#'
+#' @importFrom stats convolve
+#' @importFrom expm expm
+#' @importFrom checkmate qassert
+#' @importFrom purrr map map2 array_branch reduce
+#' @include utils.R
+#'
+#' @export
+setMethod("probability_distribution", "H2ExMarkovParam",
+  function(object, times, ...,
+      method = c("default", "H2ExMarkovParam", "CalibrationParam")) {
+    method <- match.arg(method)
+    if (isTRUE("default" == method || "H2ExMarkovParam" == method)) {
+      qassert(times, "N+[0,)")
+      method <- "ExMarkovParam"
+      frac <- getFraction(object)
+      exq0 <- getExQMatrix(getGlobalModel(object))
+      out <- map(times, ~{
+        .t <- .
+        map(getPartitionModels(object), ~{
+          expm(.t * (1 - frac) * getExQMatrix(.))[1L, , drop = TRUE]
+        }) %>%
+        reduce(~{
+          pmax(convolve(.x, rev(.y), type = "open"), 0)
+        }) %>%
+        { as.vector(t(.) %*% expm(.t * frac * exq0)) } # nolint
+      }) %>%
+      map(matrix, ncol = 1L) %>%
+      reduce(cbind) %>%
+      `dimnames<-`(NULL)
+    } else {
+        out <- callNextMethod(object, times, ..., method = method)
+    }
+
+    out
+  })
+
+
 #' @describeIn H2ExMarkovParam-class Display the object.
 #' @aliases show,H2ExMarkovParam-method
 #'

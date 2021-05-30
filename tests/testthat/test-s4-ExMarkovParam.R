@@ -88,7 +88,7 @@ test_that("`probability_distribution` works as expected for `ExMarkovParam`", {
   # HELPER END
 
   parm <- ExMarkovParam(ex_qmatrix)
-  times <- seq(25e-2, 5L, by = 25e-2)
+  times <- seq(0, 5, by = 25e-2)
 
   # length of `times` is 1
   x <- probability_distribution(parm, times[[1]])
