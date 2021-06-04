@@ -31,28 +31,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dt2adcp
-NumericMatrix dt2adcp(const NumericMatrix& x, const NumericVector& times);
-RcppExport SEXP _cvalr_dt2adcp(SEXP xSEXP, SEXP timesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
-    rcpp_result_gen = Rcpp::wrap(dt2adcp(x, times));
-    return rcpp_result_gen;
-END_RCPP
-}
-// adcp2epd
-NumericMatrix adcp2epd(const NumericMatrix& x, const std::size_t d);
-RcppExport SEXP _cvalr_adcp2epd(SEXP xSEXP, SEXP dSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const std::size_t >::type d(dSEXP);
-    rcpp_result_gen = Rcpp::wrap(adcp2epd(x, d));
-    return rcpp_result_gen;
-END_RCPP
-}
 // is_exqmatrix
 bool is_exqmatrix(const NumericMatrix& x, const double tol);
 RcppExport SEXP _cvalr_is_exqmatrix(SEXP xSEXP, SEXP tolSEXP) {
@@ -157,12 +135,61 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// Rcpp__rexmo_markovian_acdp
+NumericMatrix Rcpp__rexmo_markovian_acdp(const std::size_t n, const NumericVector& times, const std::size_t d, const NumericVector& ex_intensities);
+RcppExport SEXP _cvalr_Rcpp__rexmo_markovian_acdp(SEXP nSEXP, SEXP timesSEXP, SEXP dSEXP, SEXP ex_intensitiesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::size_t >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< const std::size_t >::type d(dSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type ex_intensities(ex_intensitiesSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rcpp__rexmo_markovian_acdp(n, times, d, ex_intensities));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Rcpp__rcamo_esm_adcp
+NumericMatrix Rcpp__rcamo_esm_adcp(const std::size_t n, const NumericVector& times, const std::size_t d, const double alpha, const double beta);
+RcppExport SEXP _cvalr_Rcpp__rcamo_esm_adcp(SEXP nSEXP, SEXP timesSEXP, SEXP dSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::size_t >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< const std::size_t >::type d(dSEXP);
+    Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< const double >::type beta(betaSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rcpp__rcamo_esm_adcp(n, times, d, alpha, beta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dt2adcp
+NumericMatrix dt2adcp(const NumericMatrix& x, const NumericVector& times);
+RcppExport SEXP _cvalr_dt2adcp(SEXP xSEXP, SEXP timesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
+    rcpp_result_gen = Rcpp::wrap(dt2adcp(x, times));
+    return rcpp_result_gen;
+END_RCPP
+}
+// adcp2epd
+NumericMatrix adcp2epd(const NumericMatrix& x, const std::size_t d);
+RcppExport SEXP _cvalr_adcp2epd(SEXP xSEXP, SEXP dSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const std::size_t >::type d(dSEXP);
+    rcpp_result_gen = Rcpp::wrap(adcp2epd(x, d));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_multiply_binomial_coefficient", (DL_FUNC) &_cvalr_multiply_binomial_coefficient, 3},
     {"_cvalr_v_multiply_binomial_coefficient", (DL_FUNC) &_cvalr_v_multiply_binomial_coefficient, 3},
-    {"_cvalr_dt2adcp", (DL_FUNC) &_cvalr_dt2adcp, 2},
-    {"_cvalr_adcp2epd", (DL_FUNC) &_cvalr_adcp2epd, 2},
     {"_cvalr_is_exqmatrix", (DL_FUNC) &_cvalr_is_exqmatrix, 2},
     {"_cvalr_portfolio_cds_coupon", (DL_FUNC) &_cvalr_portfolio_cds_coupon, 4},
     {"_cvalr_portfolio_cds_upfront", (DL_FUNC) &_cvalr_portfolio_cds_upfront, 5},
@@ -170,6 +197,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_cdo_upfront", (DL_FUNC) &_cvalr_cdo_upfront, 6},
     {"_cvalr_cdo_coupon", (DL_FUNC) &_cvalr_cdo_coupon, 5},
     {"_cvalr_cdo_equation", (DL_FUNC) &_cvalr_cdo_equation, 7},
+    {"_cvalr_Rcpp__rexmo_markovian_acdp", (DL_FUNC) &_cvalr_Rcpp__rexmo_markovian_acdp, 4},
+    {"_cvalr_Rcpp__rcamo_esm_adcp", (DL_FUNC) &_cvalr_Rcpp__rcamo_esm_adcp, 5},
+    {"_cvalr_dt2adcp", (DL_FUNC) &_cvalr_dt2adcp, 2},
+    {"_cvalr_adcp2epd", (DL_FUNC) &_cvalr_adcp2epd, 2},
     {NULL, NULL, 0}
 };
 

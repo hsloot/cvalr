@@ -1,3 +1,7 @@
+# 0.2.x
+
+- Improved sampling of *average default counting process* for ext. MO families
+
 # cvalr 0.2.3
 
 - Implement missing `probability_distribution` method for `H2ExMarkovParam`-class

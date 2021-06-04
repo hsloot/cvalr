@@ -9,14 +9,6 @@ v_multiply_binomial_coefficient <- function(x, n, k) {
     .Call(`_cvalr_v_multiply_binomial_coefficient`, x, n, k)
 }
 
-dt2adcp <- function(x, times) {
-    .Call(`_cvalr_dt2adcp`, x, times)
-}
-
-adcp2epd <- function(x, d) {
-    .Call(`_cvalr_adcp2epd`, x, d)
-}
-
 is_exqmatrix <- function(x, tol) {
     .Call(`_cvalr_is_exqmatrix`, x, tol)
 }
@@ -75,5 +67,21 @@ cdo_coupon <- function(expected_losses, times, discount_factors, lower, upper) {
 #' @export
 cdo_equation <- function(expected_losses, times, discount_factors, lower, upper, coupon, upfront) {
     .Call(`_cvalr_cdo_equation`, expected_losses, times, discount_factors, lower, upper, coupon, upfront)
+}
+
+Rcpp__rexmo_markovian_acdp <- function(n, times, d, ex_intensities) {
+    .Call(`_cvalr_Rcpp__rexmo_markovian_acdp`, n, times, d, ex_intensities)
+}
+
+Rcpp__rcamo_esm_adcp <- function(n, times, d, alpha, beta) {
+    .Call(`_cvalr_Rcpp__rcamo_esm_adcp`, n, times, d, alpha, beta)
+}
+
+dt2adcp <- function(x, times) {
+    .Call(`_cvalr_dt2adcp`, x, times)
+}
+
+adcp2epd <- function(x, d) {
+    .Call(`_cvalr_adcp2epd`, x, d)
 }
 
