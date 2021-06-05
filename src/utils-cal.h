@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <numeric>
 #include <utility>
+#include <iterator>
 
 template <typename _ForwardIterator1, typename _ForwardIterator2,
           typename _ForwardIterator3>
