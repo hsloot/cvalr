@@ -10,6 +10,7 @@
 \alias{CuadrasAugeExtMO2FParam-class}
 \alias{CuadrasAugeExtMO2FParam}
 \alias{simulate_dt,CuadrasAugeExtMO2FParam-method}
+\alias{simulate_adcp,CuadrasAugeExtMO2FParam-method}
 \alias{AlphaStableExtMO2FParam-class}
 \alias{AlphaStableExtMO2FParam}
 \alias{PoissonExtMO2FParam-class}
@@ -32,6 +33,14 @@
 
 \S4method{simulate_dt}{CuadrasAugeExtMO2FParam}(
   object,
+  ...,
+  method = c("default", "CuadrasAugeExtMO2FParam", "ExMOParam", "ExMarkovParam"),
+  n_sim = 10000L
+)
+
+\S4method{simulate_adcp}{CuadrasAugeExtMO2FParam}(
+  object,
+  times,
   ...,
   method = c("default", "CuadrasAugeExtMO2FParam", "ExMOParam", "ExMarkovParam"),
   n_sim = 10000L
@@ -103,6 +112,9 @@ Spearman's Rho and Kendall's Tau is
 
 \item \code{simulate_dt,CuadrasAugeExtMO2FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
+
+\item \code{simulate_adcp,CuadrasAugeExtMO2FParam-method}: simulates the \emph{average default counting process} and returns a
+matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
 }}
 
 \section{Slots}{
@@ -140,6 +152,9 @@ a pure-killing subordinator and a pure-drift subordinator.
 \section{Simulation}{
 
 The default times are sampled using \code{\link[rmo:rmo_esm_cuadras_auge]{rmo::rcamo_esm()}}.
+
+
+The default times are sampled using \code{\link[rmo:rexmo_markovian]{rmo::rexmo_markovian()}}.
 }
 
 \section{Alpha-stable calibration parameter class}{
@@ -198,5 +213,8 @@ expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
 
 parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 simulate_dt(parm, n_sim = 5L)
+
+parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+simulate_adcp(parm, times = seq(0, 5, by = 0.25), n_sim = 5L)
 
 }

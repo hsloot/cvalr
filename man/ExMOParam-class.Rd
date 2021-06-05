@@ -7,6 +7,7 @@
 \alias{initialize,ExMOParam-method}
 \alias{initialize,ExMOParam,ANY-method}
 \alias{simulate_dt,ExMOParam-method}
+\alias{simulate_adcp,ExMOParam-method}
 \alias{show,ExMOParam-method}
 \title{Exchangeable Marshall--Olkin calibration parameter}
 \usage{
@@ -14,6 +15,14 @@
 
 \S4method{simulate_dt}{ExMOParam}(
   object,
+  ...,
+  method = c("default", "ExMOParam", "ExMarkovParam"),
+  n_sim = 10000L
+)
+
+\S4method{simulate_adcp}{ExMOParam}(
+  object,
+  times,
   ...,
   method = c("default", "ExMOParam", "ExMarkovParam"),
   n_sim = 10000L
@@ -36,6 +45,8 @@ Marshall-Olkin distribution (see \code{\link[rmo:BernsteinFunction-class]{rmo::e
 class whose implementation should be used).}
 
 \item{n_sim}{Number of samples.}
+
+\item{times}{A non-negative numeric vector of timepoints.}
 }
 \description{
 \linkS4class{CalibrationParam}-class for the exchangeable Marshall-Olkin model for
@@ -67,6 +78,9 @@ The (scaled) exchangeable intensities, provided to the constructor are
 \item \code{simulate_dt,ExMOParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
+\item \code{simulate_adcp,ExMOParam-method}: simulates the \emph{average default counting process} and returns a
+matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
+
 \item \code{show,ExMOParam-method}: Display the object.
 }}
 
@@ -80,6 +94,9 @@ exchangeable Marshall-Olkin distribution (see \code{\link[rmo:BernsteinFunction-
 \section{Simulation}{
 
 The default times are sampled using \code{\link[rmo:rexmo_markovian]{rmo::rexmo_markovian()}}.
+
+
+The default times are sampled using \code{\link[rmo:rexmo_markovian]{rmo::rexmo_markovian()}}.
 }
 
 \examples{
@@ -87,5 +104,8 @@ ExMOParam()
 ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 parm <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 simulate_dt(parm, n_sim = 5L)
+
+parm <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
+simulate_adcp(parm, times = seq(0, 5, by = 0.25), n_sim = 5L)
 
 }

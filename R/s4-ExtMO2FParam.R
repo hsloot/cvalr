@@ -557,6 +557,46 @@ setMethod("simulate_dt", "CuadrasAugeExtMO2FParam",
   })
 
 
+#' @describeIn ExtMO2FParam-class
+#'   simulates the *average default counting process* and returns a
+#'   matrix `x` with `dim(x) == c(n_sim, length(times))`.
+#' @aliases simulate_adcp,CuadrasAugeExtMO2FParam-method
+#'
+#' @inheritParams simulate_adcp
+#' @param method Simulation method (either `"default"` or the name of the
+#'   class whose implementation should be used).
+#' @param times A non-negative numeric vector of timepoints.
+#' @param n_sim Number of samples.
+#'
+#' @section Simulation:
+#' The default times are sampled using [rmo::rexmo_markovian()].
+#'
+#'
+#' @examples
+#' parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' simulate_adcp(parm, times = seq(0, 5, by = 0.25), n_sim = 5L)
+#'
+#' @include RcppExports.R
+#'
+#' @export
+setMethod("simulate_adcp", "CuadrasAugeExtMO2FParam",
+  function(object, times, ...,
+      method = c("default", "CuadrasAugeExtMO2FParam", "ExMOParam", "ExMarkovParam"),
+      n_sim = 1e4L) {
+    method <- match.arg(method)
+
+    if (isTRUE("default" == method || "CuadrasAugeExtMO2FParam" == method)) {
+      out <- Rcpp__rcamo_esm_adcp(
+        n_sim, times, getDimension(object),
+        getLambda(object) * (1 - getNu(object)), getLambda(object) * getNu(object))
+    } else {
+      out <- callNextMethod(object, times, ..., method = method, n_sim = n_sim)
+    }
+
+    out
+  })
+
+
 #' @rdname ExtMO2FParam-class
 #'
 #' @section Alpha-stable calibration parameter class:
