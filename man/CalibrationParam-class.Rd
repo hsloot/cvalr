@@ -6,13 +6,10 @@
 \alias{simulate_dt}
 \alias{simulate_adcp}
 \alias{simulate_adcp,CalibrationParam-method}
+\alias{simulate_adcp,CalibrationParam-methodxw}
 \alias{probability_distribution}
 \alias{expected_value}
 \alias{expected_value,CalibrationParam-method}
-\alias{expected_pcds_loss}
-\alias{expected_pcds_loss,CalibrationParam-method}
-\alias{expected_cdo_loss}
-\alias{expected_cdo_loss,CalibrationParam-method}
 \alias{expected_pcds_equation}
 \alias{expected_pcds_equation,CalibrationParam-method}
 \alias{expected_cdo_equation}
@@ -27,37 +24,18 @@ simulate_adcp(object, times, ...)
 
 probability_distribution(object, times, ...)
 
-expected_value(object, times, g, ...)
+expected_value(object, times, ...)
 
 \S4method{expected_value}{CalibrationParam}(
   object,
   times,
-  g,
   ...,
-  method = c("default", "CalibrationParam"),
-  pd_args = NULL
-)
-
-expected_pcds_loss(object, times, recovery_rate, ...)
-
-\S4method{expected_pcds_loss}{CalibrationParam}(
-  object,
-  times,
-  recovery_rate,
-  ...,
-  method = c("default", "CalibrationParam")
-)
-
-expected_cdo_loss(object, times, recovery_rate, lower, upper, ...)
-
-\S4method{expected_cdo_loss}{CalibrationParam}(
-  object,
-  times,
-  recovery_rate,
-  lower,
-  upper,
-  ...,
-  method = c("default", "CalibrationParam")
+  method = c("default", "prob", "mc"),
+  n_sim = 10000L,
+  attrs = NULL,
+  .trans_v = NULL,
+  .lagg_ev = NULL,
+  .simulate_pv = NULL
 )
 
 expected_pcds_equation(
@@ -107,31 +85,34 @@ expected_cdo_equation(
 \arguments{
 \item{object}{A \linkS4class{CalibrationParam}-object.}
 
-\item{...}{Pass-through parameter.}
+\item{...}{Pass-through parameters.}
 
 \item{times}{A non-negative numeric vector of timepoints.}
 
-\item{g}{A payoff transformation function.}
+\item{method}{Calculation method (either \code{"default"}, \code{"prob"} (requires implementation of
+\code{probability_distribution}), or \code{"mc"}).}
 
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
+\item{n_sim}{Number of samples.}
 
-\item{pd_args}{A list of parameters for \code{\link[=probability_distribution]{probability_distribution()}}.}
+\item{attrs}{A named list with functions which are applied to a vector of \emph{present values}.}
 
-\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
-of the portfolio CDS/CDO.}
+\item{.trans_v}{Internal parameter, not independent for the user.}
 
-\item{lower}{Non-negative number between zero and one for the lower attachment point
-of the CDO tranche.}
+\item{.lagg_ev}{Internal parameter, not independent for the user.}
 
-\item{upper}{Non-negative number between \code{lower} and one for the upper attachment point
-of the CDO tranche.}
+\item{.simulate_pv}{Internal parameter, not independent for the user.}
 
 \item{discount_factors}{Non-negative numeric vector for the discount factors for the timepoints.}
 
-\item{coupon}{Numeric number for the running coupon of the portfolio CDS / CDO tranche.}
+\item{recovery_rate}{Non-negative number between zero and one for the \emph{recovery rate}..}
 
-\item{upfront}{Numeric number for the upfront payment of the portfolio CDS / CDO tranche.}
+\item{coupon}{Numeric number for the running coupon.}
+
+\item{upfront}{Numeric number for the upfront payment.}
+
+\item{lower}{Non-negative number between zero and one for the \emph{lower attachment point}.}
+
+\item{upper}{Non-negative number between zero and one for the \emph{upper attachment point}.}
 }
 \description{
 \code{CalibrationParam} provides a simple interface to calculate \emph{expected values}
@@ -158,22 +139,6 @@ count process} for given timepoints and returns a vector \code{x} with
 
 \item \code{expected_value,CalibrationParam-method}: calculates the \emph{expected value} for the loss based on the \emph{average default
 count process} for given timepoints and returns a vector \code{x} with
-\code{length(x) == length(times)}.
-
-\item \code{expected_pcds_loss}: calculates the \emph{expected value} for the \emph{portfolio CDS loss} based on the
-\emph{average default count process} for given timepoints and returns a vector
-\code{x} with \code{length(x) == length(times)}.
-
-\item \code{expected_pcds_loss,CalibrationParam-method}: calculates the \emph{expected value} for the \emph{portfolio CDS loss} based on the
-\emph{average default count process} for given timepoints and returns a vector
-\code{x} with \code{length(x) == length(times)}.
-
-\item \code{expected_cdo_loss}: calculates the \emph{expected value} for the \emph{CDO loss} based on the \emph{average
-default count process} for given timepoints and returns a vector \code{x} with
-\code{length(x) == length(times)}.
-
-\item \code{expected_cdo_loss,CalibrationParam-method}: calculates the \emph{expected value} for the \emph{CDO loss} based on the \emph{average
-default count process} for given timepoints and returns a vector \code{x} with
 \code{length(x) == length(times)}.
 
 \item \code{expected_pcds_equation}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
@@ -207,22 +172,30 @@ i.e. the values
 
 \section{Expected value}{
 
-The \emph{expectated value} of the \emph{average default counting process} \eqn{L}
-under a payoff-transformation can be calculated with \code{\link[=expected_value]{expected_value()}}; i.e. the
-value
+The \emph{expectated value} of finite linear transformations of the \emph{average default counting process}
+\eqn{L} under a transformation and a linear aggregation can be calculated with \code{\link[=expected_value]{expected_value()}};
+i.e. the value
 \deqn{
-  \mathbb{E}[g(L_t)] , \quad t \geq 0.
+  \mathbb{E}[diag(A^\top \cdot g(L_t))] , \quad t = (t_1, \ldots, t_m) \geq 0.
 }
-For a \emph{portfolio CDS} choose \eqn{g(x) = (1 - R) x} and for a \emph{CDO} tranche with
-attachment points \eqn{l < u} and choose
-\eqn{g(x) = min{\{ \max{\{ (1 - R) x - l, 0 \}}, u - l \}}}, where \eqn{R} is
-the recovery rate.
+with \eqn{g : \mathbb{R} \to \mathbb{R}^p} \eqn{A = (a_1, \ldots, a_p) \in R^{m \times p}}.
 \itemize{
-\item \code{\link[=expected_value]{expected_value()}} can be used for general payoff-transformations of the
-\emph{average default counting process}.
-\item \code{\link[=expected_pcds_loss]{expected_pcds_loss()}} and \code{\link[=expected_cdo_loss]{expected_cdo_loss()}} are convenience-wrappers
-for \emph{portfolio CDS} and \emph{CDO} payoff-transformations.
+\item For classes with an implementation of \code{probability_distribution}, \code{method == "prob"} can be
+used. In this case the transformation \code{g} (generalized such that \eqn{g(\mathbb{R}^m) \in
+  \mathbb{R}^{m \times p}}) should be provided via \code{.trans_v(x)} which takes an
+\eqn{\mathbb{R}^m} vector and returns a \eqn{\mathbb{R}^{m\times p}} matrix. Furthermore, the
+(diagonal of the) linear aggregation should be provided via \code{.lagg_ev(x)} which takes a
+\eqn{\mathbb{R}^{m \times p}} matrix and returns an \eqn{\mathbb{R}^p} vector. Both functions
+should be vectorized appropriately.
+\item For all classes, \code{method == "prob"} can be used. In this case a function \code{.simulate_pv} should
+be provided. This function should draw samples of \eqn{L_t^{(i)}} and  return the values of
+\eqn{(a_j^\top \cdot g_j(L_t^{(i)}))} in a \eqn{\mathbb{R}^{n \times p}} matrix. A named list
+of functions can be provided via \code{attrs} those should work simular to \code{\link[=mean]{mean()}}; their results
+will be bound to the return values as attributes.
 }
+
+The methods \code{\link[=expected_pcds_equation]{expected_pcds_equation()}} and \code{\link[=expected_cdo_equation]{expected_cdo_equation()}} are convenience-wrappers for
+expected \emph{portfolio CDS} and \emph{CDO} payoff-equations.
 }
 
 \examples{
@@ -231,46 +204,47 @@ simulate_adcp(parm, 1, n_sim = 10L)
 simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 10L)
 
 expected_value(CuadrasAugeExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
-  function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.25,
+  .trans_v = function(x) x, .lagg_ev = function(x) x)
 expected_value(AlphaStableExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
-  function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
+  dim = 50L, lambda = 0.05, rho = 0.4), seq(0.25, 5, by = 0.25),
+  .trans_v = function(x) x, .lagg_ev = function(x) apply(x, 2L, mean))
 expected_value(PoissonExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
-  function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.25,
+  .trans_v = function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
+  .lagg_ev = function(x) apply(x, 2L, mean))
 expected_value(ExponentialExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3,
-  function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2))
+  dim = 50L, lambda = 0.05, rho = 0.4), seq(0.25, 5, by = 0.25),
+  .trans_v = function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
+  .lagg_ev = function(x) apply(x, 2L, mean))
 
-expected_pcds_loss(CuadrasAugeExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
-expected_pcds_loss(AlphaStableExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
-expected_pcds_loss(PoissonExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
-expected_pcds_loss(ExponentialExtMO2FParam(
-  dim = 50L, lambda = 0.05, rho = 0.4), 0.3, 0.4)
-
-expected_cdo_loss(CuadrasAugeExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4, 0.1, 0.2)
-expected_cdo_loss(AlphaStableExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4, 0.1, 0.2)
-expected_cdo_loss(PoissonExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4, 0.1, 0.2)
-expected_cdo_loss(ExponentialExtMO2FParam(
-  dim = 50, lambda = 0.05, rho = 0.4), 0.3, 0.4, 0.1, 0.2)
+expected_value(CuadrasAugeExtMO2FParam(
+  dim = 50L, lambda = 0.05, rho = 0.4), 0.25,
+  method = "mc", n_sim = 1e4L,
+  .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim))
+expected_value(CuadrasAugeExtMO2FParam(
+  dim = 50L, lambda = 0.05, rho = 0.4), seq(0.25, 5, by = 0.25),
+  method = "mc", n_sim = 1e4L,
+  .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim))
+expected_value(CuadrasAugeExtMO2FParam(
+  dim = 50L, lambda = 0.05, rho = 0.4), seq(0.25, 5, by = 0.25),
+  function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
+  method = "mc", n_sim = 1e4L,
+  .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim),
+  attrs = list(sd = function(x) sd(x) / sqrt(length(x))))
 
 expected_pcds_equation(
-  ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+  AlphaStableExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.6),
   times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
-  recovery_rate = 0.4, coupon = 0.08, upfront = 0
-)
+  recovery_rate = 0.4, coupon = 0.08, upfront = 0)
 expected_pcds_equation(
-  ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+  AlphaStableExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.6),
   times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
-  recovery_rate = rep(0.4, 4), coupon = rep(0.08, 4), upfront = rep(0, 4)
-)
+  recovery_rate = 0.4, coupon = rep(0.08, 4), upfront = rep(0, 4))
+expected_pcds_equation(
+  AlphaStableExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.6),
+  times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+  recovery_rate = rep(0.4, 4), coupon = rep(0.08, 4), upfront = rep(0, 4))
 
 expected_cdo_equation(
   ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
@@ -286,5 +260,5 @@ expected_cdo_equation(
 \linkS4class{PoissonExtMO2FParam} \linkS4class{ExponentialExtMO2FParam}
 \linkS4class{ExtArch2FParam} \linkS4class{ClaytonExtArch2FParam}
 \linkS4class{FrankExtArch2FParam} \linkS4class{GumbelExtArch2FParam}
-\linkS4class{JoeExtArch2FParam} \code{\link[=expected_pcds_loss]{expected_pcds_loss()}}, \code{\link[=expected_cdo_loss]{expected_cdo_loss()}}
+\linkS4class{JoeExtArch2FParam}
 }

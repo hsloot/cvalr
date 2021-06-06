@@ -5,7 +5,7 @@
 \alias{H2ExtMO3FParam-class}
 \alias{initialize,H2ExtMO3FParam-method}
 \alias{initialize,H2ExtMO3FParam,ANY-method}
-\alias{expected_pcds_loss,H2ExtMO3FParam-method}
+\alias{expected_pcds_equation,H2ExtMO3FParam-method}
 \alias{show,H2ExtMO3FParam-method}
 \alias{CuadrasAugeH2ExtMO3FParam-class}
 \alias{CuadrasAugeH2ExtMO3FParam}
@@ -19,12 +19,15 @@
 \usage{
 \S4method{initialize}{H2ExtMO3FParam}(.Object, composition, lambda, nu, fraction, rho, tau, alpha)
 
-\S4method{expected_pcds_loss}{H2ExtMO3FParam}(
+\S4method{expected_pcds_equation}{H2ExtMO3FParam}(
   object,
   times,
+  discount_factors,
   recovery_rate,
+  coupon,
+  upfront,
   ...,
-  method = c("default", "H2ExtMO3FParam", "CalibrationParam")
+  method = c("default", "prob", "mc")
 )
 
 \S4method{show}{H2ExtMO3FParam}(object)
@@ -50,8 +53,13 @@
 
 \item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
-of the portfolio CDS/CDO.}
+\item{discount_factors}{Non-negative numeric vector for the discount factors for the timepoints.}
+
+\item{recovery_rate}{Non-negative number between zero and one for the \emph{recovery rate}..}
+
+\item{coupon}{Numeric number for the running coupon.}
+
+\item{upfront}{Numeric number for the upfront payment.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
@@ -112,7 +120,8 @@ For details on the underlying extendible models, see \linkS4class{ExtMO2FParam}.
 \itemize{
 \item \code{initialize,H2ExtMO3FParam-method}: Constructor
 
-\item \code{expected_pcds_loss,H2ExtMO3FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
+\item \code{expected_pcds_equation,H2ExtMO3FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
 \item \code{show,H2ExtMO3FParam-method}: Display the object.
 }}
@@ -190,13 +199,11 @@ PoissonH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, tau = c(3e-1, 
 ExponentialH2ExtMO3FParam()
 ExponentialH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, alpha = c(3e-1, 5e-1))
 parm <- AlphaStableH2ExtMO3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
-expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-  method = "CalibrationParam")
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-  method = "CalibrationParam",
-  pd_args = list(method = "CalibrationParam", seed = 1623,
-    sim_args = list(n_sim = 1e2L)))
+expected_pcds_equation(
+  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
+  coupon = 1e-1, upfront = 0)
+expected_pcds_equation(
+  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
+  coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 
 }

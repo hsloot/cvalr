@@ -17,10 +17,10 @@ if(getRversion() >= "2.15.1") utils::globalVariables(c(".")) # nolint
 #' @section Calibration parameter:
 #' A * calibration parameter* represents a family of multivariate models.  or
 #' each model the method `expected_value()` can be used to calculate arbitrary
-#' xpectations on the *default counting process*. The implementation depends on
+#' expectations on the *default counting process*. The implementation depends on
 #' the model and can involve Monte-Carlo simulation. For specific derivatives,
-#' the methods `expected_*_loss`, e.g. [expected_pcds_loss()] and
-#' [expected_cdo_loss()], should be used to allow for optimized calculations of
+#' the methods `expected_*_equation`, e.g. [expected_pcds_equation()] and
+#' [expected_cdo_equation()], should be used to allow for optimized calculations of
 #' the expectation (in particular for the Gaussian case).
 #' - At the moment, all models have exponential margins. This is not a
 #'   limitation for derivatives which are not path dependent (payoffs only

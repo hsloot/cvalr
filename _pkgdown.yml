@@ -15,7 +15,6 @@ reference:
   contents:
   - matches("^probability_distribution$")
   - matches("^expected_value$")
-  - matches("^expected_[a-z]+_loss$")
   - matches("^expected_[a-z]+_equation$")
 
 - title: Credit derivative pricing functions

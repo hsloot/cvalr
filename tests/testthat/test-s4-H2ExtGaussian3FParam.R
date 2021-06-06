@@ -74,22 +74,18 @@ test_that("`H2ExtGaussian3FParam`-class setters can be used in arbitrary order",
   expect_equal(parm, parm2)
 })
 
-test_that("`expected_pcds_loss` works as expected for `H2ExtGaussian3FParam", {
-  # HELPER START
-  epcdslfn <- function(parm, times, recovery_rate) {
-    qassert(times, "N+[0,)")
-    qassert(recovery_rate, "N1[0,1]")
-
-    (1 - recovery_rate) * pexp(times, rate = getLambda(parm))
-  }
-  # HELPER END
-
+test_that("`expected_pcds_equation` works as expected for `H2ExtGaussian3FParam", {
+  times <- seq(0.25, 5, by = 0.25)
+  discount_factors <- rep(1, length(times))
+  recovery_rate <- 4e-1
+  coupon <- 1e-1
+  upfront <- -1e-2
   parm <- H2ExtGaussian3FParam(composition = composition, lambda = lambda, nu = nu)
-  times <- seq(25e-2, 5L, by = 25e-2)
-  recovery_rate <- 0.4
 
-  x <- expected_pcds_loss(parm, times, recovery_rate = recovery_rate)
-  expect_numeric(x, any.missing = FALSE, lower = 0, upper = 1,
-    len = length(times), sorted = TRUE)
-  expect_equal(x, epcdslfn(parm, times, recovery_rate))
+  # using default
+  x <- expected_pcds_equation(parm, times, discount_factors, recovery_rate, coupon, upfront)
+  expect_numeric(x, finite = TRUE, any.missing = FALSE, len = 1L)
+  y <- test__expected_pcds_equation__default(
+    parm, times, discount_factors, recovery_rate, coupon, upfront)
+  expect_equal(x, y)
 })

@@ -1,5 +1,6 @@
 #+ r load-package
 library(cvalr)
+options("cvalr.enable_messages" = FALSE, "cvalr.enable_warnings" = FALSE)
 
 #+ r config-and-setup
 times <- seq(0.25, 5, by = 0.25)

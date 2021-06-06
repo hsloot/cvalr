@@ -241,10 +241,11 @@ setMethod("simulate_dt", "H2ExtGaussian3FParam",
 
 
 #' @describeIn H2ExtGaussian3FParam-class
-#'   returns the expected portfolio CDS loss for a specific time-point.
-#' @aliases expected_pcds_loss,H2ExtGaussian3FParam-method
+#'   calculates the *payoff equation* for a *portfolio CDS* (vectorized w.r.t.
+#'   the argumentes `recovery_rate`, `coupon`, and `upfront`).
+#' @aliases expected_pcds_equation,H2ExtGaussian3FParam-method
 #'
-#' @inheritParams probability_distribution
+#' @inheritParams expected_pcds_equation
 #' @param method Calculation method (either `"default"` or the name of the
 #'   class whose implementation should be used).
 #'
@@ -252,29 +253,41 @@ setMethod("simulate_dt", "H2ExtGaussian3FParam",
 #'
 #' @examples
 #' parm <- H2ExtGaussian3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
-#' expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-#'   method = "CalibrationParam")
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-#'   method = "CalibrationParam",
-#'   pd_args = list(method = "CalibrationParam", seed = 1623,
-#'     sim_args = list(n_sim = 1e2L)))
+#' expected_pcds_equation(
+#'   parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
+#'   coupon = 1e-1, upfront = 0)
+#' expected_pcds_equation(
+#'   parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
+#'   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 #'
 #' @importFrom stats pexp
-#' @importFrom checkmate qassert
+#' @importFrom checkmate assert check_numeric
+#' @importFrom vctrs vec_size_common vec_recycle
+#' @include RcppExports.R
 #'
 #' @export
-setMethod("expected_pcds_loss", "H2ExtGaussian3FParam",
-  function(object, times, recovery_rate, ...,
-      method = c("default", "H2ExtGaussian3FParam", "CalibrationParam")) {
+setMethod("expected_pcds_equation", "H2ExtGaussian3FParam",
+  function(object, times, discount_factors, recovery_rate, coupon, upfront, ...,
+      method = c("default", "prob", "mc")) {
     method <- match.arg(method)
-    if (isTRUE("default" == method || "H2ExtGaussian3FParam" == method)) {
+    if ("default" == method) {
       qassert(times, "N+[0,)")
-      qassert(recovery_rate, "N1[0,1]")
-      out <- (1 - recovery_rate) * pexp(times, rate = getLambda(object))
+      qassert(discount_factors, paste0("N", length(times), "[0,)"))
+      qassert(recovery_rate, "N+[0,1]")
+      qassert(coupon, "N+")
+      qassert(upfront, "N+")
+
+      p <- vec_size_common(recovery_rate, coupon, upfront)
+      recovery_rate <- vec_recycle(recovery_rate, p)
+      coupon <- vec_recycle(coupon, p)
+      upfront <- vec_recycle(upfront, p)
+
+      x <- pexp(times, rate = getLambda(object)) %*% t(1 - recovery_rate)
+
+      out <- Rcpp__lagg_ev_pcds(x, times, discount_factors, recovery_rate, coupon, upfront)
     } else {
-      out <- callNextMethod(object, times, recovery_rate, ..., method = method)
+      out <- callNextMethod(
+        object, times, discount_factors, recovery_rate, coupon, upfront, ..., method = method)
     }
 
     out

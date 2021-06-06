@@ -1,5 +1,6 @@
-#include <Rcpp.h>
 #include <cmath>
+
+#include <Rcpp.h>
 
 using namespace Rcpp;
 
@@ -7,8 +8,7 @@ using namespace Rcpp;
 
 // [[Rcpp::export(rng=false)]]
 bool is_exqmatrix(const NumericMatrix &x, const double tol) {
-  if (x.nrow() != x.ncol())
-    return false;
+  if (x.nrow() != x.ncol()) return false;
   const auto n = static_cast<std::size_t>(x.nrow());
   for (auto i = std::size_t{0}; i < n; ++i) {
     for (auto j = std::size_t{0}; j < n; ++j) {
@@ -20,8 +20,7 @@ bool is_exqmatrix(const NumericMatrix &x, const double tol) {
         return false;
     }
     const auto row = x(i, _);
-    if (std::fabs(std::accumulate(row.cbegin(), row.cend(), 0.)) >= tol)
-      return false;
+    if (std::fabs(std::accumulate(row.cbegin(), row.cend(), 0.)) >= tol) return false;
   }
   return true;
 }

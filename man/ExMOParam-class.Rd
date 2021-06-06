@@ -20,13 +20,7 @@
   n_sim = 10000L
 )
 
-\S4method{simulate_adcp}{ExMOParam}(
-  object,
-  times,
-  ...,
-  method = c("default", "ExMOParam", "ExMarkovParam"),
-  n_sim = 10000L
-)
+\S4method{simulate_adcp}{ExMOParam}(object, times, ..., n_sim = 10000L)
 
 \S4method{show}{ExMOParam}(object)
 }

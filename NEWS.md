@@ -1,18 +1,10 @@
-# 0.2.x
+# 0.3 
 
+- Internal refactoring of `expected_value` methods and user interface.
 - Improved sampling of *average default counting process* for ext. MO families
-
-# cvalr 0.2.3
-
 - Implement missing `probability_distribution` method for `H2ExMarkovParam`-class
-
-# cvalr 0.2.2
-
 - Implement missing `expected_pcds_loss` methods
 - Include continuous benchmark integration on Github
-
-# cvalr 0.2.1
-
 - Fix validity methods
 
 # cvalr 0.2

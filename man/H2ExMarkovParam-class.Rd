@@ -15,12 +15,7 @@
 
 \S4method{simulate_dt}{H2ExMarkovParam}(object, ..., n_sim = 10000L)
 
-\S4method{probability_distribution}{H2ExMarkovParam}(
-  object,
-  times,
-  ...,
-  method = c("default", "H2ExMarkovParam", "CalibrationParam")
-)
+\S4method{probability_distribution}{H2ExMarkovParam}(object, times, ...)
 
 \S4method{show}{H2ExMarkovParam}(object)
 }
@@ -39,9 +34,6 @@
 \item{n_sim}{Number of samples.}
 
 \item{times}{A non-negative numeric vector of timepoints.}
-
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
 }
 \description{
 \linkS4class{CalibrationParam} for the H2-exchangeable Markovian \emph{(average) default counting process}
