@@ -9,6 +9,9 @@
 \alias{show,H2ExtMO3FParam-method}
 \alias{CuadrasAugeH2ExtMO3FParam-class}
 \alias{CuadrasAugeH2ExtMO3FParam}
+\alias{simulate_dt,CuadrasAugeH2ExtMO3FParam-method}
+\alias{simulate_adcp,CuadrasAugeH2ExtMO3FParam-method}
+\alias{simulate_adcp,CuadrasAugeH2ExtMO3FParam-methods}
 \alias{AlphaStableH2ExtMO3FParam-class}
 \alias{AlphaStableH2ExtMO3FParam}
 \alias{PoissonH2ExtMO3FParam-class}
@@ -31,6 +34,10 @@
 )
 
 \S4method{show}{H2ExtMO3FParam}(object)
+
+\S4method{simulate_dt}{CuadrasAugeH2ExtMO3FParam}(object, ..., n_sim = 10000L)
+
+\S4method{simulate_adcp}{CuadrasAugeH2ExtMO3FParam}(object, times, ..., n_sim = 10000L)
 }
 \arguments{
 \item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
@@ -66,6 +73,8 @@
 
 \item{method}{Calculation method (either \code{"default"} or the name of the
 class whose implementation should be used).}
+
+\item{n_sim}{Number of samples.}
 }
 \description{
 \linkS4class{CalibrationParam} for the H2-extendible Marshall-Olkin \emph{(average) default counting
@@ -124,6 +133,12 @@ For details on the underlying extendible models, see \linkS4class{ExtMO2FParam}.
 the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
 \item \code{show,H2ExtMO3FParam-method}: Display the object.
+
+\item \code{simulate_dt,CuadrasAugeH2ExtMO3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
+
+\item \code{simulate_adcp,CuadrasAugeH2ExtMO3FParam-method}: simulates the \emph{average default counting process} and returns a
+matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
 }}
 
 \section{Slots}{
@@ -135,6 +150,11 @@ the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 component specific; range depends on specific model). Use \code{rho}, \code{tau}, or \code{alpha} in the
 constructor to set dependence parameter.}
 }}
+
+\section{Simulation}{
+
+The default times are sampled using the stochastic representation described in details.
+}
 
 \section{Expected portfolio CDS loss}{
 
@@ -205,5 +225,16 @@ expected_pcds_equation(
 expected_pcds_equation(
   parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
+
+composition <- c(2L, 4L, 2L)
+d <- sum(composition)
+parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+simulate_dt(parm, n_sim = 1e1L)
+
+composition <- c(2L, 4L, 2L)
+d <- sum(composition)
+parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+simulate_adcp(parm, 1, n_sim = 1e1L)
+simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 1e1L)
 
 }

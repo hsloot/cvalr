@@ -96,7 +96,7 @@ setGeneric("simulate_adcp",
 #' @describeIn CalibrationParam-class
 #'   simulates the *average default counting process* and returns a
 #'   matrix `x` with `dim(x) == c(n_sim, length(times))`.
-#' @aliases simulate_adcp,CalibrationParam-methodxw
+#' @aliases simulate_adcp,CalibrationParam-methods
 #'
 #' @examples
 #' parm <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), d = 5L))

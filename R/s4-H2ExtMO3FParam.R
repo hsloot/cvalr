@@ -430,6 +430,54 @@ setMethod("invAlpha", "CuadrasAugeH2ExtMO3FParam",
     adjacent_differences(value) / c(fraction, 1 - fraction)
   })
 
+#' @describeIn H2ExtMO3FParam-class
+#'    simulates the vector of *default times* and returns a matrix `x` with
+#'    `dim(x) == c(n_sim, getDimension(object))`.
+#' @aliases simulate_dt,CuadrasAugeH2ExtMO3FParam-method
+#' @param n_sim Number of samples.
+#'
+#' @inheritParams simulate_dt
+#' @param n_sim Number of samples.
+#'
+#' @section Simulation:
+#' The default times are sampled using the stochastic representation described in details.
+#'
+#' @examples
+#' composition <- c(2L, 4L, 2L)
+#' d <- sum(composition)
+#' parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+#' simulate_dt(parm, n_sim = 1e1L)
+#'
+#' @importFrom purrr map reduce
+#'
+#' @include utils.R
+setMethod("simulate_dt", "CuadrasAugeH2ExtMO3FParam",
+  function(object, ..., n_sim = 1e4L) {
+    Rcpp__rh2excamo_esm_dt(n_sim, getFraction(object), getModels(object))
+  })
+
+#' @describeIn H2ExtMO3FParam-class
+#'   simulates the *average default counting process* and returns a
+#'   matrix `x` with `dim(x) == c(n_sim, length(times))`.
+#' @aliases simulate_adcp,CuadrasAugeH2ExtMO3FParam-methods
+#'
+#' @examples
+#' composition <- c(2L, 4L, 2L)
+#' d <- sum(composition)
+#' parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+#' simulate_adcp(parm, 1, n_sim = 1e1L)
+#' simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 1e1L)
+#'
+#' @importFrom stats rexp
+#' @include RcppExports.R
+#'
+#' @export
+setMethod("simulate_adcp", "CuadrasAugeH2ExtMO3FParam",
+  function(object, times, ..., n_sim = 1e4L) {
+    qassert(times, "N+[0,)")
+
+      Rcpp__rh2excamo_esm_adcp(n_sim, times, getFraction(object), getModels(object))
+  })
 
 
 #' @rdname H2ExtMO3FParam-class

@@ -274,6 +274,60 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// Rcpp__rh2exmo_markovian_dt
+NumericMatrix Rcpp__rh2exmo_markovian_dt(const std::size_t n, const double fraction, const List& models);
+RcppExport SEXP _cvalr_Rcpp__rh2exmo_markovian_dt(SEXP nSEXP, SEXP fractionSEXP, SEXP modelsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::size_t >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const double >::type fraction(fractionSEXP);
+    Rcpp::traits::input_parameter< const List& >::type models(modelsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rcpp__rh2exmo_markovian_dt(n, fraction, models));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Rcpp__rh2excamo_esm_dt
+NumericMatrix Rcpp__rh2excamo_esm_dt(const std::size_t n, const double fraction, const List& models);
+RcppExport SEXP _cvalr_Rcpp__rh2excamo_esm_dt(SEXP nSEXP, SEXP fractionSEXP, SEXP modelsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::size_t >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const double >::type fraction(fractionSEXP);
+    Rcpp::traits::input_parameter< const List& >::type models(modelsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rcpp__rh2excamo_esm_dt(n, fraction, models));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Rcpp__rh2exmo_markovian_adcp
+NumericMatrix Rcpp__rh2exmo_markovian_adcp(const std::size_t n, const NumericVector& times, const double fraction, const List& models);
+RcppExport SEXP _cvalr_Rcpp__rh2exmo_markovian_adcp(SEXP nSEXP, SEXP timesSEXP, SEXP fractionSEXP, SEXP modelsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::size_t >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< const double >::type fraction(fractionSEXP);
+    Rcpp::traits::input_parameter< const List& >::type models(modelsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rcpp__rh2exmo_markovian_adcp(n, times, fraction, models));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Rcpp__rh2excamo_esm_adcp
+NumericMatrix Rcpp__rh2excamo_esm_adcp(const std::size_t n, const NumericVector& times, const double fraction, const List& models);
+RcppExport SEXP _cvalr_Rcpp__rh2excamo_esm_adcp(SEXP nSEXP, SEXP timesSEXP, SEXP fractionSEXP, SEXP modelsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::size_t >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< const double >::type fraction(fractionSEXP);
+    Rcpp::traits::input_parameter< const List& >::type models(modelsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rcpp__rh2excamo_esm_adcp(n, times, fraction, models));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_multiply_binomial_coefficient", (DL_FUNC) &_cvalr_multiply_binomial_coefficient, 3},
@@ -295,6 +349,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_Rcpp__cdo_equation", (DL_FUNC) &_cvalr_Rcpp__cdo_equation, 7},
     {"_cvalr_Rcpp__rexmo_markovian_acdp", (DL_FUNC) &_cvalr_Rcpp__rexmo_markovian_acdp, 4},
     {"_cvalr_Rcpp__rcamo_esm_adcp", (DL_FUNC) &_cvalr_Rcpp__rcamo_esm_adcp, 5},
+    {"_cvalr_Rcpp__rh2exmo_markovian_dt", (DL_FUNC) &_cvalr_Rcpp__rh2exmo_markovian_dt, 3},
+    {"_cvalr_Rcpp__rh2excamo_esm_dt", (DL_FUNC) &_cvalr_Rcpp__rh2excamo_esm_dt, 3},
+    {"_cvalr_Rcpp__rh2exmo_markovian_adcp", (DL_FUNC) &_cvalr_Rcpp__rh2exmo_markovian_adcp, 4},
+    {"_cvalr_Rcpp__rh2excamo_esm_adcp", (DL_FUNC) &_cvalr_Rcpp__rh2excamo_esm_adcp, 4},
     {NULL, NULL, 0}
 };
 

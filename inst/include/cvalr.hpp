@@ -61,8 +61,7 @@ template <typename _ForwardIt1, typename _ForwardIt2>
 inline double ddl_cdo(_ForwardIt1 l_begin, _ForwardIt1 l_end, _ForwardIt2 df_begin,
                       const double recovery_rate, const double lower, const double upper) {
   const auto l_map = [recovery_rate, lower, upper](auto val) {
-    val *= (1. - recovery_rate);
-    return (val < lower) ? 0. : ((val > upper) ? (upper - lower) : (val - lower));
+    return std::min(std::max((1. - recovery_rate) * val - lower, 0.), upper - lower);
   };
   return ddl(l_begin, l_end, df_begin, l_map);
 }
@@ -91,8 +90,7 @@ inline double eddl(_ForwardIt1 etl_begin, _ForwardIt1 etl_end, _ForwardIt2 df_be
  * @param l_map A unary operator mapping the *adcp* to the *derivative losses*
  * @param n_map A unary operator mapping the *derivative losses* to the *(mid) nominal values*
  */
-template <typename _ForwardIt1, typename _ForwardIt2, typename _UnaryOp1,
-          typename _UnaryOp2>
+template <typename _ForwardIt1, typename _ForwardIt2, typename _UnaryOp1, typename _UnaryOp2>
 inline double dpl1(_ForwardIt1 l_begin, _ForwardIt1 l_end, _ForwardIt2 t_begin,
                    _ForwardIt2 df_begin, _UnaryOp1 l_map, _UnaryOp2 n_map) {
   const auto n = static_cast<std::size_t>(std::distance(l_begin, l_end));
@@ -151,8 +149,7 @@ inline double dpl1_cdo(_ForwardIt1 l_begin, _ForwardIt1 l_end, _ForwardIt2 t_beg
                        _ForwardIt2 df_begin, const double recovery_rate, const double lower,
                        const double upper) {
   const auto l_map = [recovery_rate, lower, upper](auto val) {
-    val *= (1. - recovery_rate);
-    return (val < lower) ? 0. : ((val > upper) ? (upper - lower) : (val - lower));
+    return std::min(std::max((1. - recovery_rate) * val - lower, 0.), upper - lower);
   };
   const auto n_map = [lower, upper](const auto val) { return (upper - lower) - val; };
 
@@ -270,8 +267,8 @@ void dt2adcp(_ForwardIt1 v_begin, _ForwardIt1 v_end, _ForwardIt2 t_begin, _Forwa
  * @param n_map A unary operator mapping the *derivative losses* to the *(mid) nominal values*
  * @param u_map A unary operator mapping the *quoted upfront* to the *paid upfront*
  */
-template <typename _ForwardIt1, typename _ForwardIt2, typename _UnaryOp1,
-          typename _UnaryOp2, typename _UnaryOp3>
+template <typename _ForwardIt1, typename _ForwardIt2, typename _UnaryOp1, typename _UnaryOp2,
+          typename _UnaryOp3>
 inline double adcp2peqpv(_ForwardIt1 v_begin, _ForwardIt1 v_end, _ForwardIt2 t_begin,
                          _ForwardIt2 df_begin, const double coupon, const double upfront,
                          _UnaryOp1 l_map, _UnaryOp2 n_map, _UnaryOp3 u_map) {
@@ -325,8 +322,7 @@ inline double adcp2peqpv_cdo(_ForwardIt1 v_begin, _ForwardIt1 v_end, _ForwardIt2
                              _ForwardIt2 df_begin, const double coupon, const double upfront,
                              const double recovery_rate, const double lower, const double upper) {
   const auto l_map = [recovery_rate, lower, upper](auto val) {
-    val *= (1. - recovery_rate);
-    return (val < lower) ? 0. : ((val > upper) ? (upper - lower) : (val - lower));
+    return std::min(std::max((1. - recovery_rate) * val - lower, 0.), upper - lower);
   };
   const auto n_map = [lower, upper](const auto val) { return (upper - lower) - val; };
   const auto u_map = [lower, upper](const auto val) { return (upper - lower) * val; };

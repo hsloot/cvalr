@@ -6,7 +6,7 @@
 \alias{simulate_dt}
 \alias{simulate_adcp}
 \alias{simulate_adcp,CalibrationParam-method}
-\alias{simulate_adcp,CalibrationParam-methodxw}
+\alias{simulate_adcp,CalibrationParam-methods}
 \alias{probability_distribution}
 \alias{expected_value}
 \alias{expected_value,CalibrationParam-method}

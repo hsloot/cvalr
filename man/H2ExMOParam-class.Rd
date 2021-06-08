@@ -4,8 +4,62 @@
 \name{H2ExMOParam-class}
 \alias{H2ExMOParam-class}
 \alias{H2ExMOParam}
+\alias{simulate_dt,H2ExMOParam-method}
+\alias{simulate_adcp,H2ExMOParam-method}
+\alias{simulate_adcp,H2ExMOParam-methods}
 \title{H2-Exchangeable Marshall--Olkin calibration parameter}
+\usage{
+\S4method{simulate_dt}{H2ExMOParam}(object, ..., n_sim = 10000L)
+
+\S4method{simulate_adcp}{H2ExMOParam}(object, times, ..., n_sim = 10000L)
+}
+\arguments{
+\item{object}{A \linkS4class{CalibrationParam}-object.}
+
+\item{...}{Pass-through parameters.}
+
+\item{n_sim}{Number of samples.}
+
+\item{times}{A non-negative numeric vector of timepoints.}
+}
 \description{
 \linkS4class{CalibrationParam} for the H2-exchangeable Marshall-Olkin \emph{(average) default counting
 process} model. Extends \linkS4class{H2ExMarkovParam} and related to \linkS4class{ExMOParam}.
+}
+\section{Functions}{
+\itemize{
+\item \code{simulate_dt,H2ExMOParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
+
+\item \code{simulate_adcp,H2ExMOParam-method}: simulates the \emph{average default counting process} and returns a
+matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
+}}
+
+\section{Simulation}{
+
+The default times are sampled using the stochastic representation described in details.
+}
+
+\examples{
+composition <- c(2L, 4L, 2L)
+d <- sum(composition)
+model_global <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), d))
+model_partition <- purrr::map(composition, ~{
+  ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.5), .x))
+  })
+models <- c(list(model_global), model_partition)
+parm <- H2ExMOParam(fraction = 0.4, models = models)
+simulate_dt(parm, n_sim = 1e1L)
+
+composition <- c(2L, 4L, 2L)
+d <- sum(composition)
+model_global <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), d))
+model_partition <- purrr::map(composition, ~{
+  ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.5), .x))
+  })
+models <- c(list(model_global), model_partition)
+parm <- H2ExMOParam(fraction = 0.4, models = models)
+simulate_adcp(parm, 1, n_sim = 1e1L)
+simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 1e1L)
+
 }

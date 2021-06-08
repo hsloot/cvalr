@@ -77,3 +77,19 @@ Rcpp__rcamo_esm_adcp <- function(n, times, d, alpha, beta) {
     .Call(`_cvalr_Rcpp__rcamo_esm_adcp`, n, times, d, alpha, beta)
 }
 
+Rcpp__rh2exmo_markovian_dt <- function(n, fraction, models) {
+    .Call(`_cvalr_Rcpp__rh2exmo_markovian_dt`, n, fraction, models)
+}
+
+Rcpp__rh2excamo_esm_dt <- function(n, fraction, models) {
+    .Call(`_cvalr_Rcpp__rh2excamo_esm_dt`, n, fraction, models)
+}
+
+Rcpp__rh2exmo_markovian_adcp <- function(n, times, fraction, models) {
+    .Call(`_cvalr_Rcpp__rh2exmo_markovian_adcp`, n, times, fraction, models)
+}
+
+Rcpp__rh2excamo_esm_adcp <- function(n, times, fraction, models) {
+    .Call(`_cvalr_Rcpp__rh2excamo_esm_adcp`, n, times, fraction, models)
+}
+

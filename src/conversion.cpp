@@ -70,9 +70,8 @@ NumericMatrix Rcpp__trans_v_cdo(const NumericVector &x, const NumericVector &rec
   auto out = NumericMatrix(no_init(x.size(), recovery_rate.size()));
   for (auto i = std::size_t{0}; i < x.size(); ++i) {
     for (auto j = std::size_t{0}; j < recovery_rate.size(); ++j) {
-      const auto val = (1 - recovery_rate[j]) * x[i];
       out(i, j) =
-          (val < lower[j]) ? 0. : ((val > upper[j]) ? (upper[j] - lower[j]) : (val - lower[j]));
+          std::min(std::max((1. - recovery_rate[j]) * x[i] - lower[j], 0.), upper[j] - lower[j]);
     }
   }
 
