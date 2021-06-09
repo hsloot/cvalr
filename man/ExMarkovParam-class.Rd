@@ -13,12 +13,7 @@
 \usage{
 \S4method{initialize}{ExMarkovParam}(.Object, ex_qmatrix)
 
-\S4method{simulate_dt}{ExMarkovParam}(
-  object,
-  ...,
-  method = c("default", "ExMarkovParam"),
-  n_sim = 10000L
-)
+\S4method{simulate_dt}{ExMarkovParam}(object, ..., n_sim = 10000L)
 
 \S4method{probability_distribution}{ExMarkovParam}(object, times, ...)
 
@@ -34,9 +29,6 @@
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
-
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
 
 \item{n_sim}{Number of samples.}
 

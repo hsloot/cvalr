@@ -139,8 +139,8 @@ setGeneric("probability_distribution",
 #'
 #' @section Expected value:
 #' The *expectated value* of finite linear transformations of the *average default counting process*
-#' \eqn{L} under a transformation and a linear aggregation can be calculated with [expected_value()];
-#' i.e. the value
+#' \eqn{L} under a transformation and a linear aggregation can be calculated with
+#' [expected_value()]; i.e. the value
 #' \deqn{
 #'   \mathbb{E}[diag(A^\top \cdot g(L_t))] , \quad t = (t_1, \ldots, t_m) \geq 0.
 #' }
@@ -217,7 +217,7 @@ setGeneric("expected_value",
 #' @importFrom purrr map_dbl
 #' @include utils-math.R
 #' @export
-setMethod("expected_value", "CalibrationParam",
+setMethod("expected_value", "CalibrationParam", # nolint
   function(object, times, ...,
       method = c("default", "prob", "mc"), n_sim = 1e4L, attrs = NULL,
       .trans_v = NULL, .lagg_ev = NULL, .simulate_pv = NULL) {

@@ -173,8 +173,8 @@ i.e. the values
 \section{Expected value}{
 
 The \emph{expectated value} of finite linear transformations of the \emph{average default counting process}
-\eqn{L} under a transformation and a linear aggregation can be calculated with \code{\link[=expected_value]{expected_value()}};
-i.e. the value
+\eqn{L} under a transformation and a linear aggregation can be calculated with
+\code{\link[=expected_value]{expected_value()}}; i.e. the value
 \deqn{
   \mathbb{E}[diag(A^\top \cdot g(L_t))] , \quad t = (t_1, \ldots, t_m) \geq 0.
 }

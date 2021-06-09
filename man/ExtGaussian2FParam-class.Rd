@@ -15,12 +15,7 @@
 \usage{
 \S4method{initialize}{ExtGaussian2FParam}(.Object, dim, lambda, nu, rho, tau)
 
-\S4method{simulate_dt}{ExtGaussian2FParam}(
-  object,
-  ...,
-  method = c("default", "ExtGaussian2FParam"),
-  n_sim = 10000L
-)
+\S4method{simulate_dt}{ExtGaussian2FParam}(object, ..., n_sim = 10000L)
 
 \S4method{probability_distribution}{ExtGaussian2FParam}(object, times, ...)
 
@@ -68,8 +63,6 @@
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
 
-\item{method}{Calculation method (either \code{"default"}, \code{"prob"}, or \code{"mc"}).}
-
 \item{n_sim}{Number of samples.}
 
 \item{times}{A non-negative numeric vector of timepoints.}
@@ -81,6 +74,8 @@
 \item{coupon}{Numeric number for the running coupon.}
 
 \item{upfront}{Numeric number for the upfront payment.}
+
+\item{method}{Calculation method (either \code{"default"}, \code{"prob"}, or \code{"mc"}).}
 
 \item{lower}{Non-negative number between zero and one for the \emph{lower attachment point}.}
 

@@ -106,8 +106,6 @@ setMethod("initialize", "ExMOParam",
 #' @aliases simulate_dt,ExMOParam-method
 #'
 #' @inheritParams simulate_dt
-#' @param method Simulation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
@@ -123,20 +121,8 @@ setMethod("initialize", "ExMOParam",
 #'
 #' @export
 setMethod("simulate_dt", "ExMOParam",
-  function(object, ...,
-      method = c("default", "ExMOParam", "ExMarkovParam"), n_sim = 1e4L) {
-    method <- match.arg(method)
-    if (isTRUE("default" == method)) {
-      method <- "ExMOParam"
-    }
-
-    if (isTRUE("ExMOParam" == method)) {
-      out <- rexmo_markovian(n_sim, getDimension(object), getExIntensities(object))
-    } else {
-      out <- callNextMethod(object, ..., method = method, n_sim = n_sim)
-    }
-
-    out
+  function(object, ..., n_sim = 1e4L) {
+    rexmo_markovian(n_sim, getDimension(object), getExIntensities(object))
   })
 
 

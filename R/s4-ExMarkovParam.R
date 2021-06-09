@@ -92,8 +92,6 @@ setMethod("initialize", "ExMarkovParam",
 #' @aliases simulate_dt,ExMarkovParam-method
 #'
 #' @inheritParams simulate_dt
-#' @param method Simulation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
@@ -112,9 +110,7 @@ setMethod("initialize", "ExMarkovParam",
 #'
 #' @export
 setMethod("simulate_dt", "ExMarkovParam",
-  function(object, ...,
-      method = c("default", "ExMarkovParam"), n_sim = 1e4L) {
-    method <- match.arg(method)
+  function(object, ..., n_sim = 1e4L) {
     d <- getDimension(object)
     ex_qmatrix <- getExQMatrix(object)
     out <- matrix(nrow = n_sim, ncol = d)
@@ -143,8 +139,6 @@ setMethod("simulate_dt", "ExMarkovParam",
 #' @aliases probability_distribution,ExMarkovParam-method
 #'
 #' @inheritParams probability_distribution
-#' @param method Calculation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #'
 #' @examples
 #' probability_distribution(CuadrasAugeExtMO2FParam(

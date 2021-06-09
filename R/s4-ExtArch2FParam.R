@@ -304,8 +304,6 @@ setMethod("invTau", "ExtArch2FParam",
 #' @aliases simulate_dt,ExtArch2FParam-method
 #'
 #' @inheritParams simulate_dt
-#' @param method Simulation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
@@ -321,9 +319,7 @@ setMethod("invTau", "ExtArch2FParam",
 #' @importFrom copula rCopula
 #' @include utils.R
 setMethod("simulate_dt", "ExtArch2FParam",
-  function(object, ...,
-      method = c("default", "ExtArch2fParam"), n_sim = 1e4L) {
-    method <- match.arg(method)
+  function(object, ..., n_sim = 1e4L) {
     out <- qexp(
       rCopula(n_sim, getCopula(object)),
       rate = getLambda(object), lower.tail = !getSurvival(object))

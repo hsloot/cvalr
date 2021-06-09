@@ -38,12 +38,7 @@
   family = c("Clayton", "Frank", "Gumbel", "Joe")
 )
 
-\S4method{simulate_dt}{ExtArch2FParam}(
-  object,
-  ...,
-  method = c("default", "ExtArch2fParam"),
-  n_sim = 10000L
-)
+\S4method{simulate_dt}{ExtArch2FParam}(object, ..., n_sim = 10000L)
 
 \S4method{expected_pcds_equation}{ExtArch2FParam}(
   object,
@@ -87,9 +82,6 @@
 
 \item{...}{Pass-through parameters.}
 
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
-
 \item{n_sim}{Number of samples.}
 
 \item{times}{A non-negative numeric vector of timepoints.}
@@ -101,6 +93,9 @@ class whose implementation should be used).}
 \item{coupon}{Numeric number for the running coupon.}
 
 \item{upfront}{Numeric number for the upfront payment.}
+
+\item{method}{Calculation method (either \code{"default"} or the name of the
+class whose implementation should be used).}
 }
 \description{
 \linkS4class{CalibrationParam}-class with two parameters for the extendible

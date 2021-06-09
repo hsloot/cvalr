@@ -160,8 +160,6 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 #' @aliases simulate_dt,ExtGaussian2FParam-method
 #'
 #' @inheritParams simulate_dt
-#' @param method Simulation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
@@ -179,9 +177,7 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 #'
 #' @export
 setMethod("simulate_dt", "ExtGaussian2FParam",
-  function(object, ...,
-      method = c("default", "ExtGaussian2FParam"), n_sim = 1e4L) {
-    method <- match.arg(method)
+  function(object, ..., n_sim = 1e4L) {
     normalCopula(param = getNu(object), dim = getDimension(object), dispstr = "ex") %>%
       rCopula(n_sim, .) %>%
       qexp(rate = getLambda(object), lower.tail = FALSE)
