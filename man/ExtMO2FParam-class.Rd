@@ -5,7 +5,7 @@
 \alias{ExtMO2FParam-class}
 \alias{initialize,ExtMO2FParam-method}
 \alias{initialize,ExtMO2FParam,ANY-method}
-\alias{expected_pcds_loss,ExtMO2FParam-method}
+\alias{expected_pcds_equation,ExtMO2FParam-method}
 \alias{show,ExtMO2FParam-method}
 \alias{CuadrasAugeExtMO2FParam-class}
 \alias{CuadrasAugeExtMO2FParam}
@@ -21,30 +21,22 @@
 \usage{
 \S4method{initialize}{ExtMO2FParam}(.Object, dim, lambda, nu, rho, tau, alpha)
 
-\S4method{expected_pcds_loss}{ExtMO2FParam}(
+\S4method{expected_pcds_equation}{ExtMO2FParam}(
   object,
   times,
+  discount_factors,
   recovery_rate,
+  coupon,
+  upfront,
   ...,
-  method = c("default", "ExtMO2FParam", "CalibrationParam")
+  method = c("default", "prob", "mc")
 )
 
 \S4method{show}{ExtMO2FParam}(object)
 
-\S4method{simulate_dt}{CuadrasAugeExtMO2FParam}(
-  object,
-  ...,
-  method = c("default", "CuadrasAugeExtMO2FParam", "ExMOParam", "ExMarkovParam"),
-  n_sim = 10000L
-)
+\S4method{simulate_dt}{CuadrasAugeExtMO2FParam}(object, ..., n_sim = 10000L)
 
-\S4method{simulate_adcp}{CuadrasAugeExtMO2FParam}(
-  object,
-  times,
-  ...,
-  method = c("default", "CuadrasAugeExtMO2FParam", "ExMOParam", "ExMarkovParam"),
-  n_sim = 10000L
-)
+\S4method{simulate_adcp}{CuadrasAugeExtMO2FParam}(object, times, ..., n_sim = 10000L)
 }
 \arguments{
 \item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
@@ -65,14 +57,19 @@
 
 \item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
-of the portfolio CDS/CDO.}
+\item{discount_factors}{Non-negative numeric vector for the discount factors for the timepoints.}
+
+\item{recovery_rate}{Non-negative number between zero and one for the \emph{recovery rate}..}
+
+\item{coupon}{Numeric number for the running coupon.}
+
+\item{upfront}{Numeric number for the upfront payment.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
 
-\item{method}{Simulation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
+\item{method}{Calculation method (either \code{"default"}, \code{"prob"} (requires implementation of
+\code{probability_distribution}), or \code{"mc"}).}
 
 \item{n_sim}{Number of samples.}
 }
@@ -104,9 +101,8 @@ Spearman's Rho and Kendall's Tau is
 \itemize{
 \item \code{initialize,ExtMO2FParam-method}: Constructor
 
-\item \code{expected_pcds_loss,ExtMO2FParam-method}: calculates the \emph{expected value} for the \emph{portfolio CDS loss} based on the
-\emph{average default count process} for given timepoints and returns a vector
-\code{x} with \code{length(x) == length(times)}.
+\item \code{expected_pcds_equation,ExtMO2FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
 \item \code{show,ExtMO2FParam-method}: Display the object.
 
@@ -197,19 +193,13 @@ PoissonExtMO2FParam()
 PoissonExtMO2FParam(dim = 5L, lambda = 8e-2, tau = 4e-1)
 ExponentialExtMO2FParam()
 ExponentialExtMO2FParam(dim = 5L, lambda = 8e-2, alpha = 4e-1)
-expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-  times = 0.25, recovery_rate = 0.4)
-expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-  times = seq(0, 5, by = 0.25), recovery_rate = 0.4)
-expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-  times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam")
-expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-  times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
-  pd_args = list(method = "CalibrationParam", seed = 1623, sim_args = list(n_sim = 1e2L)))
-expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-  times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
-  pd_args = list(method = "CalibrationParam", seed = 1623,
-  sim_args = list(method = "ExMarkovParam", n_sim = 1e2L)))
+parm <- CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4)
+expected_pcds_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+  coupon = 1e-1, upfront = 0)
+expected_pcds_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+  coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 
 parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 simulate_dt(parm, n_sim = 5L)

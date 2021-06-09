@@ -164,52 +164,55 @@ test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`
 })
 
 
-test_that("`expected_pcds_loss` works as expected for `ExtGaussian2FParam", {
-  # HELPER START
-  epcdslfn <- function(parm, times, recovery_rate) {
-    qassert(times, "N+[0,)")
-    qassert(recovery_rate, "N1[0,1]")
+test_that("`expected_pcds_equation` works as expected for `ExtGaussian2FParam", {
+  times <- seq(0, 5, by = 0.25)
+  discount_factors <- rep(1, length(times))
+  recovery_rate <- 4e-1
+  coupon <- 1e-1
+  upfront <- -1e-2
+  parm <- ExtGaussian2FParam(dim = d, lambda = lambda, rho = rho)
 
-    (1 - recovery_rate) * pexp(times, rate = getLambda(parm))
-  }
-  # HELPER END
+  # using default
+  x <- expected_pcds_equation(parm, times, discount_factors, recovery_rate, coupon, upfront)
+  expect_numeric(x, finite = TRUE, any.missing = FALSE, len = 1L)
+  y <- test__expected_pcds_equation__default(
+    parm, times, discount_factors, recovery_rate, coupon, upfront)
+  expect_equal(x, y)
 
-  parm <- ExtGaussian2FParam(dim = d, lambda = lambda, nu = nu)
-  times <- seq(25e-2, 5L, by = 25e-2)
-  recovery_rate <- 0.4
-
-  x <- expected_pcds_loss(parm, times, recovery_rate = recovery_rate)
-  expect_numeric(x, any.missing = FALSE, lower = 0, upper = 1,
-    len = length(times), sorted = TRUE)
-  expect_equal(x, epcdslfn(parm, times, recovery_rate))
+  # using prob
+  x <- expected_pcds_equation(parm, times, discount_factors, recovery_rate, coupon, upfront,
+    method = "prob")
+  expect_numeric(x, finite = TRUE, any.missing = FALSE, len = 1L)
+  y <- test__expected_pcds_equation__prob(
+    parm, times, discount_factors, recovery_rate, coupon, upfront)
+  expect_equal(x, y)
 })
 
 
-test_that("`expected_cdo_loss` works as expected for `ExtGaussian2FParam`", {
-  # HELPER START
-  ecdolfn <- function(parm, times, recovery_rate, lower, upper) {
-    qassert(times, "N+[0,)")
-    qassert(recovery_rate, "N1[0,1]")
-    qassert(lower, "N1[0,1]")
-    qassert(upper, "N1[0,1]")
-    lambda <- getLambda(parm)
-    nu <- getNu(parm)
-
-    cop <- copula::normalCopula(param = -sqrt(1 - nu), dim = 2L, dispstr = "ex")
-    u_left <- cbind(1 - pmin(lower / (1 - recovery_rate), 1), pexp(times, rate = lambda))
-    u_right <- cbind(1 - pmin(upper / (1 - recovery_rate), 1), pexp(times, rate = lambda))
-    (1 - recovery_rate) * (copula::pCopula(u_left, cop) - copula::pCopula(u_right, cop))
-  }
-  # HELPER END
-
-  parm <- ExtGaussian2FParam(dim = d, lambda = lambda, nu = nu)
+test_that("`expected_cdo_equation` works as expected for `ExtGaussian2FParam`", {
   times <- seq(25e-2, 5L, by = 25e-2)
+  discount_factors <- rep(1, length(times))
   recovery_rate <- 0.4
-  lower <- 0.1
-  upper <- 0.2
+  lower <- c(0, 0.1, 0.2, 0.35)
+  upper <- c(0.1, 0.2, 0.35, 1)
+  coupon <- c(rep(5e-2, 3), 0)
+  upfront <- c(8e-1, 5e-1, 1e-1, 0)
+  parm <- ExtGaussian2FParam(dim = d, lambda = lambda, nu = nu)
 
-  x <- expected_cdo_loss(parm, times, recovery_rate, lower, upper)
-  expect_numeric(x, any.missing = FALSE, lower = 0, upper = 1,
-    len = length(times), sorted = TRUE)
-  expect_equal(x, ecdolfn(parm, times, recovery_rate, lower, upper))
+  #using default
+  x <- expected_cdo_equation(
+    parm, times, discount_factors, recovery_rate, lower, upper, coupon, upfront)
+  expect_numeric(x, finite = TRUE, any.missing = FALSE, len = 4L)
+  y <- test__expected_cdo_equation__gaussian(
+    parm, times, discount_factors, recovery_rate, lower, upper, coupon, upfront)
+  expect_equal(x, y)
+
+  # using prob
+  x <- expected_cdo_equation(
+    parm, times, discount_factors, recovery_rate, lower, upper, coupon, upfront,
+    method = "prob")
+  expect_numeric(x, finite = TRUE, any.missing = FALSE, len = 4L)
+  y <- test__expected_cdo_equation__prob(
+    parm, times, discount_factors, recovery_rate, lower, upper, coupon, upfront)
+  expect_equal(x, y)
 })

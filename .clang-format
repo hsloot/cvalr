@@ -2,6 +2,7 @@
 Language: Cpp
 BasedOnStyle: Google
 IncludeBlocks: Regroup
+ColumnLimit: 100
 IncludeCategories:
   - Regex:           '^(<mo/)'
     Priority:        2

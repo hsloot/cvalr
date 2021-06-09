@@ -211,8 +211,6 @@ setMethod("simulate_dt", "H2ExMarkovParam",
 #' @aliases probability_distribution,H2ExMarkovParam-method
 #'
 #' @inheritParams probability_distribution
-#' @param method Calculation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #'
 #' @examples
 #' probability_distribution(CuadrasAugeH2ExtMO3FParam(
@@ -247,32 +245,24 @@ setMethod("simulate_dt", "H2ExMarkovParam",
 #'
 #' @export
 setMethod("probability_distribution", "H2ExMarkovParam",
-  function(object, times, ...,
-      method = c("default", "H2ExMarkovParam", "CalibrationParam")) {
-    method <- match.arg(method)
-    if (isTRUE("default" == method || "H2ExMarkovParam" == method)) {
-      qassert(times, "N+[0,)")
-      method <- "ExMarkovParam"
-      frac <- getFraction(object)
-      exq0 <- getExQMatrix(getGlobalModel(object))
-      out <- map(times, ~{
-        .t <- .
-        map(getPartitionModels(object), ~{
-          expm(.t * (1 - frac) * getExQMatrix(.))[1L, , drop = TRUE]
-        }) %>%
-        reduce(~{
-          pmax(convolve(.x, rev(.y), type = "open"), 0)
-        }) %>%
-        { as.vector(t(.) %*% expm(.t * frac * exq0)) } # nolint
-      }) %>%
-      map(matrix, ncol = 1L) %>%
-      reduce(cbind) %>%
-      `dimnames<-`(NULL)
-    } else {
-        out <- callNextMethod(object, times, ..., method = method)
-    }
+  function(object, times, ...) {
+    qassert(times, "N+[0,)")
+    frac <- getFraction(object)
+    exq0 <- getExQMatrix(getGlobalModel(object))
 
-    out
+    map(times, ~{
+      .t <- .
+      map(getPartitionModels(object), ~{
+        expm(.t * (1 - frac) * getExQMatrix(.))[1L, , drop = TRUE]
+      }) %>%
+      reduce(~{
+        pmax(convolve(.x, rev(.y), type = "open"), 0)
+      }) %>%
+      { as.vector(t(.) %*% expm(.t * frac * exq0)) } # nolint
+    }) %>%
+    map(matrix, ncol = 1L) %>%
+    reduce(cbind) %>%
+    `dimnames<-`(NULL)
   })
 
 

@@ -1,6 +1,6 @@
 Package: cvalr
 Title: Credit Derivative Valuation in R
-Version: 0.2.3.9001
+Version: 0.3
 Authors@R:
     person(given = "Henrik",
            family = "Sloot",
@@ -26,7 +26,8 @@ Imports:
     waldo,
     purrr,
     magrittr,
-    rlang
+    rlang,
+    vctrs
 LinkingTo:
     Rcpp,
     rmo
@@ -41,8 +42,8 @@ Collate:
     'checkmate.R'
     'cvalr-package.R'
     'utils-math.R'
-    'utils.R'
     's4-CalibrationParam.R'
+    'utils.R'
     's4-ExMarkovParam.R'
     's4-ExMOParam.R'
     's4-ExtMOParam.R'
@@ -56,6 +57,7 @@ Collate:
     's4-H2ExtMO3FParam.R'
     's4-H2ExtGaussian3FParam.R'
     's4-H2ExtArch3FParam.R'
+    'zzz.R'
 URL: https://github.com/hsloot/cvalr
 BugReports: https://github.com/hsloot/cvalr/issues
 Remotes: github::hsloot/rmo

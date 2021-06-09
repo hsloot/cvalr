@@ -369,14 +369,11 @@ setMethod("initialize", signature = "ExtMO2FParam", # nolint
 
 
 #' @describeIn ExtMO2FParam-class
-#'   calculates the *expected value* for the *portfolio CDS loss* based on the
-#'   *average default count process* for given timepoints and returns a vector
-#'   `x` with `length(x) == length(times)`.
-#' @aliases expected_pcds_loss,ExtMO2FParam-method
+#'   calculates the *payoff equation* for a *portfolio CDS* (vectorized w.r.t.
+#'   the argumentes `recovery_rate`, `coupon`, and `upfront`).
+#' @aliases expected_pcds_equation,ExtMO2FParam-method
 #'
-#' @inheritParams expected_pcds_loss
-#' @param method Calculation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
+#' @inheritParams expected_pcds_equation
 #'
 #' @section Expected portfolio CDS loss:
 #' The *expected portfolio CDS loss* for *recovery rate* \eqn{R} is calculated
@@ -389,33 +386,42 @@ setMethod("initialize", signature = "ExtMO2FParam", # nolint
 #' distribution function for rate \eqn{\lambda}.
 #'
 #' @examples
-#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-#'   times = 0.25, recovery_rate = 0.4)
-#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-#'   times = seq(0, 5, by = 0.25), recovery_rate = 0.4)
-#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-#'   times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam")
-#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-#'   times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
-#'   pd_args = list(method = "CalibrationParam", seed = 1623, sim_args = list(n_sim = 1e2L)))
-#' expected_pcds_loss(CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4),
-#'   times = seq(0, 5, by = 0.25), recovery_rate = 0.4, method = "CalibrationParam",
-#'   pd_args = list(method = "CalibrationParam", seed = 1623,
-#'   sim_args = list(method = "ExMarkovParam", n_sim = 1e2L)))
+#' parm <- CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4)
+#' expected_pcds_equation(
+#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   coupon = 1e-1, upfront = 0)
+#' expected_pcds_equation(
+#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 #'
 #' @importFrom stats pexp
-#' @importFrom checkmate qassert
+#' @importFrom checkmate assert check_numeric
+#' @importFrom vctrs vec_size_common vec_recycle
+#' @include RcppExports.R
+#'
 #' @export
-setMethod("expected_pcds_loss", "ExtMO2FParam",
-  function(object, times, recovery_rate, ...,
-      method = c("default", "ExtMO2FParam", "CalibrationParam")) {
+setMethod("expected_pcds_equation", "ExtMO2FParam",
+  function(object, times, discount_factors, recovery_rate, coupon, upfront, ...,
+      method = c("default", "prob", "mc")) {
     method <- match.arg(method)
-    if (isTRUE("default" == method || "ExtMO2FParam" == method)) {
+    if ("default" == method) {
       qassert(times, "N+[0,)")
-      qassert(recovery_rate, "N1[0,1]")
-      out <- (1 - recovery_rate) * pexp(times, rate = getLambda(object))
+      qassert(discount_factors, paste0("N", length(times), "[0,)"))
+      qassert(recovery_rate, "N+[0,1]")
+      qassert(coupon, "N+")
+      qassert(upfront, "N+")
+
+      p <- vec_size_common(recovery_rate, coupon, upfront)
+      recovery_rate <- vec_recycle(recovery_rate, p)
+      coupon <- vec_recycle(coupon, p)
+      upfront <- vec_recycle(upfront, p)
+
+      x <- pexp(times, rate = getLambda(object)) %*% t(1 - recovery_rate)
+
+      out <- Rcpp__lagg_ev_pcds(x, times, discount_factors, recovery_rate, coupon, upfront)
     } else {
-      out <- callNextMethod(object, times, recovery_rate, ..., method = method)
+      out <- callNextMethod(
+        object, times, discount_factors, recovery_rate, coupon, upfront, ..., method = method)
     }
 
     out
@@ -524,8 +530,6 @@ setReplaceMethod("setNu", "CuadrasAugeExtMO2FParam",
 #' @aliases simulate_dt,CuadrasAugeExtMO2FParam-method
 #'
 #' @inheritParams simulate_dt
-#' @param method Simulation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
@@ -541,19 +545,10 @@ setReplaceMethod("setNu", "CuadrasAugeExtMO2FParam",
 #'
 #' @export
 setMethod("simulate_dt", "CuadrasAugeExtMO2FParam",
-  function(object, ...,
-      method = c("default", "CuadrasAugeExtMO2FParam", "ExMOParam", "ExMarkovParam"),
-      n_sim = 1e4L) {
-    method <- match.arg(method)
-    if (isTRUE("default" == method || "CuadrasAugeExtMO2FParam" == method)) {
-      out <- rcamo_esm(
-        n_sim, getDimension(object),
-        getLambda(object) * (1 - getNu(object)), getLambda(object) * getNu(object))
-    } else {
-      out <- callNextMethod(object, ..., method = method, n_sim = n_sim)
-    }
-
-    out
+  function(object, ..., n_sim = 1e4L) {
+    rcamo_esm(
+      n_sim, getDimension(object),
+      getLambda(object) * (1 - getNu(object)), getLambda(object) * getNu(object))
   })
 
 
@@ -563,8 +558,6 @@ setMethod("simulate_dt", "CuadrasAugeExtMO2FParam",
 #' @aliases simulate_adcp,CuadrasAugeExtMO2FParam-method
 #'
 #' @inheritParams simulate_adcp
-#' @param method Simulation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #' @param times A non-negative numeric vector of timepoints.
 #' @param n_sim Number of samples.
 #'
@@ -580,20 +573,10 @@ setMethod("simulate_dt", "CuadrasAugeExtMO2FParam",
 #'
 #' @export
 setMethod("simulate_adcp", "CuadrasAugeExtMO2FParam",
-  function(object, times, ...,
-      method = c("default", "CuadrasAugeExtMO2FParam", "ExMOParam", "ExMarkovParam"),
-      n_sim = 1e4L) {
-    method <- match.arg(method)
-
-    if (isTRUE("default" == method || "CuadrasAugeExtMO2FParam" == method)) {
-      out <- Rcpp__rcamo_esm_adcp(
-        n_sim, times, getDimension(object),
-        getLambda(object) * (1 - getNu(object)), getLambda(object) * getNu(object))
-    } else {
-      out <- callNextMethod(object, times, ..., method = method, n_sim = n_sim)
-    }
-
-    out
+  function(object, times, ..., n_sim = 1e4L) {
+    Rcpp__rcamo_esm_adcp(
+      n_sim, times, getDimension(object),
+      getLambda(object) * (1 - getNu(object)), getLambda(object) * getNu(object))
   })
 
 

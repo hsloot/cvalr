@@ -1,9 +1,11 @@
 #+ r load-package
 library(cvalr)
+options("cvalr.enable_messages" = FALSE, "cvalr.enable_warnings" = FALSE)
 
 #+ r config-and-setup
+n_sim <- 1e4L
 pd_args <- list(method = "CalibrationParam", sim_args = list(n_sim = 1e4))
-times <- seq(0.25, 5, by = 0.25)
+times <- seq(0, 5, by = 0.25)
 discount_factors <- rep(1, length(times))
 recovery_rate <- 4e-1
 spread <- 6e-2
@@ -46,57 +48,57 @@ parm_joh2extar3f <- JoeH2ExtArch3FParam(composition = composition, lambda = lamb
 bench::mark(
   CuadrasAugeExtMO2FParam = expected_pcds_equation(
     parm_caextmo2f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   AlphaStableExtMO2FParam = expected_pcds_equation(
     parm_asextmo2f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   PoissonExtMO2FParam = expected_pcds_equation(
     parm_poextmo2f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   ExponentialExtMO2FParam = expected_pcds_equation(
     parm_exextmo2f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   ExtGaussian2FParam = expected_pcds_equation(
     parm_extga2f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   ClaytonExtArch2FParam = expected_pcds_equation(
     parm_clextar2f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   FrankExtArch2FParam = expected_pcds_equation(
     parm_frextar2f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   GumbelExtArch2FParam = expected_pcds_equation(
     parm_guextar2f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   JoeExtArch2FParam = expected_pcds_equation(
     parm_joextar2f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   CuadrasAugeH2ExtMO3FParam = expected_pcds_equation(
     parm_cah2extmo3f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   AlphaStableH2ExtMO3FParam = expected_pcds_equation(
     parm_ash2extmo3f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   PoissonH2ExtMO3FParam = expected_pcds_equation(
     parm_poh2extmo3f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   ExponentialH2ExtMO3FParam = expected_pcds_equation(
     parm_exh2extmo3f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   H2ExtGaussian3FParam = expected_pcds_equation(
     parm_h2extga3f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   ClaytonH2ExtArch3FParam = expected_pcds_equation(
     parm_clh2extar3f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   FrankH2ExtArch3FParam = expected_pcds_equation(
     parm_frh2extar3f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   GumbelH2ExtArch3FParam = expected_pcds_equation(
     parm_guh2extar3f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   JoeH2ExtArch3FParam = expected_pcds_equation(
     parm_joh2extar3f, times, discount_factors, recovery_rate, spread, 0,
-    method = "CalibrationParam", pd_args = pd_args),
+    method = "mc", n_sim = n_sim),
   min_time = 1, min_iterations = 1L, check = FALSE
 )

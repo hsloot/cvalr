@@ -1,8 +1,9 @@
 #+ r load-package
 library(cvalr)
+options("cvalr.enable_messages" = FALSE, "cvalr.enable_warnings" = FALSE)
 
 #+ r config-and-setup
-times <- seq(0.25, 5, by = 0.25)
+times <- seq(0, 5, by = 0.25)
 discount_factors <- rep(1, length(times))
 recovery_rate <- 4e-1
 spread <- 6e-2

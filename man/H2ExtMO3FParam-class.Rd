@@ -5,10 +5,13 @@
 \alias{H2ExtMO3FParam-class}
 \alias{initialize,H2ExtMO3FParam-method}
 \alias{initialize,H2ExtMO3FParam,ANY-method}
-\alias{expected_pcds_loss,H2ExtMO3FParam-method}
+\alias{expected_pcds_equation,H2ExtMO3FParam-method}
 \alias{show,H2ExtMO3FParam-method}
 \alias{CuadrasAugeH2ExtMO3FParam-class}
 \alias{CuadrasAugeH2ExtMO3FParam}
+\alias{simulate_dt,CuadrasAugeH2ExtMO3FParam-method}
+\alias{simulate_adcp,CuadrasAugeH2ExtMO3FParam-method}
+\alias{simulate_adcp,CuadrasAugeH2ExtMO3FParam-methods}
 \alias{AlphaStableH2ExtMO3FParam-class}
 \alias{AlphaStableH2ExtMO3FParam}
 \alias{PoissonH2ExtMO3FParam-class}
@@ -19,15 +22,22 @@
 \usage{
 \S4method{initialize}{H2ExtMO3FParam}(.Object, composition, lambda, nu, fraction, rho, tau, alpha)
 
-\S4method{expected_pcds_loss}{H2ExtMO3FParam}(
+\S4method{expected_pcds_equation}{H2ExtMO3FParam}(
   object,
   times,
+  discount_factors,
   recovery_rate,
+  coupon,
+  upfront,
   ...,
-  method = c("default", "H2ExtMO3FParam", "CalibrationParam")
+  method = c("default", "prob", "mc")
 )
 
 \S4method{show}{H2ExtMO3FParam}(object)
+
+\S4method{simulate_dt}{CuadrasAugeH2ExtMO3FParam}(object, ..., n_sim = 10000L)
+
+\S4method{simulate_adcp}{CuadrasAugeH2ExtMO3FParam}(object, times, ..., n_sim = 10000L)
 }
 \arguments{
 \item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
@@ -50,14 +60,21 @@
 
 \item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
-of the portfolio CDS/CDO.}
+\item{discount_factors}{Non-negative numeric vector for the discount factors for the timepoints.}
+
+\item{recovery_rate}{Non-negative number between zero and one for the \emph{recovery rate}..}
+
+\item{coupon}{Numeric number for the running coupon.}
+
+\item{upfront}{Numeric number for the upfront payment.}
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
 
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
+\item{method}{Calculation method (either \code{"default"}, \code{"prob"} (requires implementation of
+\code{probability_distribution}), or \code{"mc"}).}
+
+\item{n_sim}{Number of samples.}
 }
 \description{
 \linkS4class{CalibrationParam} for the H2-extendible Marshall-Olkin \emph{(average) default counting
@@ -112,9 +129,16 @@ For details on the underlying extendible models, see \linkS4class{ExtMO2FParam}.
 \itemize{
 \item \code{initialize,H2ExtMO3FParam-method}: Constructor
 
-\item \code{expected_pcds_loss,H2ExtMO3FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
+\item \code{expected_pcds_equation,H2ExtMO3FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
 \item \code{show,H2ExtMO3FParam-method}: Display the object.
+
+\item \code{simulate_dt,CuadrasAugeH2ExtMO3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\code{dim(x) == c(n_sim, getDimension(object))}.
+
+\item \code{simulate_adcp,CuadrasAugeH2ExtMO3FParam-method}: simulates the \emph{average default counting process} and returns a
+matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
 }}
 
 \section{Slots}{
@@ -126,6 +150,11 @@ For details on the underlying extendible models, see \linkS4class{ExtMO2FParam}.
 component specific; range depends on specific model). Use \code{rho}, \code{tau}, or \code{alpha} in the
 constructor to set dependence parameter.}
 }}
+
+\section{Simulation}{
+
+The default times are sampled using the stochastic representation described in details.
+}
 
 \section{Expected portfolio CDS loss}{
 
@@ -190,13 +219,22 @@ PoissonH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, tau = c(3e-1, 
 ExponentialH2ExtMO3FParam()
 ExponentialH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, alpha = c(3e-1, 5e-1))
 parm <- AlphaStableH2ExtMO3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
-expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-  method = "CalibrationParam")
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-  method = "CalibrationParam",
-  pd_args = list(method = "CalibrationParam", seed = 1623,
-    sim_args = list(n_sim = 1e2L)))
+expected_pcds_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+  coupon = 1e-1, upfront = 0)
+expected_pcds_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+  coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
+
+composition <- c(2L, 4L, 2L)
+d <- sum(composition)
+parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+simulate_dt(parm, n_sim = 1e1L)
+
+composition <- c(2L, 4L, 2L)
+d <- sum(composition)
+parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+simulate_adcp(parm, 1, n_sim = 1e1L)
+simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 1e1L)
 
 }

@@ -304,8 +304,6 @@ setMethod("invTau", "ExtArch2FParam",
 #' @aliases simulate_dt,ExtArch2FParam-method
 #'
 #' @inheritParams simulate_dt
-#' @param method Simulation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
@@ -321,9 +319,7 @@ setMethod("invTau", "ExtArch2FParam",
 #' @importFrom copula rCopula
 #' @include utils.R
 setMethod("simulate_dt", "ExtArch2FParam",
-  function(object, ...,
-      method = c("default", "ExtArch2fParam"), n_sim = 1e4L) {
-    method <- match.arg(method)
+  function(object, ..., n_sim = 1e4L) {
     out <- qexp(
       rCopula(n_sim, getCopula(object)),
       rate = getLambda(object), lower.tail = !getSurvival(object))
@@ -332,35 +328,51 @@ setMethod("simulate_dt", "ExtArch2FParam",
   })
 
 #' @describeIn ExtArch2FParam-class
-#'   returns the expected portfolio CDS loss for a specific time-point.
-#' @aliases expected_pcds_loss,ExtArch2FParam-method
+#'   calculates the *payoff equation* for a *portfolio CDS* (vectorized w.r.t.
+#'   the argumentes `recovery_rate`, `coupon`, and `upfront`).
+#' @aliases expected_pcds_equation,ExtArch2FParam-method
 #'
-#' @inheritParams probability_distribution
-#' @param method Calculation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
+#' @inheritParams expected_pcds_equation
 #'
 #' @inheritSection ExtMO2FParam-class Expected portfolio CDS loss
 #'
 #' @examples
 #' parm <- FrankExtArch2FParam(75L, 8e-2, rho = 4e-1)
-#' expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-#'   method = "CalibrationParam", pd_args = list(n_sim = 1e2L))
+#' expected_pcds_equation(
+#'   parm, times =seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   coupon = 1e-1, upfront = 0)
+#' expected_pcds_equation(
+#'   parm, times =seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 #'
 #' @importFrom stats pexp
-#' @importFrom checkmate qassert
+#' @importFrom checkmate qassert assert check_numeric
+#' @importFrom vctrs vec_size_common vec_recycle
+#' @include RcppExports.R
+#'
 #' @export
-setMethod("expected_pcds_loss", "ExtArch2FParam",
-  function(object, times, recovery_rate, ...,
-      method = c("default", "ExtArch2FParam", "CalibrationParam")) {
+setMethod("expected_pcds_equation", "ExtArch2FParam",
+  function(object, times, discount_factors, recovery_rate, coupon, upfront, ...,
+      method = c("default", "prob", "mc")) {
     method <- match.arg(method)
-    if (isTRUE("default" == method || "ExtArch2FParam" == method)) {
+    if ("default" == method) {
       qassert(times, "N+[0,)")
-      qassert(recovery_rate, "N1[0,1]")
-      out <- (1 - recovery_rate) * pexp(times, rate = getLambda(object))
+      qassert(discount_factors, paste0("N", length(times), "[0,)"))
+      qassert(recovery_rate, "N+[0,1]")
+      qassert(coupon, "N+")
+      qassert(upfront, "N+")
+
+      p <- vec_size_common(recovery_rate, coupon, upfront)
+      recovery_rate <- vec_recycle(recovery_rate, p)
+      coupon <- vec_recycle(coupon, p)
+      upfront <- vec_recycle(upfront, p)
+
+      x <- pexp(times, rate = getLambda(object)) %*% t(1 - recovery_rate)
+
+      out <- Rcpp__lagg_ev_pcds(x, times, discount_factors, recovery_rate, coupon, upfront)
     } else {
-      out <- callNextMethod(object, times, recovery_rate, ..., method = method)
+      out <- callNextMethod(
+        object, times, discount_factors, recovery_rate, coupon, upfront, ..., method = method)
     }
 
     out

@@ -303,40 +303,51 @@ setMethod("getModelName", "H2ExtMO3FParam",
   })
 
 #' @describeIn H2ExtMO3FParam-class
-#'   returns the expected portfolio CDS loss for a specific time-point.
-#' @aliases expected_pcds_loss,H2ExtMO3FParam-method
+#'   calculates the *payoff equation* for a *portfolio CDS* (vectorized w.r.t.
+#'   the argumentes `recovery_rate`, `coupon`, and `upfront`).
+#' @aliases expected_pcds_equation,H2ExtMO3FParam-method
 #'
-#' @inheritParams probability_distribution
-#' @param method Calculation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
+#' @inheritParams expected_pcds_equation
 #'
 #' @inheritSection ExtMO2FParam-class Expected portfolio CDS loss
 #'
 #' @examples
 #' parm <- AlphaStableH2ExtMO3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
-#' expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-#'   method = "CalibrationParam")
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-#'   method = "CalibrationParam",
-#'   pd_args = list(method = "CalibrationParam", seed = 1623,
-#'     sim_args = list(n_sim = 1e2L)))
+#' expected_pcds_equation(
+#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   coupon = 1e-1, upfront = 0)
+#' expected_pcds_equation(
+#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 #'
 #' @importFrom stats pexp
-#' @importFrom checkmate qassert
+#' @importFrom checkmate assert check_numeric
+#' @importFrom vctrs vec_size_common vec_recycle
+#' @include RcppExports.R
 #'
 #' @export
-setMethod("expected_pcds_loss", "H2ExtMO3FParam",
-  function(object, times, recovery_rate, ...,
-      method = c("default", "H2ExtMO3FParam", "CalibrationParam")) {
+setMethod("expected_pcds_equation", "H2ExtMO3FParam",
+  function(object, times, discount_factors, recovery_rate, coupon, upfront, ...,
+      method = c("default", "prob", "mc")) {
     method <- match.arg(method)
-    if (isTRUE("default" == method || "H2ExtMO3FParam" == method)) {
+    if ("default" == method) {
       qassert(times, "N+[0,)")
-      qassert(recovery_rate, "N1[0,1]")
-      out <- (1 - recovery_rate) * pexp(times, rate = getLambda(object))
+      qassert(discount_factors, paste0("N", length(times), "[0,)"))
+      qassert(recovery_rate, "N+[0,1]")
+      qassert(coupon, "N+")
+      qassert(upfront, "N+")
+
+      p <- vec_size_common(recovery_rate, coupon, upfront)
+      recovery_rate <- vec_recycle(recovery_rate, p)
+      coupon <- vec_recycle(coupon, p)
+      upfront <- vec_recycle(upfront, p)
+
+      x <- pexp(times, rate = getLambda(object)) %*% t(1 - recovery_rate)
+
+      out <- Rcpp__lagg_ev_pcds(x, times, discount_factors, recovery_rate, coupon, upfront)
     } else {
-      out <- callNextMethod(object, times, recovery_rate, ..., method = method)
+      out <- callNextMethod(
+        object, times, discount_factors, recovery_rate, coupon, upfront, ..., method = method)
     }
 
     out
@@ -417,6 +428,54 @@ setMethod("invAlpha", "CuadrasAugeH2ExtMO3FParam",
     adjacent_differences(value) / c(fraction, 1 - fraction)
   })
 
+#' @describeIn H2ExtMO3FParam-class
+#'    simulates the vector of *default times* and returns a matrix `x` with
+#'    `dim(x) == c(n_sim, getDimension(object))`.
+#' @aliases simulate_dt,CuadrasAugeH2ExtMO3FParam-method
+#' @param n_sim Number of samples.
+#'
+#' @inheritParams simulate_dt
+#' @param n_sim Number of samples.
+#'
+#' @section Simulation:
+#' The default times are sampled using the stochastic representation described in details.
+#'
+#' @examples
+#' composition <- c(2L, 4L, 2L)
+#' d <- sum(composition)
+#' parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+#' simulate_dt(parm, n_sim = 1e1L)
+#'
+#' @importFrom purrr map reduce
+#'
+#' @include utils.R
+setMethod("simulate_dt", "CuadrasAugeH2ExtMO3FParam",
+  function(object, ..., n_sim = 1e4L) {
+    Rcpp__rh2excamo_esm_dt(n_sim, getFraction(object), getModels(object))
+  })
+
+#' @describeIn H2ExtMO3FParam-class
+#'   simulates the *average default counting process* and returns a
+#'   matrix `x` with `dim(x) == c(n_sim, length(times))`.
+#' @aliases simulate_adcp,CuadrasAugeH2ExtMO3FParam-methods
+#'
+#' @examples
+#' composition <- c(2L, 4L, 2L)
+#' d <- sum(composition)
+#' parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+#' simulate_adcp(parm, 1, n_sim = 1e1L)
+#' simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 1e1L)
+#'
+#' @importFrom stats rexp
+#' @include RcppExports.R
+#'
+#' @export
+setMethod("simulate_adcp", "CuadrasAugeH2ExtMO3FParam",
+  function(object, times, ..., n_sim = 1e4L) {
+    qassert(times, "N+[0,)")
+
+      Rcpp__rh2excamo_esm_adcp(n_sim, times, getFraction(object), getModels(object))
+  })
 
 
 #' @rdname H2ExtMO3FParam-class

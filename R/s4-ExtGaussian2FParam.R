@@ -160,8 +160,6 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 #' @aliases simulate_dt,ExtGaussian2FParam-method
 #'
 #' @inheritParams simulate_dt
-#' @param method Simulation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
@@ -179,9 +177,7 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 #'
 #' @export
 setMethod("simulate_dt", "ExtGaussian2FParam",
-  function(object, ...,
-      method = c("default", "ExtGaussian2FParam"), n_sim = 1e4L) {
-    method <- match.arg(method)
+  function(object, ..., n_sim = 1e4L) {
     normalCopula(param = getNu(object), dim = getDimension(object), dispstr = "ex") %>%
       rCopula(n_sim, .) %>%
       qexp(rate = getLambda(object), lower.tail = FALSE)
@@ -193,8 +189,6 @@ setMethod("simulate_dt", "ExtGaussian2FParam",
 #' @aliases probability_distribution,ExtGaussian2FParam-method
 #'
 #' @inheritParams probability_distribution
-#' @param method Calculation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #'
 #' @section Probability distribution:
 #' The probability of \eqn{j} portfolio items being defaulted at time \eqn{t} is
@@ -223,95 +217,100 @@ setMethod("simulate_dt", "ExtGaussian2FParam",
 #' @include utils.R
 #' @export
 setMethod("probability_distribution", "ExtGaussian2FParam",
-  function(object, times, ...,
-      method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
-    method <- match.arg(method)
-    if (isTRUE("default" == method || "ExtGaussian2FParam" == method)) {
-      qassert(times, "N+[0,)")
-      d <- getDimension(object)
-      lambda <- getLambda(object)
-      nu <- getNu(object)
-      out <- qnorm(pexp(times, rate = lambda)) %>%
-        cross2(0L:d, .) %>%
-        map_dbl(~{
-          k <- .[[1]]
-          z <- .[[2]]
-          if (-Inf == z) {
-            if (0L == k) {
-              out <- 1
-            } else {
-              out <- 0
-            }
+  function(object, times, ...) {
+    qassert(times, "N+[0,)")
+    d <- getDimension(object)
+    lambda <- getLambda(object)
+    nu <- getNu(object)
+    out <- qnorm(pexp(times, rate = lambda)) %>%
+      cross2(0L:d, .) %>%
+      map_dbl(~{
+        k <- .[[1]]
+        z <- .[[2]]
+        if (-Inf == z) {
+          if (0L == k) {
+            out <- 1
           } else {
-            lg <- function(x, lower_tail = TRUE) {
-              pnorm((z - sqrt(nu) * x) / sqrt(1 - nu), log.p = TRUE, lower.tail = lower_tail)
-            }
-            int_fn <- function(x) {
-              v_multiply_binomial_coefficient(
-                exp(k * lg(x, lower_tail = TRUE) + (d - k) * lg(x, lower_tail = FALSE)), d, k) *
-                dnorm(x)
-            }
-            int_res <- integrate(
-              int_fn, lower = -Inf, upper = Inf, rel.tol = .Machine$double.eps^0.5)
-            out <- int_res$value
+            out <- 0
           }
-          out
-        }) %>%
-        matrix(nrow = d+1L, ncol = length(times))
-    } else {
-      out <- callNextMethod(object, times, ..., method = method)
-    }
+        } else {
+          lg <- function(x, lower_tail = TRUE) {
+            pnorm((z - sqrt(nu) * x) / sqrt(1 - nu), log.p = TRUE, lower.tail = lower_tail)
+          }
+          int_fn <- function(x) {
+            v_multiply_binomial_coefficient(
+              exp(k * lg(x, lower_tail = TRUE) + (d - k) * lg(x, lower_tail = FALSE)), d, k) *
+              dnorm(x)
+          }
+          int_res <- integrate(
+            int_fn, lower = -Inf, upper = Inf, rel.tol = .Machine$double.eps^0.5)
+          out <- int_res$value
+        }
+        out
+      }) %>%
+      matrix(nrow = d+1L, ncol = length(times))
 
     out
   })
 
 #' @describeIn ExtGaussian2FParam-class
-#'   returns the expected portfolio CDS loss for a specific time-point.
-#' @aliases expected_pcds_loss,ExtGaussian2FParam-method
+#'   calculates the *payoff equation* for a *portfolio CDS* (vectorized w.r.t.
+#'   the argumentes `recovery_rate`, `coupon`, and `upfront`).
+#' @aliases expected_pcds_equation,ExtGaussian2FParam-method
 #'
-#' @inheritParams probability_distribution
-#' @param method Calculation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
+#' @inheritParams expected_pcds_equation
 #'
 #' @inheritSection ExtMO2FParam-class Expected portfolio CDS loss
 #'
 #' @examples
 #' parm <- ExtGaussian2FParam(75L, 8e-2, rho = 4e-1)
-#' expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-#'   method = "CalibrationParam")
-#' expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-#'   method = "CalibrationParam",
-#'   pd_args = list(method = "CalibrationParam", seed = 1623,
-#'     sim_args = list(n_sim = 1e2L)))
+#' expected_pcds_equation(
+#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   coupon = 1e-1, upfront = 0)
+#' expected_pcds_equation(
+#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 #'
 #' @importFrom stats pexp
-#' @importFrom checkmate qassert
+#' @importFrom checkmate assert check_numeric
+#' @importFrom vctrs vec_size_common vec_recycle
+#' @include RcppExports.R
 #'
 #' @export
-setMethod("expected_pcds_loss", "ExtGaussian2FParam",
-  function(object, times, recovery_rate, ...,
-      method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
+setMethod("expected_pcds_equation", "ExtGaussian2FParam",
+  function(object, times, discount_factors, recovery_rate, coupon, upfront, ...,
+      method = c("default", "prob", "mc")) {
     method <- match.arg(method)
-    if (isTRUE("default" == method || "ExtGaussian2FParam" == method)) {
+    if ("default" == method) {
       qassert(times, "N+[0,)")
-      qassert(recovery_rate, "N1[0,1]")
-      out <- (1 - recovery_rate) * pexp(times, rate = getLambda(object))
+      qassert(discount_factors, paste0("N", length(times), "[0,)"))
+      qassert(recovery_rate, "N+[0,1]")
+      qassert(coupon, "N+")
+      qassert(upfront, "N+")
+
+      p <- vec_size_common(recovery_rate, coupon, upfront)
+      recovery_rate <- vec_recycle(recovery_rate, p)
+      coupon <- vec_recycle(coupon, p)
+      upfront <- vec_recycle(upfront, p)
+
+      x <- pexp(times, rate = getLambda(object)) %*% t(1 - recovery_rate)
+
+      out <- Rcpp__lagg_ev_pcds(x, times, discount_factors, recovery_rate, coupon, upfront)
     } else {
-      out <- callNextMethod(object, times, recovery_rate, ..., method = method)
+      out <- callNextMethod(
+        object, times, discount_factors, recovery_rate, coupon, upfront, ..., method = method)
     }
 
     out
   })
 
 #' @describeIn ExtGaussian2FParam-class
-#'   returns the expected CDO loss for a specific time-point.
-#' @aliases expected_cdo_loss,ExtGaussian2FParam-method
+#'   calculates the *payoff equation* for a *CDO* (vectorized w.r.t. the
+#'   argumentes `recovery_rate`, `coupon`, and `upfront`).
+#' @aliases expected_cdo_equation,ExtGaussian2FParam-method
 #'
-#' @inheritParams probability_distribution
-#' @param method Calculation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
+#' @inheritParams expected_cdo_equation
+#' @param method Calculation method (either `"default"`, `"prob"`, or `"mc"`).
 #'
 #' @section Expected CDO tranche loss:
 #' The *expected loss of a CDO tranche* with *upper and lower attachment points*
@@ -328,41 +327,65 @@ setMethod("expected_pcds_loss", "ExtGaussian2FParam",
 #'
 #' @examples
 #' parm <- ExtGaussian2FParam(5L, 8e-2, rho = 4e-1)
-#' expected_cdo_loss(parm, times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
-#' expected_cdo_loss(parm, times = seq(0, 1, by = 0.25),
-#'   recovery_rate = 0.4, lower = 0.1, upper = 0.2)
-#' expected_cdo_loss(parm, times = seq(0, 1, by = 0.25),
-#'   recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam")
-#' expected_cdo_loss(parm, times = seq(0, 1, by = 0.25),
-#'   recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam",
-#'   pd_args = list(method = "CalibrationParam", seed = 1623,
-#'     sim_args = list(n_sim = 1e2L)))
+#' expected_cdo_equation(
+#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L),
+#'   recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35), upper = c(0.1, 0.2, 0.35, 1),
+#'   coupon = c(rep(5e-2, 3L), 0), upfront = c(8e-1, 5e-1, 1e-1, -5e-2))
+#' expected_cdo_equation(
+#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L),
+#'   recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35), upper = c(0.1, 0.2, 0.35, 1),
+#'   coupon = c(rep(5e-2, 3L), 0), upfront = c(8e-1, 5e-1, 1e-1, -5e-2),
+#'   method = "prob")
+#' expected_cdo_equation(
+#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L),
+#'   recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35), upper = c(0.1, 0.2, 0.35, 1),
+#'   coupon = c(rep(5e-2, 3L), 0), upfront = c(8e-1, 5e-1, 1e-1, -5e-2),
+#'   method = "mc", n_sim = 1e1)
 #'
 #' @importFrom copula normalCopula pCopula
 #' @importFrom stats pexp
-#' @importFrom checkmate qassert assert_numeric
+#' @importFrom checkmate assert check_numeric
 #'
 #' @export
-setMethod("expected_cdo_loss", "ExtGaussian2FParam",
+setMethod("expected_cdo_equation", "ExtGaussian2FParam",
   function(
-      object, times, recovery_rate, lower, upper, ...,
-      method = c("default", "ExtGaussian2FParam", "CalibrationParam")) {
+      object, times, discount_factors, recovery_rate, lower, upper, coupon, upfront, ...,
+      method = c("default", "prob", "mc")) {
     method <- match.arg(method)
-    if (isTRUE("default" == method || "ExtGaussian2FParam" == method)) {
+    if ("default" == method) {
       qassert(times, "N+[0,)")
-      qassert(recovery_rate, "N1[0,1]")
-      qassert(lower, "N1[0,1]")
-      assert_numeric(upper, lower = lower, upper = 1)
+      qassert(discount_factors, paste0("N", length(times), "[0,)"))
+      qassert(recovery_rate, "N+[0,1]")
+      qassert(lower, "N+[0,1]")
+      qassert(upper, "N+[0,1]")
+      qassert(upper - lower, "N+[0,1]")
+      qassert(coupon, "N+")
+      qassert(upfront, "N+")
 
-      cop <- normalCopula(-sqrt(1-getNu(object)))
-      out <- pexp(times, rate = getLambda(object)) %>%
-        map_dbl(~{
-          u_left <- c(pmax(1 - lower / (1 - recovery_rate), 0), .)
-          u_right <- c(pmax(1 - upper / (1 - recovery_rate), 0), .)
-          (1 - recovery_rate) * (pCopula(u_left, cop) - pCopula(u_right, cop))
-        })
+      p <- vec_size_common(recovery_rate, lower, upper, coupon, upfront)
+      recovery_rate <- vec_recycle(recovery_rate, p)
+      lower <- vec_recycle(lower, p)
+      upper <- vec_recycle(upper, p)
+      coupon <- vec_recycle(coupon, p)
+      upfront <- vec_recycle(upfront, p)
+
+      cop <- normalCopula(-sqrt(1 - getNu(object)))
+
+      x <- matrix(nrow = length(times), ncol = p)
+      for (j in seq_len(ncol(x))) {
+        x[, j] <- pexp(times, rate = getLambda(object)) %>%
+          map_dbl(~{
+            u_left <- c(pmax(1 - lower[j] / (1 - recovery_rate[j]), 0), .)
+            u_right <- c(pmax(1 - upper[j] / (1 - recovery_rate[j]), 0), .)
+            (1 - recovery_rate[j]) * (pCopula(u_left, cop) - pCopula(u_right, cop))
+          })
+      }
+      out <- Rcpp__lagg_ev_cdo(
+        x, times, discount_factors, recovery_rate, lower, upper, coupon, upfront)
     } else {
-      out <- callNextMethod(object, times, recovery_rate, lower, upper, ..., method = method)
+      out <- callNextMethod(
+        object, times, discount_factors, recovery_rate, lower, upper, coupon, upfront, ...,
+        method = method)
     }
 
     out

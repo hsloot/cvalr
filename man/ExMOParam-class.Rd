@@ -13,20 +13,9 @@
 \usage{
 \S4method{initialize}{ExMOParam}(.Object, ex_intensities)
 
-\S4method{simulate_dt}{ExMOParam}(
-  object,
-  ...,
-  method = c("default", "ExMOParam", "ExMarkovParam"),
-  n_sim = 10000L
-)
+\S4method{simulate_dt}{ExMOParam}(object, ..., n_sim = 10000L)
 
-\S4method{simulate_adcp}{ExMOParam}(
-  object,
-  times,
-  ...,
-  method = c("default", "ExMOParam", "ExMarkovParam"),
-  n_sim = 10000L
-)
+\S4method{simulate_adcp}{ExMOParam}(object, times, ..., n_sim = 10000L)
 
 \S4method{show}{ExMOParam}(object)
 }
@@ -40,9 +29,6 @@ Marshall-Olkin distribution (see \code{\link[rmo:BernsteinFunction-class]{rmo::e
 
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
-
-\item{method}{Simulation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
 
 \item{n_sim}{Number of samples.}
 

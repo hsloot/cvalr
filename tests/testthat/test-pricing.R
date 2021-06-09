@@ -16,7 +16,7 @@ test_that("Portfolio CDS coupon is calculated correctly", {
   )
 
   expect_equal(
-    portfolio_cds_coupon(
+    Rcpp__portfolio_cds_coupon(
       expected_losses, times, discount_factors, recovery_rate
     ),
     eddl / edpl1
@@ -34,7 +34,7 @@ test_that("Portfolio CDS upfront is calculated correctly", {
   )
 
   expect_equal(
-    portfolio_cds_upfront(
+    Rcpp__portfolio_cds_upfront(
       expected_losses, times, discount_factors, recovery_rate, coupon
     ),
     eddl - (coupon * edpl1)
@@ -43,12 +43,12 @@ test_that("Portfolio CDS upfront is calculated correctly", {
 
 test_that("Portfolio CDS equation is calculated correctly", {
   coupon <- 0.05
-  upfront <- portfolio_cds_upfront(
+  upfront <- Rcpp__portfolio_cds_upfront(
     expected_losses, times, discount_factors, recovery_rate, coupon
   )
 
   expect_equal(
-    portfolio_cds_equation(
+    Rcpp__portfolio_cds_equation(
       expected_losses, times, discount_factors, recovery_rate, coupon, upfront
     ),
     0
@@ -72,7 +72,7 @@ test_that("CDO upfront payment is calculated correctly", {
   )
 
   expect_equal(
-    cdo_upfront(
+    Rcpp__cdo_upfront(
       expected_losses, times, discount_factors, lower, upper, coupon
     ),
     (eddl - coupon * edpl1) / (upper - lower))
@@ -87,7 +87,7 @@ test_that("CDO coupon is calculated correctly", {
   )
 
   expect_equal(
-    cdo_coupon(
+    Rcpp__cdo_coupon(
       expected_losses, times, discount_factors, lower, upper
     ),
     eddl / edpl1
@@ -96,11 +96,11 @@ test_that("CDO coupon is calculated correctly", {
 
 test_that("CDO equation is calculated correctly", {
   coupon <- 0.05
-  upfront <- cdo_upfront(
+  upfront <- Rcpp__cdo_upfront(
     expected_losses, times, discount_factors, lower, upper, coupon
   )
   expect_equal(
-    cdo_equation(
+    Rcpp__cdo_equation(
       expected_losses, times, discount_factors, lower, upper, coupon, upfront
     ),
     0

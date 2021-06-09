@@ -13,60 +13,60 @@ is_exqmatrix <- function(x, tol) {
     .Call(`_cvalr_is_exqmatrix`, x, tol)
 }
 
-#' Portfolio CDS spread and CDO methods
-#'
-#' @param expected_losses The expected losses (not including recovered part)
-#' @param times The times of the payment schedule
-#' @param discount_factors The discount factors.
-#' @param recovery_rate The recovery rate
-#'
-#' @name cdx
-#' @export
-portfolio_cds_coupon <- function(expected_losses, times, discount_factors, recovery_rate) {
-    .Call(`_cvalr_portfolio_cds_coupon`, expected_losses, times, discount_factors, recovery_rate)
+Rcpp__dt2adcp <- function(x, times) {
+    .Call(`_cvalr_Rcpp__dt2adcp`, x, times)
 }
 
-#' @rdname cdx
-#'
-#' @param coupon The periodically paid coupon of the payment leg
-#' @param upfront The upfront payment
-#'
-#' @export
-portfolio_cds_upfront <- function(expected_losses, times, discount_factors, recovery_rate, coupon) {
-    .Call(`_cvalr_portfolio_cds_upfront`, expected_losses, times, discount_factors, recovery_rate, coupon)
+Rcpp__adcp2peqpv_pcds <- function(x, times, discount_factors, recovery_rate, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__adcp2peqpv_pcds`, x, times, discount_factors, recovery_rate, coupon, upfront)
 }
 
-#' @rdname cdx
-#'
-#' @param upfront The upfront payment
-#'
-#' @export
-portfolio_cds_equation <- function(expected_losses, times, discount_factors, recovery_rate, coupon, upfront) {
-    .Call(`_cvalr_portfolio_cds_equation`, expected_losses, times, discount_factors, recovery_rate, coupon, upfront)
+Rcpp__adcp2peqpv_cdo <- function(x, times, discount_factors, recovery_rate, lower, upper, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__adcp2peqpv_cdo`, x, times, discount_factors, recovery_rate, lower, upper, coupon, upfront)
 }
 
-#' @rdname cdx
-#'
-#' @param lower Lower attachment of the CDO tranche
-#' @param upper Upper attachment of the CDO tranche
-#'
-#' @export
-cdo_upfront <- function(expected_losses, times, discount_factors, lower, upper, coupon) {
-    .Call(`_cvalr_cdo_upfront`, expected_losses, times, discount_factors, lower, upper, coupon)
+Rcpp__trans_v_pcds <- function(x, recovery_rate) {
+    .Call(`_cvalr_Rcpp__trans_v_pcds`, x, recovery_rate)
 }
 
-#' @rdname cdx
-#'
-#' @export
-cdo_coupon <- function(expected_losses, times, discount_factors, lower, upper) {
-    .Call(`_cvalr_cdo_coupon`, expected_losses, times, discount_factors, lower, upper)
+Rcpp__trans_v_cdo <- function(x, recovery_rate, lower, upper) {
+    .Call(`_cvalr_Rcpp__trans_v_cdo`, x, recovery_rate, lower, upper)
 }
 
-#' @rdname cdx
-#'
-#' @export
-cdo_equation <- function(expected_losses, times, discount_factors, lower, upper, coupon, upfront) {
-    .Call(`_cvalr_cdo_equation`, expected_losses, times, discount_factors, lower, upper, coupon, upfront)
+Rcpp__lagg_ev_pcds <- function(x, times, discount_factors, recovery_rate, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__lagg_ev_pcds`, x, times, discount_factors, recovery_rate, coupon, upfront)
+}
+
+Rcpp__lagg_ev_cdo <- function(x, times, discount_factors, recovery_rate, lower, upper, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__lagg_ev_cdo`, x, times, discount_factors, recovery_rate, lower, upper, coupon, upfront)
+}
+
+Rcpp__adcp2epd <- function(x, d) {
+    .Call(`_cvalr_Rcpp__adcp2epd`, x, d)
+}
+
+Rcpp__portfolio_cds_coupon <- function(expected_losses, times, discount_factors, recovery_rate) {
+    .Call(`_cvalr_Rcpp__portfolio_cds_coupon`, expected_losses, times, discount_factors, recovery_rate)
+}
+
+Rcpp__portfolio_cds_upfront <- function(expected_losses, times, discount_factors, recovery_rate, coupon) {
+    .Call(`_cvalr_Rcpp__portfolio_cds_upfront`, expected_losses, times, discount_factors, recovery_rate, coupon)
+}
+
+Rcpp__portfolio_cds_equation <- function(expected_losses, times, discount_factors, recovery_rate, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__portfolio_cds_equation`, expected_losses, times, discount_factors, recovery_rate, coupon, upfront)
+}
+
+Rcpp__cdo_upfront <- function(expected_losses, times, discount_factors, lower, upper, coupon) {
+    .Call(`_cvalr_Rcpp__cdo_upfront`, expected_losses, times, discount_factors, lower, upper, coupon)
+}
+
+Rcpp__cdo_coupon <- function(expected_losses, times, discount_factors, lower, upper) {
+    .Call(`_cvalr_Rcpp__cdo_coupon`, expected_losses, times, discount_factors, lower, upper)
+}
+
+Rcpp__cdo_equation <- function(expected_losses, times, discount_factors, lower, upper, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__cdo_equation`, expected_losses, times, discount_factors, lower, upper, coupon, upfront)
 }
 
 Rcpp__rexmo_markovian_acdp <- function(n, times, d, ex_intensities) {
@@ -77,11 +77,19 @@ Rcpp__rcamo_esm_adcp <- function(n, times, d, alpha, beta) {
     .Call(`_cvalr_Rcpp__rcamo_esm_adcp`, n, times, d, alpha, beta)
 }
 
-dt2adcp <- function(x, times) {
-    .Call(`_cvalr_dt2adcp`, x, times)
+Rcpp__rh2exmo_markovian_dt <- function(n, fraction, models) {
+    .Call(`_cvalr_Rcpp__rh2exmo_markovian_dt`, n, fraction, models)
 }
 
-adcp2epd <- function(x, d) {
-    .Call(`_cvalr_adcp2epd`, x, d)
+Rcpp__rh2excamo_esm_dt <- function(n, fraction, models) {
+    .Call(`_cvalr_Rcpp__rh2excamo_esm_dt`, n, fraction, models)
+}
+
+Rcpp__rh2exmo_markovian_adcp <- function(n, times, fraction, models) {
+    .Call(`_cvalr_Rcpp__rh2exmo_markovian_adcp`, n, times, fraction, models)
+}
+
+Rcpp__rh2excamo_esm_adcp <- function(n, times, fraction, models) {
+    .Call(`_cvalr_Rcpp__rh2excamo_esm_adcp`, n, times, fraction, models)
 }
 

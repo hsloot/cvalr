@@ -8,43 +8,39 @@
 \alias{initialize,ExtGaussian2FParam,ANY-method}
 \alias{simulate_dt,ExtGaussian2FParam-method}
 \alias{probability_distribution,ExtGaussian2FParam-method}
-\alias{expected_pcds_loss,ExtGaussian2FParam-method}
-\alias{expected_cdo_loss,ExtGaussian2FParam-method}
+\alias{expected_pcds_equation,ExtGaussian2FParam-method}
+\alias{expected_cdo_equation,ExtGaussian2FParam-method}
 \alias{show,ExtGaussian2FParam-method}
 \title{Two-factor extendible Gaussian calibration parameters}
 \usage{
 \S4method{initialize}{ExtGaussian2FParam}(.Object, dim, lambda, nu, rho, tau)
 
-\S4method{simulate_dt}{ExtGaussian2FParam}(
-  object,
-  ...,
-  method = c("default", "ExtGaussian2FParam"),
-  n_sim = 10000L
-)
+\S4method{simulate_dt}{ExtGaussian2FParam}(object, ..., n_sim = 10000L)
 
-\S4method{probability_distribution}{ExtGaussian2FParam}(
+\S4method{probability_distribution}{ExtGaussian2FParam}(object, times, ...)
+
+\S4method{expected_pcds_equation}{ExtGaussian2FParam}(
   object,
   times,
-  ...,
-  method = c("default", "ExtGaussian2FParam", "CalibrationParam")
-)
-
-\S4method{expected_pcds_loss}{ExtGaussian2FParam}(
-  object,
-  times,
+  discount_factors,
   recovery_rate,
+  coupon,
+  upfront,
   ...,
-  method = c("default", "ExtGaussian2FParam", "CalibrationParam")
+  method = c("default", "prob", "mc")
 )
 
-\S4method{expected_cdo_loss}{ExtGaussian2FParam}(
+\S4method{expected_cdo_equation}{ExtGaussian2FParam}(
   object,
   times,
+  discount_factors,
   recovery_rate,
   lower,
   upper,
+  coupon,
+  upfront,
   ...,
-  method = c("default", "ExtGaussian2FParam", "CalibrationParam")
+  method = c("default", "prob", "mc")
 )
 
 \S4method{show}{ExtGaussian2FParam}(object)
@@ -67,21 +63,23 @@
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
 
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
-
 \item{n_sim}{Number of samples.}
 
 \item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
-of the portfolio CDS/CDO.}
+\item{discount_factors}{Non-negative numeric vector for the discount factors for the timepoints.}
 
-\item{lower}{Non-negative number between zero and one for the lower attachment point
-of the CDO tranche.}
+\item{recovery_rate}{Non-negative number between zero and one for the \emph{recovery rate}..}
 
-\item{upper}{Non-negative number between \code{lower} and one for the upper attachment point
-of the CDO tranche.}
+\item{coupon}{Numeric number for the running coupon.}
+
+\item{upfront}{Numeric number for the upfront payment.}
+
+\item{method}{Calculation method (either \code{"default"}, \code{"prob"}, or \code{"mc"}).}
+
+\item{lower}{Non-negative number between zero and one for the \emph{lower attachment point}.}
+
+\item{upper}{Non-negative number between zero and one for the \emph{upper attachment point}.}
 }
 \description{
 \linkS4class{CalibrationParam}-class with two parameters for the extendible
@@ -115,9 +113,11 @@ Kendall's Tau is
 \item \code{probability_distribution,ExtGaussian2FParam-method}: calculates the \emph{probability vector} for the \emph{average default count process}
 and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, length(times))}.
 
-\item \code{expected_pcds_loss,ExtGaussian2FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
+\item \code{expected_pcds_equation,ExtGaussian2FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{expected_cdo_loss,ExtGaussian2FParam-method}: returns the expected CDO loss for a specific time-point.
+\item \code{expected_cdo_equation,ExtGaussian2FParam-method}: calculates the \emph{payoff equation} for a \emph{CDO} (vectorized w.r.t. the
+argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
 \item \code{show,ExtGaussian2FParam-method}: Display the object.
 }}
@@ -195,24 +195,27 @@ probability_distribution(parm, seq(0, 1, by = 0.25),
   method = "CalibrationParam", seed = 1623, sim_args(n_sim  = 1e2L))
 
 parm <- ExtGaussian2FParam(75L, 8e-2, rho = 4e-1)
-expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-  method = "CalibrationParam")
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-  method = "CalibrationParam",
-  pd_args = list(method = "CalibrationParam", seed = 1623,
-    sim_args = list(n_sim = 1e2L)))
+expected_pcds_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+  coupon = 1e-1, upfront = 0)
+expected_pcds_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+  coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 
 parm <- ExtGaussian2FParam(5L, 8e-2, rho = 4e-1)
-expected_cdo_loss(parm, times = 0.25, recovery_rate = 0.4, lower = 0.1, upper = 0.2)
-expected_cdo_loss(parm, times = seq(0, 1, by = 0.25),
-  recovery_rate = 0.4, lower = 0.1, upper = 0.2)
-expected_cdo_loss(parm, times = seq(0, 1, by = 0.25),
-  recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam")
-expected_cdo_loss(parm, times = seq(0, 1, by = 0.25),
-  recovery_rate = 0.4, lower = 0.1, upper = 0.2, method = "CalibrationParam",
-  pd_args = list(method = "CalibrationParam", seed = 1623,
-    sim_args = list(n_sim = 1e2L)))
+expected_cdo_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L),
+  recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35), upper = c(0.1, 0.2, 0.35, 1),
+  coupon = c(rep(5e-2, 3L), 0), upfront = c(8e-1, 5e-1, 1e-1, -5e-2))
+expected_cdo_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L),
+  recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35), upper = c(0.1, 0.2, 0.35, 1),
+  coupon = c(rep(5e-2, 3L), 0), upfront = c(8e-1, 5e-1, 1e-1, -5e-2),
+  method = "prob")
+expected_cdo_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L),
+  recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35), upper = c(0.1, 0.2, 0.35, 1),
+  coupon = c(rep(5e-2, 3L), 0), upfront = c(8e-1, 5e-1, 1e-1, -5e-2),
+  method = "mc", n_sim = 1e1)
 
 }

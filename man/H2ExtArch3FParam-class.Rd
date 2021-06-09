@@ -6,7 +6,7 @@
 \alias{H2ExtArch3FParam}
 \alias{initialize,H2ExtArch3FParam-method}
 \alias{initialize,H2ExtArch3FParam,ANY-method}
-\alias{expected_pcds_loss,H2ExtArch3FParam-method}
+\alias{expected_pcds_equation,H2ExtArch3FParam-method}
 \alias{show,H2ExtArch3FParam-method}
 \alias{simulate_dt,H2ExtArch3FParam-method}
 \alias{ClaytonH2ExtArch3FParam-class}
@@ -38,12 +38,15 @@
   family = c("Clayton", "Frank", "Gumbel", "Joe")
 )
 
-\S4method{expected_pcds_loss}{H2ExtArch3FParam}(
+\S4method{expected_pcds_equation}{H2ExtArch3FParam}(
   object,
   times,
+  discount_factors,
   recovery_rate,
+  coupon,
+  upfront,
   ...,
-  method = c("default", "H2ExtArch3FParam", "CalibrationParam")
+  method = c("default", "prob", "mc")
 )
 
 \S4method{show}{H2ExtArch3FParam}(object)
@@ -81,13 +84,18 @@
 
 \item{times}{A non-negative numeric vector of timepoints.}
 
-\item{recovery_rate}{Non-negative number between zero and one for the recovery rate
-of the portfolio CDS/CDO.}
+\item{discount_factors}{Non-negative numeric vector for the discount factors for the timepoints.}
+
+\item{recovery_rate}{Non-negative number between zero and one for the \emph{recovery rate}..}
+
+\item{coupon}{Numeric number for the running coupon.}
+
+\item{upfront}{Numeric number for the upfront payment.}
 
 \item{...}{Pass-through parameters.}
 
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
+\item{method}{Calculation method (either \code{"default"}, \code{"prob"} (requires implementation of
+\code{probability_distribution}), or \code{"mc"}).}
 
 \item{n_sim}{Number of samples.}
 }
@@ -115,7 +123,8 @@ For details on the underlying extendible model, see \linkS4class{ExtArch2FParam}
 \itemize{
 \item \code{initialize,H2ExtArch3FParam-method}: Constructor
 
-\item \code{expected_pcds_loss,H2ExtArch3FParam-method}: returns the expected portfolio CDS loss for a specific time-point.
+\item \code{expected_pcds_equation,H2ExtArch3FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
 \item \code{show,H2ExtArch3FParam-method}: Display the object.
 
@@ -165,14 +174,12 @@ H2ExtArch3FParam(
   composition = c(3L, 3L, 4L, 5L), lambda = 8e-2, tau = c(3e-1, 5e-1), survival = TRUE)
 
 parm <- ClaytonH2ExtArch3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
-expected_pcds_loss(parm, times = 0.25, recovery_rate = 0.4)
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4)
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-  method = "CalibrationParam")
-expected_pcds_loss(parm, times = seq(0, 1, by = 0.25), recovery_rate = 0.4,
-  method = "CalibrationParam",
-  pd_args = list(method = "CalibrationParam", seed = 1623,
-    sim_args = list(n_sim = 1e2L)))
+expected_pcds_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+  coupon = 1e-1, upfront = 0)
+expected_pcds_equation(
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+  coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 
 parm <- FrankH2ExtArch3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(2e-1, 7e-1))
 simulate_dt(parm, n_sim = 5L)
