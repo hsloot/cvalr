@@ -3,7 +3,7 @@ set.seed(1623)
 n <- 5e1L
 d <- 75L
 lambda <- 1e-1
-times <- seq(0.25, 5, by = 0.25)
+times <- seq(0, 5, by = 0.25)
 
 dt_mat <- matrix(rexp(n * d, rate = lambda), nrow = n, ncol = d)
 

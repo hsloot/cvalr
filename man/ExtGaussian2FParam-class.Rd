@@ -196,24 +196,24 @@ probability_distribution(parm, seq(0, 1, by = 0.25),
 
 parm <- ExtGaussian2FParam(75L, 8e-2, rho = 4e-1)
 expected_pcds_equation(
-  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0)
 expected_pcds_equation(
-  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 
 parm <- ExtGaussian2FParam(5L, 8e-2, rho = 4e-1)
 expected_cdo_equation(
-  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L),
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L),
   recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35), upper = c(0.1, 0.2, 0.35, 1),
   coupon = c(rep(5e-2, 3L), 0), upfront = c(8e-1, 5e-1, 1e-1, -5e-2))
 expected_cdo_equation(
-  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L),
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L),
   recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35), upper = c(0.1, 0.2, 0.35, 1),
   coupon = c(rep(5e-2, 3L), 0), upfront = c(8e-1, 5e-1, 1e-1, -5e-2),
   method = "prob")
 expected_cdo_equation(
-  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L),
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L),
   recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35), upper = c(0.1, 0.2, 0.35, 1),
   coupon = c(rep(5e-2, 3L), 0), upfront = c(8e-1, 5e-1, 1e-1, -5e-2),
   method = "mc", n_sim = 1e1)

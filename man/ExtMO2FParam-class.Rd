@@ -68,8 +68,8 @@
 \item{...}{arguments to specify properties of the new object, to
       be passed to \code{initialize()}.}
 
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
+\item{method}{Calculation method (either \code{"default"}, \code{"prob"} (requires implementation of
+\code{probability_distribution}), or \code{"mc"}).}
 
 \item{n_sim}{Number of samples.}
 }
@@ -195,10 +195,10 @@ ExponentialExtMO2FParam()
 ExponentialExtMO2FParam(dim = 5L, lambda = 8e-2, alpha = 4e-1)
 parm <- CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4)
 expected_pcds_equation(
-  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0)
 expected_pcds_equation(
-  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 
 parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)

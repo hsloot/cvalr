@@ -187,14 +187,14 @@ setGeneric("expected_value",
 #'   dim = 50L, lambda = 0.05, rho = 0.4), 0.25,
 #'   .trans_v = function(x) x, .lagg_ev = function(x) x)
 #' expected_value(AlphaStableExtMO2FParam(
-#'   dim = 50L, lambda = 0.05, rho = 0.4), seq(0.25, 5, by = 0.25),
+#'   dim = 50L, lambda = 0.05, rho = 0.4), seq(0, 5, by = 0.25),
 #'   .trans_v = function(x) x, .lagg_ev = function(x) apply(x, 2L, mean))
 #' expected_value(PoissonExtMO2FParam(
 #'   dim = 50L, lambda = 0.05, rho = 0.4), 0.25,
 #'   .trans_v = function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
 #'   .lagg_ev = function(x) apply(x, 2L, mean))
 #' expected_value(ExponentialExtMO2FParam(
-#'   dim = 50L, lambda = 0.05, rho = 0.4), seq(0.25, 5, by = 0.25),
+#'   dim = 50L, lambda = 0.05, rho = 0.4), seq(0, 5, by = 0.25),
 #'   .trans_v = function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
 #'   .lagg_ev = function(x) apply(x, 2L, mean))
 #'
@@ -203,11 +203,11 @@ setGeneric("expected_value",
 #'   method = "mc", n_sim = 1e4L,
 #'   .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim))
 #' expected_value(CuadrasAugeExtMO2FParam(
-#'   dim = 50L, lambda = 0.05, rho = 0.4), seq(0.25, 5, by = 0.25),
+#'   dim = 50L, lambda = 0.05, rho = 0.4), seq(0, 5, by = 0.25),
 #'   method = "mc", n_sim = 1e4L,
 #'   .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim))
 #' expected_value(CuadrasAugeExtMO2FParam(
-#'   dim = 50L, lambda = 0.05, rho = 0.4), seq(0.25, 5, by = 0.25),
+#'   dim = 50L, lambda = 0.05, rho = 0.4), seq(0, 5, by = 0.25),
 #'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
 #'   method = "mc", n_sim = 1e4L,
 #'   .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim),
@@ -296,15 +296,15 @@ setGeneric("expected_pcds_equation",
 #' @examples
 #' expected_pcds_equation(
 #'   AlphaStableExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+#'   times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21),
 #'   recovery_rate = 0.4, coupon = 0.08, upfront = 0)
 #' expected_pcds_equation(
 #'   AlphaStableExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+#'   times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21),
 #'   recovery_rate = 0.4, coupon = rep(0.08, 4), upfront = rep(0, 4))
 #' expected_pcds_equation(
 #'   AlphaStableExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+#'   times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21),
 #'   recovery_rate = rep(0.4, 4), coupon = rep(0.08, 4), upfront = rep(0, 4))
 #'
 #' @importFrom checkmate qassert
@@ -361,7 +361,7 @@ setGeneric("expected_cdo_equation",
 #' @examples
 #' expected_cdo_equation(
 #'   ExtGaussian2FParam(dim = 75, lambda = 0.05, rho = 0.6),
-#'   times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20),
+#'   times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21),
 #'   recovery_rate = 0.4, lower = c(0, 0.1, 0.2, 0.35),
 #'   upper = c(0.1, 0.2, 0.35, 1), coupon = 0.08, upfront = 0
 #' )

@@ -65,8 +65,8 @@
 
 \item{upfront}{Numeric number for the upfront payment.}
 
-\item{method}{Calculation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
+\item{method}{Calculation method (either \code{"default"}, \code{"prob"} (requires implementation of
+\code{probability_distribution}), or \code{"mc"}).}
 }
 \description{
 \linkS4class{CalibrationParam} for the H2-extendible Gaussian copula with Exponential margin model for
@@ -148,10 +148,10 @@ simulate_dt(parm, n_sim = 5L)
 
 parm <- H2ExtGaussian3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
 expected_pcds_equation(
-  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0)
 expected_pcds_equation(
-  parm, times = seq(0.25, 5, by = 0.25), discount_factors = rep(1, 20L), recovery_rate = 0.4,
+  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 
 }

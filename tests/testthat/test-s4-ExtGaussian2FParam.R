@@ -165,7 +165,7 @@ test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`
 
 
 test_that("`expected_pcds_equation` works as expected for `ExtGaussian2FParam", {
-  times <- seq(0.25, 5, by = 0.25)
+  times <- seq(0, 5, by = 0.25)
   discount_factors <- rep(1, length(times))
   recovery_rate <- 4e-1
   coupon <- 1e-1

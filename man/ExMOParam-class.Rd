@@ -33,9 +33,6 @@ Marshall-Olkin distribution (see \code{\link[rmo:BernsteinFunction-class]{rmo::e
 \item{n_sim}{Number of samples.}
 
 \item{times}{A non-negative numeric vector of timepoints.}
-
-\item{method}{Simulation method (either \code{"default"} or the name of the
-class whose implementation should be used).}
 }
 \description{
 \linkS4class{CalibrationParam}-class for the exchangeable Marshall-Olkin model for

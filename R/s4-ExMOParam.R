@@ -132,8 +132,6 @@ setMethod("simulate_dt", "ExMOParam",
 #' @aliases simulate_adcp,ExMOParam-method
 #'
 #' @inheritParams simulate_adcp
-#' @param method Simulation method (either `"default"` or the name of the
-#'   class whose implementation should be used).
 #' @param times A non-negative numeric vector of timepoints.
 #' @param n_sim Number of samples.
 #'
