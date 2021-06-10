@@ -1,3 +1,7 @@
+# 0.3.1
+
+- Fix H2-ext. CA-sampling
+
 # 0.3 
 
 - Internal refactoring of `expected_value` methods and user interface.

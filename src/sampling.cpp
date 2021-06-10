@@ -89,9 +89,10 @@ typename cuadras_auge_distribution::param_type extract_param<cuadras_auge_distri
   const auto model = as_s4(x);
   if (!model.is("CuadrasAugeExtMO2FParam")) stop("Not an CuadrasAugeExtMO2FParam");
   const auto dim = as<std::size_t>(model.slot("dim"));
+  const auto lambda = as<double>(model.slot("lambda"));
   const auto nu = as<double>(model.slot("nu"));
-  const auto alpha = (1. - nu) * scale;
-  const auto beta = nu * scale;
+  const auto alpha = lambda * (1. - nu) * scale;
+  const auto beta = lambda * nu * scale;
 
   return parm_t{dim, alpha, beta};
 }
