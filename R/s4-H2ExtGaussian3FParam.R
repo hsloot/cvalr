@@ -222,8 +222,9 @@ setMethod("initialize", "H2ExtGaussian3FParam",
 #' parm <- H2ExtGaussian3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(2e-1, 7e-1))
 #' simulate_dt(parm, n_sim = 5L)
 #'
-#' @importFrom copula normalCopula rCopula P2p p2P
-#' @importFrom stats qexp
+#' @importFrom mvtnorm rmvnorm
+#' @importFrom copula P2p p2P
+#' @importFrom stats qexp pnorm
 #' @include utils.R
 setMethod("simulate_dt", "H2ExtGaussian3FParam",
   function(object, ..., n_sim = 1e4L) {
@@ -234,9 +235,9 @@ setMethod("simulate_dt", "H2ExtGaussian3FParam",
     for (elem in getPartition(object)) {
       corr[elem, elem] <- p2P(nu[[2]], d = length(elem))
     }
-    cop <- normalCopula(param = P2p(corr), dim = d, dispstr = "un")
 
-    qexp(rCopula(n_sim, cop), rate = lambda, lower.tail = FALSE)
+    qexp(pnorm(rmvnorm(n_sim, sigma = corr, checkSymmetry = FALSE)),
+      rate = lambda, lower.tail = FALSE)
   })
 
 

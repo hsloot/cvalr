@@ -104,13 +104,18 @@ test__expected_cdo_equation__gaussian <- function( # nolint
   lambda <- getLambda(object)
   nu <- getNu(object)
 
-  cop <- copula::normalCopula(param = -sqrt(1 - nu), dim = 2L, dispstr = "ex")
+  corr <- copula::p2P(-sqrt(1 - nu), 2L)
   x <- matrix(nrow = length(times), ncol = p)
-  for (j in seq_len(ncol(x))) {
-    u_left <- cbind(1 - pmin(lower[j] / (1 - recovery_rate[j]), 1), pexp(times, rate = lambda))
-    u_right <- cbind(1 - pmin(upper[j] / (1 - recovery_rate[j]), 1), pexp(times, rate = lambda))
-    x[, j] <- (1 - recovery_rate[j]) *
-      (copula::pCopula(u_left, cop) - copula::pCopula(u_right, cop))
+  for (i in seq_len(nrow(x))) {
+    for (j in seq_len(ncol(x))) {
+      u_left <- c(1 - pmin(lower[j] / (1 - recovery_rate[j]), 1), pexp(times[i], rate = lambda))
+      u_right <- c(1 - pmin(upper[j] / (1 - recovery_rate[j]), 1), pexp(times[i], rate = lambda))
+
+      x_left <- mvtnorm::pmvnorm(lower = rep.int(-Inf, 2L), upper = qnorm(u_left), corr = corr)
+      x_right <- mvtnorm::pmvnorm(lower = rep.int(-Inf, 2L), upper = qnorm(u_right), corr = corr)
+
+      x[i, j] <- (1 - recovery_rate[j]) * (x_left - x_right)
+    }
   }
   out <- numeric(p)
   for (j in seq_along(out)) {

@@ -171,16 +171,18 @@ setMethod("initialize", signature = "ExtGaussian2FParam",
 #' parm <- ExtGaussian2FParam(5L, 8e-2, rho = 4e-1)
 #' simulate_dt(parm, n_sim = 5L)
 #'
-#' @importFrom stats qexp
-#' @importFrom copula normalCopula rCopula
+#' @importFrom stats qexp pnorm
+#' @importFrom mvtnorm rmvnorm
 #' @include utils.R
 #'
 #' @export
 setMethod("simulate_dt", "ExtGaussian2FParam",
   function(object, ..., n_sim = 1e4L) {
-    normalCopula(param = getNu(object), dim = getDimension(object), dispstr = "ex") %>%
-      rCopula(n_sim, .) %>%
-      qexp(rate = getLambda(object), lower.tail = FALSE)
+    d <- getDimension(object)
+    corr <- matrix(getNu(object), nrow = d, ncol = d)
+    diag(corr) <- rep(1, d)
+    qexp(pnorm(rmvnorm(n_sim, sigma = corr, checkSymmetry = FALSE)),
+      rate = getLambda(object), lower.tail = FALSE)
   })
 
 #' @describeIn ExtGaussian2FParam-class
@@ -342,8 +344,8 @@ setMethod("expected_pcds_equation", "ExtGaussian2FParam",
 #'   coupon = c(rep(5e-2, 3L), 0), upfront = c(8e-1, 5e-1, 1e-1, -5e-2),
 #'   method = "mc", n_sim = 1e1)
 #'
-#' @importFrom copula normalCopula pCopula
-#' @importFrom stats pexp
+#' @importFrom mvtnorm pmvnorm
+#' @importFrom stats pexp qnorm
 #' @importFrom checkmate assert check_numeric
 #'
 #' @export
@@ -369,15 +371,16 @@ setMethod("expected_cdo_equation", "ExtGaussian2FParam",
       coupon <- vec_recycle(coupon, p)
       upfront <- vec_recycle(upfront, p)
 
-      cop <- normalCopula(-sqrt(1 - getNu(object)))
-
+      corr <- p2P(-sqrt(1 - getNu(object)), 2L)
       x <- matrix(nrow = length(times), ncol = p)
       for (j in seq_len(ncol(x))) {
         x[, j] <- pexp(times, rate = getLambda(object)) %>%
           map_dbl(~{
             u_left <- c(pmax(1 - lower[j] / (1 - recovery_rate[j]), 0), .)
             u_right <- c(pmax(1 - upper[j] / (1 - recovery_rate[j]), 0), .)
-            (1 - recovery_rate[j]) * (pCopula(u_left, cop) - pCopula(u_right, cop))
+            (1 - recovery_rate[j]) *
+              (pmvnorm(rep(-Inf, 2L), qnorm(u_left), corr = corr) -
+                pmvnorm(rep(-Inf, 2L), qnorm(u_right), corr = corr))
           })
       }
       out <- Rcpp__lagg_ev_cdo(

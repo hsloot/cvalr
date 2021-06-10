@@ -1,8 +1,8 @@
 # 0.3.1
 
-- Fix H2-ext. CA-sampling
+- Fix H2-ext. CA-sampling and problems with Miwa (`copula` and `mvtnorm` algorithm)
 
-# 0.3 
+# 0.3
 
 - Internal refactoring of `expected_value` methods and user interface.
 - Improved sampling of *average default counting process* for ext. MO families

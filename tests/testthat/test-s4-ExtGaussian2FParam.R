@@ -141,7 +141,7 @@ test_that("`probability_distribution` works as expected for `ExtGaussian2FParam`
   # HELPER END
 
   parm <- ExtGaussian2FParam(d, lambda, nu)
-  times <- seq(25e-2, 5L, by = 25e-2)
+  times <- seq(0, 5L, by = 25e-2)
 
   # length of `times` is 1
   x <- probability_distribution(parm, times[[1]])
@@ -190,7 +190,7 @@ test_that("`expected_pcds_equation` works as expected for `ExtGaussian2FParam", 
 
 
 test_that("`expected_cdo_equation` works as expected for `ExtGaussian2FParam`", {
-  times <- seq(25e-2, 5L, by = 25e-2)
+  times <- seq(0, 5L, by = 25e-2)
   discount_factors <- rep(1, length(times))
   recovery_rate <- 0.4
   lower <- c(0, 0.1, 0.2, 0.35)
@@ -199,7 +199,7 @@ test_that("`expected_cdo_equation` works as expected for `ExtGaussian2FParam`", 
   upfront <- c(8e-1, 5e-1, 1e-1, 0)
   parm <- ExtGaussian2FParam(dim = d, lambda = lambda, nu = nu)
 
-  #using default
+  # using default
   x <- expected_cdo_equation(
     parm, times, discount_factors, recovery_rate, lower, upper, coupon, upfront)
   expect_numeric(x, finite = TRUE, any.missing = FALSE, len = 4L)
