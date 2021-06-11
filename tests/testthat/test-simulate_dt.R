@@ -41,7 +41,8 @@ expect_cor_not_rejected <- function(x, corr, level) {
   )
 }
 
-d <- 8L
+composition <- c(28, 24, 16, 4, 3)
+d <- sum(composition)
 lambda <- 8e-2
 rho <- 4e-1
 
@@ -77,11 +78,10 @@ test_that("`simulate_dt` spearman correlation is in appr. CI for Ext. Param", {
 })
 
 fraction <- 0.4
-partition <- list(1:2, 3:6, 7:8)
-composition <- purrr::map_int(partition, length)
-d <- sum(composition)
-lambda <- 8e-2
-rho <- c(2e-1, 7e-1)
+lambda <- 10e-2
+rho <- c(35e-2, 45e-2)
+partition <- getPartition(CuadrasAugeH2ExtMO3FParam(
+  composition = composition, lambda = lambda, rho = rho))
 
 corr <- copula::p2P(rho[[1]], d = d)
 walk(partition, ~{
@@ -91,19 +91,19 @@ walk(partition, ~{
 test_that("`simulate_dt` spearman correlation is in appr. CI for H2-Ext. Param", {
   expect_cor_not_rejected(
     simulate_dt(CuadrasAugeH2ExtMO3FParam(
-      composition = composition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
   expect_cor_not_rejected(
     simulate_dt(AlphaStableH2ExtMO3FParam(
-      composition = composition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
   expect_cor_not_rejected(
     simulate_dt(PoissonH2ExtMO3FParam(
-      composition = composition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
   expect_cor_not_rejected(
     simulate_dt(ExponentialH2ExtMO3FParam(
-      composition = composition, fraction = fraction, lambda = lambda, rho = rho), n_sim = n_sim),
+      composition = composition, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
 
   expect_cor_not_rejected(
