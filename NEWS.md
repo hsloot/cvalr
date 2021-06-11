@@ -1,3 +1,7 @@
+# 0.3.2
+
+- Change logic of `attrs` argument for `expected_value`.
+
 # 0.3.1
 
 - Fix H2-ext. CA-sampling and problems with Miwa (`copula` and `mvtnorm` algorithm)

@@ -94,7 +94,7 @@ expected_cdo_equation(
 
 \item{n_sim}{Number of samples.}
 
-\item{attrs}{A named list with functions which are applied to a vector of \emph{present values}.}
+\item{attrs}{A named list with functions which are applied to a matrix of \emph{present values}.}
 
 \item{.trans_v}{Internal parameter, not independent for the user.}
 
@@ -190,8 +190,8 @@ should be vectorized appropriately.
 \item For all classes, \code{method == "prob"} can be used. In this case a function \code{.simulate_pv} should
 be provided. This function should draw samples of \eqn{L_t^{(i)}} and  return the values of
 \eqn{(a_j^\top \cdot g_j(L_t^{(i)}))} in a \eqn{\mathbb{R}^{n \times p}} matrix. A named list
-of functions can be provided via \code{attrs} those should work simular to \code{\link[=mean]{mean()}}; their results
-will be bound to the return values as attributes.
+of functions can be provided via \code{attrs} those should take a matrix of simulated pvs as
+arguments; their results will be bound to the return values as attributes.
 }
 
 The methods \code{\link[=expected_pcds_equation]{expected_pcds_equation()}} and \code{\link[=expected_cdo_equation]{expected_cdo_equation()}} are convenience-wrappers for
@@ -231,7 +231,7 @@ expected_value(CuadrasAugeExtMO2FParam(
   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
   method = "mc", n_sim = 1e4L,
   .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim),
-  attrs = list(sd = function(x) sd(x) / sqrt(length(x))))
+  attrs = list(sd = function(x) apply(x, 2L, function(y) sd(y) / sqrt(length(y)))))
 
 expected_pcds_equation(
   AlphaStableExtMO2FParam(dim = 75, lambda = 0.05, rho = 0.6),
