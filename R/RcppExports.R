@@ -45,28 +45,48 @@ Rcpp__adcp2epd <- function(x, d) {
     .Call(`_cvalr_Rcpp__adcp2epd`, x, d)
 }
 
-Rcpp__portfolio_cds_coupon <- function(expected_losses, times, discount_factors, recovery_rate) {
-    .Call(`_cvalr_Rcpp__portfolio_cds_coupon`, expected_losses, times, discount_factors, recovery_rate)
+Rcpp__pcds_ddl <- function(l, df, recovery_rate) {
+    .Call(`_cvalr_Rcpp__pcds_ddl`, l, df, recovery_rate)
 }
 
-Rcpp__portfolio_cds_upfront <- function(expected_losses, times, discount_factors, recovery_rate, coupon) {
-    .Call(`_cvalr_Rcpp__portfolio_cds_upfront`, expected_losses, times, discount_factors, recovery_rate, coupon)
+Rcpp__cdo_ddl <- function(l, df, recovery_rate, lower, upper) {
+    .Call(`_cvalr_Rcpp__cdo_ddl`, l, df, recovery_rate, lower, upper)
 }
 
-Rcpp__portfolio_cds_equation <- function(expected_losses, times, discount_factors, recovery_rate, coupon, upfront) {
-    .Call(`_cvalr_Rcpp__portfolio_cds_equation`, expected_losses, times, discount_factors, recovery_rate, coupon, upfront)
+Rcpp__eddl <- function(l, df) {
+    .Call(`_cvalr_Rcpp__eddl`, l, df)
 }
 
-Rcpp__cdo_upfront <- function(expected_losses, times, discount_factors, lower, upper, coupon) {
-    .Call(`_cvalr_Rcpp__cdo_upfront`, expected_losses, times, discount_factors, lower, upper, coupon)
+Rcpp__pcds_dpl <- function(l, t, df, recovery_rate, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__pcds_dpl`, l, t, df, recovery_rate, coupon, upfront)
 }
 
-Rcpp__cdo_coupon <- function(expected_losses, times, discount_factors, lower, upper) {
-    .Call(`_cvalr_Rcpp__cdo_coupon`, expected_losses, times, discount_factors, lower, upper)
+Rcpp__cdo_dpl <- function(l, t, df, recovery_rate, lower, upper, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__cdo_dpl`, l, t, df, recovery_rate, lower, upper, coupon, upfront)
 }
 
-Rcpp__cdo_equation <- function(expected_losses, times, discount_factors, lower, upper, coupon, upfront) {
-    .Call(`_cvalr_Rcpp__cdo_equation`, expected_losses, times, discount_factors, lower, upper, coupon, upfront)
+Rcpp__pcds_edpl <- function(l, t, df, recovery_rate, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__pcds_edpl`, l, t, df, recovery_rate, coupon, upfront)
+}
+
+Rcpp__cdo_edpl <- function(l, t, df, recovery_rate, lower, upper, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__cdo_edpl`, l, t, df, recovery_rate, lower, upper, coupon, upfront)
+}
+
+Rcpp__pcds_dtl <- function(l, t, df, recovery_rate, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__pcds_dtl`, l, t, df, recovery_rate, coupon, upfront)
+}
+
+Rcpp__cdo_dtl <- function(l, t, df, recovery_rate, lower, upper, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__cdo_dtl`, l, t, df, recovery_rate, lower, upper, coupon, upfront)
+}
+
+Rcpp__pcds_edtl <- function(l, t, df, recovery_rate, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__pcds_edtl`, l, t, df, recovery_rate, coupon, upfront)
+}
+
+Rcpp__cdo_edtl <- function(l, t, df, recovery_rate, lower, upper, coupon, upfront) {
+    .Call(`_cvalr_Rcpp__cdo_edtl`, l, t, df, recovery_rate, lower, upper, coupon, upfront)
 }
 
 Rcpp__rexmo_markovian_acdp <- function(n, times, d, ex_intensities) {

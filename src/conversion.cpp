@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include <cvalr.hpp>
+
 using namespace Rcpp;
 
 // [[Rcpp::export(rng=false)]]
@@ -7,7 +8,8 @@ NumericMatrix Rcpp__dt2adcp(const NumericMatrix &x, const NumericVector &times) 
   auto out = NumericMatrix(no_init(x.nrow(), times.size()));
   for (auto k = std::size_t{0}; k < x.nrow(); ++k) {
     const auto values = x(k, _);
-    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(), out(k, _).begin());
+    cvalr::conversion::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(),
+                               out(k, _).begin());
   }
 
   return out;
@@ -18,14 +20,19 @@ NumericMatrix Rcpp__adcp2peqpv_pcds(const NumericMatrix &x, const NumericVector 
                                     const NumericVector &discount_factors,
                                     const NumericVector &recovery_rate, const NumericVector &coupon,
                                     const NumericVector &upfront) {
+  using dl_functor = cvalr::pcds_dtl_functor;
+  using deriv_type = typename dl_functor::deriv_type;
+  auto conversion = std::vector<dl_functor>{};
+  for (auto j = std::size_t{0}; j < recovery_rate.size(); ++j) {
+    conversion.emplace_back(dl_functor{deriv_type{recovery_rate[j], coupon[j], upfront[j]},
+                                       times.cbegin(), times.cend(), discount_factors.cbegin()});
+  }
   auto out = NumericMatrix(no_init(x.nrow(), recovery_rate.size()));
   for (auto k = size_t{0}; k < x.nrow(); ++k) {
     // copying is required because of issues with ConstMatrixRow's iterators
     const auto values = std::vector<double>(x(k, _).cbegin(), x(k, _).cend());
     for (auto j = size_t{0}; j < recovery_rate.size(); ++j) {
-      out(k, j) = cvalr::adcp2peqpv_pcds(values.cbegin(), values.cend(), times.cbegin(),
-                                         discount_factors.cbegin(), coupon[j], upfront[j],
-                                         recovery_rate[j]);
+      out(k, j) = conversion[j](values.cbegin(), values.cend());
     }
   }
   return out;
@@ -37,14 +44,20 @@ NumericMatrix Rcpp__adcp2peqpv_cdo(const NumericMatrix &x, const NumericVector &
                                    const NumericVector &recovery_rate, const NumericVector &lower,
                                    const NumericVector &upper, const NumericVector &coupon,
                                    const NumericVector &upfront) {
+  using dl_functor = cvalr::cdo_dtl_functor;
+  using deriv_type = typename dl_functor::deriv_type;
+  auto conversion = std::vector<dl_functor>{};
+  for (auto j = std::size_t{0}; j < recovery_rate.size(); ++j) {
+    conversion.emplace_back(
+        dl_functor{deriv_type{recovery_rate[j], lower[j], upper[j], coupon[j], upfront[j]},
+                   times.cbegin(), times.cend(), discount_factors.cbegin()});
+  }
   auto out = NumericMatrix(no_init(x.nrow(), recovery_rate.size()));
   for (auto k = std::size_t{0}; k < x.nrow(); ++k) {
     // copying is required because of issues with ConstMatrixRow's iterators
     const auto values = std::vector<double>(x(k, _).cbegin(), x(k, _).cend());
     for (auto j = std::size_t{0}; j < recovery_rate.size(); ++j) {
-      out(k, j) = cvalr::adcp2peqpv_cdo(values.cbegin(), values.cend(), times.cbegin(),
-                                        discount_factors.cbegin(), coupon[j], upfront[j],
-                                        recovery_rate[j], lower[j], upper[j]);
+      out(k, j) = conversion[j](values.cbegin(), values.cend());
     }
   }
 
@@ -83,19 +96,14 @@ NumericVector Rcpp__lagg_ev_pcds(const NumericMatrix &x, const NumericVector &ti
                                  const NumericVector &discount_factors,
                                  const NumericVector &recovery_rate, const NumericVector &coupon,
                                  const NumericVector &upfront) {
+  using dl_functor = cvalr::pcds_edtl_functor;
+  using deriv_type = typename dl_functor::deriv_type;
   auto out = NumericVector(no_init(recovery_rate.size()));
   for (auto i = std::size_t{0}; i < recovery_rate.size(); ++i) {
     // copying is required because of issues with ConstMatrixRow's iterators
     const auto values = std::vector<double>(x(_, i).cbegin(), x(_, i).cend());
-    const auto l_map = [](const auto val) { return val; };
-    const auto n_map = [recovery_rate = recovery_rate[i]](const auto val) {
-      return 1. - val / (1. - recovery_rate);
-    };
-    const auto u_map = [](const auto val) { return val; };
-
-    out[i] =
-        cvalr::adcp2peqpv(values.cbegin(), values.cend(), times.cbegin(), discount_factors.cbegin(),
-                          coupon[i], upfront[i], l_map, n_map, u_map);
+    out[i] = dl_functor{deriv_type{recovery_rate[i], coupon[i], upfront[i]}, times.cbegin(),
+                        times.cend(), discount_factors.cbegin()}(values.cbegin(), values.cend());
   }
 
   return out;
@@ -107,20 +115,15 @@ NumericVector Rcpp__lagg_ev_cdo(const NumericMatrix &x, const NumericVector &tim
                                 const NumericVector &recovery_rate, const NumericVector &lower,
                                 const NumericVector &upper, const NumericVector &coupon,
                                 const NumericVector &upfront) {
+  using dl_functor = cvalr::cdo_edtl_functor;
+  using deriv_type = typename dl_functor::deriv_type;
   auto out = NumericVector(no_init(recovery_rate.size()));
   for (auto i = std::size_t{0}; i < recovery_rate.size(); ++i) {
     // copying is required because of issues with ConstMatrixRow's iterators
     const auto values = std::vector<double>(x(_, i).cbegin(), x(_, i).cend());
-    const auto l_map = [](const auto val) { return val; };
-    const auto n_map = [lower = lower[i], upper = upper[i]](const auto val) {
-      return (upper - lower) - val;
-    };
-    const auto u_map = [lower = lower[i], upper = upper[i]](const auto val) {
-      return (upper - lower) * val;
-    };
-    out[i] =
-        cvalr::adcp2peqpv(values.cbegin(), values.cend(), times.cbegin(), discount_factors.cbegin(),
-                          coupon[i], upfront[i], l_map, n_map, u_map);
+    out[i] = dl_functor{deriv_type{recovery_rate[i], lower[i], upper[i], coupon[i], upfront[i]},
+                        times.cbegin(), times.cend(),
+                        discount_factors.cbegin()}(values.cbegin(), values.cend());
   }
 
   return out;

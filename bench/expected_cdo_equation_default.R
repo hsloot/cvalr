@@ -3,7 +3,7 @@ library(cvalr)
 options("cvalr.enable_messages" = FALSE, "cvalr.enable_warnings" = FALSE)
 
 #+ r config-and-setup
-times <- seq(0, 5, by = 0.25)
+times <- seq(25e-2, 5, by = 25e-2)
 discount_factors <- rep(1, length(times))
 recovery_rate <- 4e-1
 lower <- c(0, 0.1, 0.2, 0.35)

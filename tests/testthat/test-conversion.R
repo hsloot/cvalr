@@ -3,7 +3,7 @@ set.seed(1623)
 n <- 5e1L
 d <- 75L
 lambda <- 1e-1
-times <- seq(0, 5, by = 0.25)
+times <- seq(25e-2, 5, by = 25e-2)
 
 dt_mat <- matrix(rexp(n * d, rate = lambda), nrow = n, ncol = d)
 
@@ -49,7 +49,7 @@ test_that("Conversion \"adcp -> peqpv (pcds)\" works as expected", {
     for (j in 1:p) {
       y <- R__adcp2l_pcds(x, recovery_rate[j])
       for (k in 1:n) {
-        out[k, j] <- Rcpp__portfolio_cds_equation(
+        out[k, j] <- Rcpp__pcds_edtl(
           y[k, ], times, discount_factors, recovery_rate[j], coupon[j], upfront[j])
       }
     }
@@ -81,8 +81,8 @@ test_that("Conversion \"adcp -> peqpv (cdo)\" works as expected", {
     for (j in 1:p) {
       y <- R__adcp2l_cdo(x, recovery_rate[j], lower[j], upper[j])
       for (k in 1:n) {
-        out[k, j] <- Rcpp__cdo_equation(
-          y[k, ], times, discount_factors, lower[j], upper[j], coupon[j], upfront[j])
+        out[k, j] <- Rcpp__cdo_edtl(
+          y[k, ], times, discount_factors, recovery_rate[j], lower[j], upper[j], coupon[j], upfront[j])
       }
     }
 

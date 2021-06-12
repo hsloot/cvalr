@@ -45,7 +45,8 @@ NumericMatrix Rcpp__rexmo_markovian_acdp(const std::size_t n, const NumericVecto
   for (auto k = R_xlen_t{0}; k < n; ++k) {
     if ((d * k) % C_CHECK_USR_INTERRUP == 0) Rcpp::checkUserInterrupt();
     const auto values = dist(engine, parm);
-    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(), out(k, _).begin());
+    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(),
+                               out(k, _).begin());
   }
 
   return out;
@@ -66,7 +67,8 @@ NumericMatrix Rcpp__rcamo_esm_adcp(const std::size_t n, const NumericVector &tim
   for (auto k = R_xlen_t{0}; k < n; ++k) {
     if ((d * k) % C_CHECK_USR_INTERRUP == 0) Rcpp::checkUserInterrupt();
     const auto values = dist(engine, parm);
-    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(), out(k, _).begin());
+    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(),
+                               out(k, _).begin());
   }
 
   return out;
@@ -208,7 +210,8 @@ NumericMatrix Rcpp__rh2exmo_adcp(const std::size_t n, const NumericVector &times
     std::transform(global_values.cbegin(), global_values.cend(), partition_values.cbegin(),
                    values.begin(), [](const auto x, const auto y) { return std::min(x, y); });
 
-    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(), out(k, _).begin());
+    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(),
+                               out(k, _).begin());
   }
 
   return out;

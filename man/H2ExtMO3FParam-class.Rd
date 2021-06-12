@@ -220,10 +220,10 @@ ExponentialH2ExtMO3FParam()
 ExponentialH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, alpha = c(3e-1, 5e-1))
 parm <- AlphaStableH2ExtMO3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
 expected_pcds_equation(
-  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+  parm, times = seq(25e-2, 5, by = 25e-2), discount_factors = rep(1, 20L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0)
 expected_pcds_equation(
-  parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+  parm, times = seq(25e-2, 5, by = 25e-2), discount_factors = rep(1, 20L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 
 composition <- c(2L, 4L, 2L)
@@ -235,6 +235,6 @@ composition <- c(2L, 4L, 2L)
 d <- sum(composition)
 parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
 simulate_adcp(parm, 1, n_sim = 1e1L)
-simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 1e1L)
+simulate_adcp(parm, seq(25e-2, 5, by = 25e-2), n_sim = 1e1L)
 
 }

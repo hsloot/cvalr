@@ -339,10 +339,10 @@ setMethod("simulate_dt", "ExtArch2FParam",
 #' @examples
 #' parm <- FrankExtArch2FParam(75L, 8e-2, rho = 4e-1)
 #' expected_pcds_equation(
-#'   parm, times =seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   parm, times = seq(25e-2, 5, by = 25e-2), discount_factors = rep(1, 20L), recovery_rate = 0.4,
 #'   coupon = 1e-1, upfront = 0)
 #' expected_pcds_equation(
-#'   parm, times =seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   parm, times = seq(25e-2, 5, by = 25e-2), discount_factors = rep(1, 20L), recovery_rate = 0.4,
 #'   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 #'
 #' @importFrom stats pexp

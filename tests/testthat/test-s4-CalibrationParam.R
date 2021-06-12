@@ -8,7 +8,7 @@ rho <- 3 * alpha / (4 - alpha)
 tau <- alpha / (2 - alpha)
 
 n_sim <- 5e1L
-times <- seq(0, 5, by = 0.25)
+times <- seq(25e-2, 5, by = 25e-2)
 discount_factors <- exp(-times * 50e-4)
 
 recovery_rate <- 4e-1
