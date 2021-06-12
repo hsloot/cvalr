@@ -5,7 +5,7 @@ options("cvalr.enable_messages" = FALSE, "cvalr.enable_warnings" = FALSE)
 #+ r config-and-setup
 n_sim <- 1e4L
 pd_args <- list(method = "CalibrationParam", sim_args = list(n_sim = 1e4))
-times <- seq(0, 5, by = 0.25)
+times <- seq(25e-2, 5, by = 25e-2)
 discount_factors <- rep(1, length(times))
 recovery_rate <- 4e-1
 spread <- 6e-2

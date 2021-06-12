@@ -1,78 +1,82 @@
 #include <Rcpp.h>
 #include <cvalr.hpp>
+#include <fastcvalr.hpp>
 
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-double Rcpp__portfolio_cds_coupon(const NumericVector &expected_losses, const NumericVector &times,
-                                  const NumericVector &discount_factors,
-                                  const double recovery_rate) {
-  const auto eddl =
-      cvalr::eddl(expected_losses.cbegin(), expected_losses.cend(), discount_factors.cbegin());
-  const auto edpl1 = cvalr::edpl1_pcds(expected_losses.cbegin(), expected_losses.cend(),
-                                       times.cbegin(), discount_factors.cbegin(), recovery_rate);
-
-  return eddl / edpl1;
+double Rcpp__pcds_ddl(const NumericVector &l, const NumericVector &df, const double recovery_rate) {
+  return cvalr::pcds_ddl_functor{df.cbegin(), df.cend(), recovery_rate}(l.cbegin(), l.cend());
 }
 
 // [[Rcpp::export]]
-double Rcpp__portfolio_cds_upfront(const NumericVector &expected_losses, const NumericVector &times,
-                                   const NumericVector &discount_factors,
-                                   const double recovery_rate, const double coupon) {
-  const auto eddl =
-      cvalr::eddl(expected_losses.cbegin(), expected_losses.cend(), discount_factors.cbegin());
-  const auto edpl1 = cvalr::edpl1_pcds(expected_losses.cbegin(), expected_losses.cend(),
-                                       times.cbegin(), discount_factors.cbegin(), recovery_rate);
-
-  return eddl - (coupon * edpl1);
+double Rcpp__cdo_ddl(const NumericVector &l, const NumericVector &df, const double recovery_rate,
+                     const double lower, const double upper) {
+  return cvalr::cdo_ddl_functor{df.cbegin(), df.cend(), recovery_rate, lower, upper}(l.cbegin(),
+                                                                                     l.cend());
 }
 
 // [[Rcpp::export]]
-double Rcpp__portfolio_cds_equation(const NumericVector &expected_losses,
-                                    const NumericVector &times,
-                                    const NumericVector &discount_factors,
-                                    const double recovery_rate, const double coupon,
-                                    const double upfront) {
-  const auto eddl =
-      cvalr::eddl(expected_losses.cbegin(), expected_losses.cend(), discount_factors.cbegin());
-  const auto edpl1 = cvalr::edpl1_pcds(expected_losses.cbegin(), expected_losses.cend(),
-                                       times.cbegin(), discount_factors.cbegin(), recovery_rate);
-
-  return eddl - (upfront + coupon * edpl1);
+double Rcpp__eddl(const NumericVector &l, const NumericVector &df) {
+  return cvalr::eddl_functor{df.cbegin(), df.cend()}(l.cbegin(), l.cend());
 }
 
 // [[Rcpp::export]]
-double Rcpp__cdo_upfront(const NumericVector &expected_losses, const NumericVector &times,
-                         const NumericVector &discount_factors, const double lower,
-                         const double upper, const double coupon) {
-  const auto eddl =
-      cvalr::eddl(expected_losses.cbegin(), expected_losses.cend(), discount_factors.cbegin());
-  const auto edpl1 = cvalr::edpl1_cdo(expected_losses.cbegin(), expected_losses.cend(),
-                                      times.cbegin(), discount_factors.cbegin(), lower, upper);
-
-  return (eddl - coupon * edpl1) / (upper - lower);
+double Rcpp__pcds_dpl(const NumericVector &l, const NumericVector &t, const NumericVector &df,
+                      const double recovery_rate, const double coupon, const double upfront) {
+  return cvalr::pcds_dpl_functor{t.cbegin(), t.cend(), df.cbegin(), recovery_rate, coupon, upfront}(
+      l.cbegin(), l.cend());
 }
 
 // [[Rcpp::export]]
-double Rcpp__cdo_coupon(const NumericVector &expected_losses, const NumericVector &times,
-                        const NumericVector &discount_factors, const double lower,
-                        const double upper) {
-  const auto eddl =
-      cvalr::eddl(expected_losses.cbegin(), expected_losses.cend(), discount_factors.cbegin());
-  const auto edpl1 = cvalr::edpl1_cdo(expected_losses.cbegin(), expected_losses.cend(),
-                                      times.cbegin(), discount_factors.cbegin(), lower, upper);
-
-  return eddl / edpl1;
+double Rcpp__cdo_dpl(const NumericVector &l, const NumericVector &t, const NumericVector &df,
+                     const double recovery_rate, const double lower, const double upper,
+                     const double coupon, const double upfront) {
+  return cvalr::cdo_dpl_functor{t.cbegin(), t.cend(), df.cbegin(), recovery_rate,
+                                lower,      upper,    coupon,      upfront}(l.cbegin(), l.cend());
 }
 
 // [[Rcpp::export]]
-double Rcpp__cdo_equation(const NumericVector &expected_losses, const NumericVector &times,
-                          const NumericVector &discount_factors, const double lower,
-                          const double upper, const double coupon, const double upfront) {
-  const auto eddl =
-      cvalr::eddl(expected_losses.cbegin(), expected_losses.cend(), discount_factors.cbegin());
-  const auto edpl1 = cvalr::edpl1_cdo(expected_losses.cbegin(), expected_losses.cend(),
-                                      times.cbegin(), discount_factors.cbegin(), lower, upper);
+double Rcpp__pcds_edpl(const NumericVector &l, const NumericVector &t, const NumericVector &df,
+                       const double recovery_rate, const double coupon, const double upfront) {
+  return cvalr::pcds_edpl_functor{t.cbegin(),    t.cend(), df.cbegin(),
+                                  recovery_rate, coupon,   upfront}(l.cbegin(), l.cend());
+}
 
-  return eddl - ((upper - lower) * upfront + coupon * edpl1);
+// [[Rcpp::export]]
+double Rcpp__cdo_edpl(const NumericVector &l, const NumericVector &t, const NumericVector &df,
+                      const double recovery_rate, const double lower, const double upper,
+                      const double coupon, const double upfront) {
+  return cvalr::cdo_edpl_functor{t.cbegin(), t.cend(), df.cbegin(), recovery_rate,
+                                 lower,      upper,    coupon,      upfront}(l.cbegin(), l.cend());
+}
+
+// [[Rcpp::export]]
+double Rcpp__pcds_dtl(const NumericVector &l, const NumericVector &t, const NumericVector &df,
+                      const double recovery_rate, const double coupon, const double upfront) {
+  return cvalr::pcds_dtl_functor{t.cbegin(), t.cend(), df.cbegin(), recovery_rate, coupon, upfront}(
+      l.cbegin(), l.cend());
+}
+
+// [[Rcpp::export]]
+double Rcpp__cdo_dtl(const NumericVector &l, const NumericVector &t, const NumericVector &df,
+                     const double recovery_rate, const double lower, const double upper,
+                     const double coupon, const double upfront) {
+  return cvalr::cdo_dtl_functor{t.cbegin(), t.cend(), df.cbegin(), recovery_rate,
+                                lower,      upper,    coupon,      upfront}(l.cbegin(), l.cend());
+}
+
+// [[Rcpp::export]]
+double Rcpp__pcds_edtl(const NumericVector &l, const NumericVector &t, const NumericVector &df,
+                       const double recovery_rate, const double coupon, const double upfront) {
+  return cvalr::pcds_edtl_functor{t.cbegin(),    t.cend(), df.cbegin(),
+                                  recovery_rate, coupon,   upfront}(l.cbegin(), l.cend());
+}
+
+// [[Rcpp::export]]
+double Rcpp__cdo_edtl(const NumericVector &l, const NumericVector &t, const NumericVector &df,
+                      const double recovery_rate, const double lower, const double upper,
+                      const double coupon, const double upfront) {
+  return cvalr::cdo_edtl_functor{t.cbegin(), t.cend(), df.cbegin(), recovery_rate,
+                                 lower,      upper,    coupon,      upfront}(l.cbegin(), l.cend());
 }

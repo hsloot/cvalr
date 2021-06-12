@@ -140,7 +140,7 @@ setMethod("simulate_dt", "ExMOParam",
 #'
 #' @examples
 #' parm <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
-#' simulate_adcp(parm, times = seq(0, 5, by = 0.25), n_sim = 5L)
+#' simulate_adcp(parm, times = seq(25e-2, 5, by = 25e-2), n_sim = 5L)
 #'
 #' @importFrom rmo rexmo_markovian
 #' @include RcppExports.R

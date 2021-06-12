@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include <cvalr.hpp>
+#include <fastcvalr.hpp>
 using namespace Rcpp;
 
 // [[Rcpp::export(rng=false)]]
@@ -18,14 +19,18 @@ NumericMatrix Rcpp__adcp2peqpv_pcds(const NumericMatrix &x, const NumericVector 
                                     const NumericVector &discount_factors,
                                     const NumericVector &recovery_rate, const NumericVector &coupon,
                                     const NumericVector &upfront) {
+  auto conversion = std::vector<cvalr::pcds_dtl_functor>{};
+  for (auto j = std::size_t{0}; j < recovery_rate.size(); ++j) {
+    conversion.emplace_back(cvalr::pcds_dtl_functor{times.cbegin(), times.cend(),
+                                                    discount_factors.cbegin(), recovery_rate[j],
+                                                    coupon[j], upfront[j]});
+  }
   auto out = NumericMatrix(no_init(x.nrow(), recovery_rate.size()));
   for (auto k = size_t{0}; k < x.nrow(); ++k) {
     // copying is required because of issues with ConstMatrixRow's iterators
     const auto values = std::vector<double>(x(k, _).cbegin(), x(k, _).cend());
     for (auto j = size_t{0}; j < recovery_rate.size(); ++j) {
-      out(k, j) = cvalr::adcp2peqpv_pcds(values.cbegin(), values.cend(), times.cbegin(),
-                                         discount_factors.cbegin(), coupon[j], upfront[j],
-                                         recovery_rate[j]);
+      out(k, j) = conversion[j](values.cbegin(), values.cend());
     }
   }
   return out;
@@ -37,14 +42,18 @@ NumericMatrix Rcpp__adcp2peqpv_cdo(const NumericMatrix &x, const NumericVector &
                                    const NumericVector &recovery_rate, const NumericVector &lower,
                                    const NumericVector &upper, const NumericVector &coupon,
                                    const NumericVector &upfront) {
+  auto conversion = std::vector<cvalr::cdo_dtl_functor>{};
+  for (auto j = std::size_t{0}; j < recovery_rate.size(); ++j) {
+    conversion.emplace_back(cvalr::cdo_dtl_functor{times.cbegin(), times.cend(),
+                                                   discount_factors.cbegin(), recovery_rate[j],
+                                                   lower[j], upper[j], coupon[j], upfront[j]});
+  }
   auto out = NumericMatrix(no_init(x.nrow(), recovery_rate.size()));
   for (auto k = std::size_t{0}; k < x.nrow(); ++k) {
     // copying is required because of issues with ConstMatrixRow's iterators
     const auto values = std::vector<double>(x(k, _).cbegin(), x(k, _).cend());
     for (auto j = std::size_t{0}; j < recovery_rate.size(); ++j) {
-      out(k, j) = cvalr::adcp2peqpv_cdo(values.cbegin(), values.cend(), times.cbegin(),
-                                        discount_factors.cbegin(), coupon[j], upfront[j],
-                                        recovery_rate[j], lower[j], upper[j]);
+      out(k, j) = conversion[j](values.cbegin(), values.cend());
     }
   }
 
@@ -87,15 +96,9 @@ NumericVector Rcpp__lagg_ev_pcds(const NumericMatrix &x, const NumericVector &ti
   for (auto i = std::size_t{0}; i < recovery_rate.size(); ++i) {
     // copying is required because of issues with ConstMatrixRow's iterators
     const auto values = std::vector<double>(x(_, i).cbegin(), x(_, i).cend());
-    const auto l_map = [](const auto val) { return val; };
-    const auto n_map = [recovery_rate = recovery_rate[i]](const auto val) {
-      return 1. - val / (1. - recovery_rate);
-    };
-    const auto u_map = [](const auto val) { return val; };
-
-    out[i] =
-        cvalr::adcp2peqpv(values.cbegin(), values.cend(), times.cbegin(), discount_factors.cbegin(),
-                          coupon[i], upfront[i], l_map, n_map, u_map);
+    out[i] = cvalr::pcds_edtl_functor{times.cbegin(),   times.cend(), discount_factors.cbegin(),
+                                      recovery_rate[i], coupon[i],    upfront[i]}(values.cbegin(),
+                                                                                  values.cend());
   }
 
   return out;
@@ -111,16 +114,9 @@ NumericVector Rcpp__lagg_ev_cdo(const NumericMatrix &x, const NumericVector &tim
   for (auto i = std::size_t{0}; i < recovery_rate.size(); ++i) {
     // copying is required because of issues with ConstMatrixRow's iterators
     const auto values = std::vector<double>(x(_, i).cbegin(), x(_, i).cend());
-    const auto l_map = [](const auto val) { return val; };
-    const auto n_map = [lower = lower[i], upper = upper[i]](const auto val) {
-      return (upper - lower) - val;
-    };
-    const auto u_map = [lower = lower[i], upper = upper[i]](const auto val) {
-      return (upper - lower) * val;
-    };
-    out[i] =
-        cvalr::adcp2peqpv(values.cbegin(), values.cend(), times.cbegin(), discount_factors.cbegin(),
-                          coupon[i], upfront[i], l_map, n_map, u_map);
+    out[i] = cvalr::cdo_edtl_functor{times.cbegin(),   times.cend(), discount_factors.cbegin(),
+                                     recovery_rate[i], lower[i],     upper[i],
+                                     coupon[i],        upfront[i]}(values.cbegin(), values.cend());
   }
 
   return out;

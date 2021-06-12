@@ -61,7 +61,7 @@ setMethod("simulate_dt", "H2ExMOParam",
 #' models <- c(list(model_global), model_partition)
 #' parm <- H2ExMOParam(fraction = 0.4, models = models)
 #' simulate_adcp(parm, 1, n_sim = 1e1L)
-#' simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 1e1L)
+#' simulate_adcp(parm, seq(25e-2, 5, by = 25e-2), n_sim = 1e1L)
 #'
 #' @importFrom stats rexp
 #' @include RcppExports.R
