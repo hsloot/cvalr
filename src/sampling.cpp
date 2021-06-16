@@ -30,10 +30,21 @@ using markovian_exmo_distribution =
                                                 uniform_int_distribution, discrete_distribution,
                                                 rmolib::algorithm::shuffler>;
 
+struct no_shuffler {
+  template <typename _RandomAccessIterator, typename _Engine, typename _UniformIntDistribution>
+  void operator()(_RandomAccessIterator first, _RandomAccessIterator last, _Engine &&engine,
+                  _UniformIntDistribution &&dist) const {
+    return;
+  }
+};
+
+using markovian_exmo_adcp_distribution = rmolib::random::markovian_exmo_distribution<
+    double, exponential_distribution, uniform_int_distribution, discrete_distribution, no_shuffler>;
+
 // [[Rcpp::export]]
 NumericMatrix Rcpp__rexmo_markovian_acdp(const std::size_t n, const NumericVector &times,
                                          const std::size_t d, const NumericVector &ex_intensities) {
-  using dist_t = markovian_exmo_distribution;
+  using dist_t = markovian_exmo_adcp_distribution;
   using parm_t = typename dist_t::param_type;
 
   auto engine = r_engine{};
@@ -45,8 +56,7 @@ NumericMatrix Rcpp__rexmo_markovian_acdp(const std::size_t n, const NumericVecto
   for (auto k = R_xlen_t{0}; k < n; ++k) {
     if ((d * k) % C_CHECK_USR_INTERRUP == 0) Rcpp::checkUserInterrupt();
     const auto values = dist(engine, parm);
-    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(),
-                               out(k, _).begin());
+    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(), out(k, _).begin());
   }
 
   return out;
@@ -67,8 +77,7 @@ NumericMatrix Rcpp__rcamo_esm_adcp(const std::size_t n, const NumericVector &tim
   for (auto k = R_xlen_t{0}; k < n; ++k) {
     if ((d * k) % C_CHECK_USR_INTERRUP == 0) Rcpp::checkUserInterrupt();
     const auto values = dist(engine, parm);
-    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(),
-                               out(k, _).begin());
+    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(), out(k, _).begin());
   }
 
   return out;
@@ -103,6 +112,20 @@ template <>
 typename markovian_exmo_distribution::param_type extract_param<markovian_exmo_distribution>(
     SEXP x, const double scale) {
   using parm_t = typename markovian_exmo_distribution::param_type;
+  const auto model = as_s4(x);
+  if (!model.is("ExMOParam")) stop("Not an ExMOParam");
+  auto ex_intensities = as<std::vector<double>>(NumericVector(model.slot("ex_intensities")));
+  std::transform(ex_intensities.cbegin(), ex_intensities.cend(), ex_intensities.begin(),
+                 [scale](const auto val) { return scale * val; });
+
+  return parm_t{static_cast<std::size_t>(ex_intensities.size()), ex_intensities.cbegin(),
+                ex_intensities.cend()};
+}
+
+template <>
+typename markovian_exmo_adcp_distribution::param_type extract_param<markovian_exmo_adcp_distribution>(
+    SEXP x, const double scale) {
+  using parm_t = typename markovian_exmo_adcp_distribution::param_type;
   const auto model = as_s4(x);
   if (!model.is("ExMOParam")) stop("Not an ExMOParam");
   auto ex_intensities = as<std::vector<double>>(NumericVector(model.slot("ex_intensities")));
@@ -210,8 +233,7 @@ NumericMatrix Rcpp__rh2exmo_adcp(const std::size_t n, const NumericVector &times
     std::transform(global_values.cbegin(), global_values.cend(), partition_values.cbegin(),
                    values.begin(), [](const auto x, const auto y) { return std::min(x, y); });
 
-    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(),
-                               out(k, _).begin());
+    cvalr::dt2adcp(values.cbegin(), values.cend(), times.cbegin(), times.cend(), out(k, _).begin());
   }
 
   return out;
@@ -220,7 +242,7 @@ NumericMatrix Rcpp__rh2exmo_adcp(const std::size_t n, const NumericVector &times
 // [[Rcpp::export]]
 NumericMatrix Rcpp__rh2exmo_markovian_adcp(const std::size_t n, const NumericVector &times,
                                            const double fraction, const List &models) {
-  return Rcpp__rh2exmo_adcp<markovian_exmo_distribution>(n, times, fraction, models);
+  return Rcpp__rh2exmo_adcp<markovian_exmo_adcp_distribution>(n, times, fraction, models);
 }
 
 // [[Rcpp::export]]
