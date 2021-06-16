@@ -9,7 +9,7 @@ upfront <- -5e-2
 
 
 times <- seq(25e-2, 5, by = 0.25)
-df <- exp(-(-50e-4) * times)
+df <- exp(- (-50e-4) * times)
 l <- drop(Rcpp__dt2adcp(matrix(rexp(d, lambda), nrow = 1L), times))
 
 test_that("Portfolio CDS DDL is calculated correctly", {

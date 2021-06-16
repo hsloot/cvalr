@@ -82,7 +82,8 @@ test_that("Conversion \"adcp -> peqpv (cdo)\" works as expected", {
       y <- R__adcp2l_cdo(x, recovery_rate[j], lower[j], upper[j])
       for (k in 1:n) {
         out[k, j] <- Rcpp__cdo_edtl(
-          y[k, ], times, discount_factors, recovery_rate[j], lower[j], upper[j], coupon[j], upfront[j])
+          y[k, ], times, discount_factors,
+          recovery_rate[j], lower[j], upper[j], coupon[j], upfront[j])
       }
     }
 
