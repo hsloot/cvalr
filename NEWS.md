@@ -1,3 +1,7 @@
+# 0.3.3
+
+- Refactor backend using different, linear representations.
+
 # 0.3.2
 
 - Change logic of `attrs` argument for `expected_value`.
