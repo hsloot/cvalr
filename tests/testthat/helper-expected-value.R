@@ -27,7 +27,7 @@ test__expected_pcds_equation__default <- function( # nolint
   })
   out <- numeric(p)
   for (i in seq_along(out)) {
-    out[i] <- Rcpp__portfolio_cds_equation(
+    out[i] <- Rcpp__pcds_edtl(
       x[, i], times, discount_factors, recovery_rate[i], coupon[i], upfront[i])
   }
 
@@ -63,7 +63,7 @@ test__expected_pcds_equation__prob <- function( # nolint
     nrow = length(times), ncol = p)
   out <- numeric(p)
   for (i in seq_along(out)) {
-    out[i] <- Rcpp__portfolio_cds_equation(
+    out[i] <- Rcpp__pcds_edtl(
       x[, i], times, discount_factors, recovery_rate[i], coupon[i], upfront[i])
   }
 
@@ -81,7 +81,7 @@ test__expected_pcds_equation__mc <- function( # nolint
   y <- matrix(nrow = n_sim, ncol = p)
   for (i in seq_len(nrow(y))) {
     for (j in seq_len(ncol(y))) {
-      y[i, j] <- Rcpp__portfolio_cds_equation(
+      y[i, j] <- Rcpp__pcds_edtl(
         test__pcds_fn(x[i, ], recovery_rate[j]), times, discount_factors,
         recovery_rate = recovery_rate[j], coupon = coupon[j], upfront = upfront[j])
     }
@@ -119,8 +119,8 @@ test__expected_cdo_equation__gaussian <- function( # nolint
   }
   out <- numeric(p)
   for (j in seq_along(out)) {
-    out[j] <- Rcpp__cdo_equation(
-      x[, j], times, discount_factors, lower[j], upper[j], coupon[j], upfront[j])
+    out[j] <- Rcpp__cdo_edtl(
+      x[, j], times, discount_factors, recovery_rate[j], lower[j], upper[j], coupon[j], upfront[j])
   }
 
   out
@@ -162,8 +162,8 @@ test__expected_cdo_equation__prob <- function( # nolint
     nrow = length(times), ncol = p)
   out <- numeric(p)
   for (i in seq_along(out)) {
-    out[i] <- Rcpp__cdo_equation(
-      x[, i], times, discount_factors, lower[i], upper[i], coupon[i], upfront[i])
+    out[i] <- Rcpp__cdo_edtl(
+      x[, i], times, discount_factors, recovery_rate[i], lower[i], upper[i], coupon[i], upfront[i])
   }
 
   out
@@ -182,9 +182,9 @@ test__expected_cdo_equation__mc <- function( # nolint
   y <- matrix(nrow = n_sim, ncol = p)
   for (i in seq_len(nrow(y))) {
     for (j in seq_len(ncol(y))) {
-      y[i, j] <- Rcpp__cdo_equation(
+      y[i, j] <- Rcpp__cdo_edtl(
         test__cdo_fn(x[i, ], recovery_rate[j], lower[j], upper[j]), times, discount_factors,
-        lower = lower[j], upper = upper[j],
+        recovery_rate[j], lower = lower[j], upper = upper[j],
         coupon = coupon[j], upfront = upfront[j])
     }
   }

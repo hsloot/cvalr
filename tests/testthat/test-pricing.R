@@ -1,108 +1,70 @@
+d <- 75L
 lambda <- 0.1
-rate <- 0.005
+
 recovery_rate <- 0.4
-times <- seq(0, 2, by = 0.25)
-discount_factors <- exp(-rate * times)
+lower <- 0.1
+upper <- 0.2
+coupon <- 20e-2
+upfront <- -5e-2
 
-expected_losses <- cds_expected_loss(times, lambda, recovery_rate)
 
-test_that("Portfolio CDS coupon is calculated correctly", {
-  expected_nominals <- 1 - expected_losses / (1 - recovery_rate)
+times <- seq(25e-2, 5, by = 0.25)
+df <- exp(- (-50e-4) * times)
+l <- drop(Rcpp__dt2adcp(matrix(rexp(d, lambda), nrow = 1L), times))
 
-  eddl <- sum(discount_factors[-1] * diff(expected_losses))
-  edpl1 <- sum(
-    discount_factors[-1] * diff(times) *
-      0.5 * (expected_nominals[-1] + expected_nominals[-9])
-  )
-
-  expect_equal(
-    Rcpp__portfolio_cds_coupon(
-      expected_losses, times, discount_factors, recovery_rate
-    ),
-    eddl / edpl1
-  )
+test_that("Portfolio CDS DDL is calculated correctly", {
+  expect_equal(Rcpp__pcds_ddl(l, df, recovery_rate),
+               test__pcds_ddl(l, df, recovery_rate))
 })
 
-test_that("Portfolio CDS upfront is calculated correctly", {
-  coupon <- 0.05
-  expected_nominals <- 1 - expected_losses / (1 - recovery_rate)
-
-  eddl <- sum(discount_factors[-1] * diff(expected_losses))
-  edpl1 <- sum(
-    discount_factors[-1] * diff(times) *
-      0.5 * (expected_nominals[-1] + expected_nominals[-9])
-  )
-
-  expect_equal(
-    Rcpp__portfolio_cds_upfront(
-      expected_losses, times, discount_factors, recovery_rate, coupon
-    ),
-    eddl - (coupon * edpl1)
-  )
+test_that("CDO DDL is calculated correctly", {
+  expect_equal(Rcpp__cdo_ddl(l, df, recovery_rate, lower, upper),
+               test__cdo_ddl(l, df, recovery_rate, lower, upper))
 })
 
-test_that("Portfolio CDS equation is calculated correctly", {
-  coupon <- 0.05
-  upfront <- Rcpp__portfolio_cds_upfront(
-    expected_losses, times, discount_factors, recovery_rate, coupon
-  )
+test_that("EDDL is calculated correctly", {
+  el <- pmin(pmax((1- recovery_rate) * l - lower, 0), upper - lower)
 
-  expect_equal(
-    Rcpp__portfolio_cds_equation(
-      expected_losses, times, discount_factors, recovery_rate, coupon, upfront
-    ),
-    0
-  )
+  expect_equal(Rcpp__eddl(el, df),
+               test__eddl(el, df))
 })
 
-lower <- 0.03
-upper <- 0.1
-rho <- 0.1
-expected_losses <- cdo_tranche_expected_loss_gaussian(
-  times, lambda, rho, lower, upper, recovery_rate)
-expected_nominals <- upper - lower - expected_losses
-
-test_that("CDO upfront payment is calculated correctly", {
-  coupon <- 0.05
-
-  eddl <- sum(discount_factors[-1] * diff(expected_losses))
-  edpl1 <- sum(
-    discount_factors[-1] * diff(times) *
-      0.5 * (expected_nominals[-1] + expected_nominals[-9])
-  )
-
-  expect_equal(
-    Rcpp__cdo_upfront(
-      expected_losses, times, discount_factors, lower, upper, coupon
-    ),
-    (eddl - coupon * edpl1) / (upper - lower))
+test_that("Portfolio CDS DPL is calculated correctly", {
+  expect_equal(Rcpp__pcds_dpl(l, times, df, recovery_rate, coupon, upfront),
+               test__pcds_dpl(l, times, df, recovery_rate, coupon, upfront))
 })
 
-test_that("CDO coupon is calculated correctly", {
-
-  eddl <- sum(discount_factors[-1] * diff(expected_losses))
-  edpl1 <- sum(
-    discount_factors[-1] * diff(times) *
-      0.5 * (expected_nominals[-1] + expected_nominals[-9])
-  )
-
-  expect_equal(
-    Rcpp__cdo_coupon(
-      expected_losses, times, discount_factors, lower, upper
-    ),
-    eddl / edpl1
-  )
+test_that("CDO DPL is calculated correctly", {
+  expect_equal(Rcpp__cdo_dpl(l, times, df, recovery_rate, lower, upper, coupon, upfront),
+               test__cdo_dpl(l, times, df, recovery_rate, lower, upper, coupon, upfront))
 })
 
-test_that("CDO equation is calculated correctly", {
-  coupon <- 0.05
-  upfront <- Rcpp__cdo_upfront(
-    expected_losses, times, discount_factors, lower, upper, coupon
-  )
-  expect_equal(
-    Rcpp__cdo_equation(
-      expected_losses, times, discount_factors, lower, upper, coupon, upfront
-    ),
-    0
-  )
+test_that("Portfolio CDS EDPL is calculated correctly", {
+  expect_equal(Rcpp__pcds_edpl(l, times, df, recovery_rate, coupon, upfront),
+               test__pcds_edpl(l, times, df, recovery_rate, coupon, upfront))
+})
+
+test_that("CDO EDPL is calculated correctly", {
+  expect_equal(Rcpp__cdo_edpl(l, times, df, recovery_rate, lower, upper, coupon, upfront),
+               test__cdo_edpl(l, times, df, recovery_rate, lower, upper, coupon, upfront))
+})
+
+test_that("Portfolio CDS DTL is calculated correctly", {
+  expect_equal(Rcpp__pcds_dtl(l, times, df, recovery_rate, coupon, upfront),
+               test__pcds_dtl(l, times, df, recovery_rate, coupon, upfront))
+})
+
+test_that("CDO DTL is calculated correctly", {
+  expect_equal(Rcpp__cdo_dtl(l, times, df, recovery_rate, lower, upper, coupon, upfront),
+               test__cdo_dtl(l, times, df, recovery_rate, lower, upper, coupon, upfront))
+})
+
+test_that("Portfolio CDS EDTL is calculated correctly", {
+  expect_equal(Rcpp__pcds_edtl(l, times, df, recovery_rate, coupon, upfront),
+               test__pcds_edtl(l, times, df, recovery_rate, coupon, upfront))
+})
+
+test_that("CDO EDTL is calculated correctly", {
+  expect_equal(Rcpp__cdo_edtl(l, times, df, recovery_rate, lower, upper, coupon, upfront),
+               test__cdo_edtl(l, times, df, recovery_rate, lower, upper, coupon, upfront))
 })

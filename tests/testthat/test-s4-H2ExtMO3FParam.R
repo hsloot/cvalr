@@ -5,7 +5,7 @@ lambda <- 8e-2
 alpha <- c(3e-1, 6e-1)
 
 test_that("`expected_pcds_equation` works as expected for `H2ExtMO3FParam", {
-  times <- seq(0, 5, by = 0.25)
+  times <- seq(25e-2, 5, by = 25e-2)
   discount_factors <- rep(1, length(times))
   recovery_rate <- 4e-1
   coupon <- 1e-1

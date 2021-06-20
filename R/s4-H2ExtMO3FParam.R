@@ -314,10 +314,10 @@ setMethod("getModelName", "H2ExtMO3FParam",
 #' @examples
 #' parm <- AlphaStableH2ExtMO3FParam(c(3, 3, 4, 5), 8e-2, rho = c(3e-1, 6e-1))
 #' expected_pcds_equation(
-#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   parm, times = seq(25e-2, 5, by = 25e-2), discount_factors = rep(1, 20L), recovery_rate = 0.4,
 #'   coupon = 1e-1, upfront = 0)
 #' expected_pcds_equation(
-#'   parm, times = seq(0, 5, by = 0.25), discount_factors = rep(1, 21L), recovery_rate = 0.4,
+#'   parm, times = seq(25e-2, 5, by = 25e-2), discount_factors = rep(1, 20L), recovery_rate = 0.4,
 #'   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 #'
 #' @importFrom stats pexp
@@ -464,7 +464,7 @@ setMethod("simulate_dt", "CuadrasAugeH2ExtMO3FParam",
 #' d <- sum(composition)
 #' parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
 #' simulate_adcp(parm, 1, n_sim = 1e1L)
-#' simulate_adcp(parm, seq(0, 5, by = 0.25), n_sim = 1e1L)
+#' simulate_adcp(parm, seq(25e-2, 5, by = 25e-2), n_sim = 1e1L)
 #'
 #' @importFrom stats rexp
 #' @include RcppExports.R
