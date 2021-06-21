@@ -8,7 +8,7 @@
   "description": "Methods required for the valuation of credit derivatives.",
   "name": "cvalr: Credit Derivative Valuation in R",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.3.3",
+  "version": "0.3.3.9000",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",

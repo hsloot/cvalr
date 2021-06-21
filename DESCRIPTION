@@ -1,6 +1,6 @@
 Package: cvalr
 Title: Credit Derivative Valuation in R
-Version: 0.3.3
+Version: 0.3.3.9000
 Authors@R:
     person(given = "Henrik",
            family = "Sloot",

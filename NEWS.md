@@ -1,3 +1,7 @@
+# 0.3.x
+
+- Add additional tests and refactor tests for simulating calibration parameters.
+
 # 0.3.3
 
 - Refactor backend using different, linear representations.
