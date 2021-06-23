@@ -7,11 +7,11 @@
 \alias{initialize,H2ExtMO3FParam,ANY-method}
 \alias{expected_pcds_equation,H2ExtMO3FParam-method}
 \alias{show,H2ExtMO3FParam-method}
-\alias{CuadrasAugeH2ExtMO3FParam-class}
-\alias{CuadrasAugeH2ExtMO3FParam}
-\alias{simulate_dt,CuadrasAugeH2ExtMO3FParam-method}
-\alias{simulate_adcp,CuadrasAugeH2ExtMO3FParam-method}
-\alias{simulate_adcp,CuadrasAugeH2ExtMO3FParam-methods}
+\alias{ArmageddonH2ExtMO3FParam-class}
+\alias{ArmageddonH2ExtMO3FParam}
+\alias{simulate_dt,ArmageddonH2ExtMO3FParam-method}
+\alias{simulate_adcp,ArmageddonH2ExtMO3FParam-method}
+\alias{simulate_adcp,ArmageddonH2ExtMO3FParam-methods}
 \alias{AlphaStableH2ExtMO3FParam-class}
 \alias{AlphaStableH2ExtMO3FParam}
 \alias{PoissonH2ExtMO3FParam-class}
@@ -35,9 +35,9 @@
 
 \S4method{show}{H2ExtMO3FParam}(object)
 
-\S4method{simulate_dt}{CuadrasAugeH2ExtMO3FParam}(object, ..., n_sim = 10000L)
+\S4method{simulate_dt}{ArmageddonH2ExtMO3FParam}(object, ..., n_sim = 10000L)
 
-\S4method{simulate_adcp}{CuadrasAugeH2ExtMO3FParam}(object, times, ..., n_sim = 10000L)
+\S4method{simulate_adcp}{ArmageddonH2ExtMO3FParam}(object, times, ..., n_sim = 10000L)
 }
 \arguments{
 \item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
@@ -134,10 +134,10 @@ the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
 \item \code{show,H2ExtMO3FParam-method}: Display the object.
 
-\item \code{simulate_dt,CuadrasAugeH2ExtMO3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt,ArmageddonH2ExtMO3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{simulate_adcp,CuadrasAugeH2ExtMO3FParam-method}: simulates the \emph{average default counting process} and returns a
+\item \code{simulate_adcp,ArmageddonH2ExtMO3FParam-method}: simulates the \emph{average default counting process} and returns a
 matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
 }}
 
@@ -168,7 +168,7 @@ with \eqn{g(x) = (1 - R) \cdot x} and \eqn{F} being the Exponential
 distribution function for rate \eqn{\lambda}.
 }
 
-\section{Cuadras-Augé calibration parameter class}{
+\section{Armageddon-shock calibration parameter class}{
 
 Corresponds to a Lévy subordinator which is a convex combination of
 a pure-killing subordinator and a pure-drift subordinator.
@@ -210,8 +210,8 @@ and \eqn{\alpha = 2 / (1 + \nu) - 2 / (2 + \nu)}
 }
 
 \examples{
-CuadrasAugeH2ExtMO3FParam()
-CuadrasAugeH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+ArmageddonH2ExtMO3FParam()
+ArmageddonH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 AlphaStableH2ExtMO3FParam()
 AlphaStableH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 PoissonH2ExtMO3FParam()
@@ -228,12 +228,12 @@ expected_pcds_equation(
 
 composition <- c(2L, 4L, 2L)
 d <- sum(composition)
-parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+parm <- ArmageddonH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
 simulate_dt(parm, n_sim = 1e1L)
 
 composition <- c(2L, 4L, 2L)
 d <- sum(composition)
-parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+parm <- ArmageddonH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
 simulate_adcp(parm, 1, n_sim = 1e1L)
 simulate_adcp(parm, seq(25e-2, 5, by = 25e-2), n_sim = 1e1L)
 

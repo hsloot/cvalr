@@ -16,7 +16,7 @@ lambda <- 8e-2
 tau1 <- 4e-1
 tau2 <- c(3e-2, 6e-2)
 
-parm_caextmo2f <- CuadrasAugeExtMO2FParam(dim = dim, lambda = lambda, tau = tau1)
+parm_caextmo2f <- ArmageddonExtMO2FParam(dim = dim, lambda = lambda, tau = tau1)
 parm_asextmo2f <- AlphaStableExtMO2FParam(dim = dim, lambda = lambda, tau = tau1)
 parm_poextmo2f <- PoissonExtMO2FParam(dim = dim, lambda = lambda, tau = tau1)
 parm_exextmo2f <- ExponentialExtMO2FParam(dim = dim, lambda = lambda, tau = tau1)
@@ -29,7 +29,7 @@ parm_guextar2f <- GumbelExtArch2FParam(dim = dim, lambda = lambda, tau = tau1)
 parm_joextar2f <- JoeExtArch2FParam(dim = dim, lambda = lambda, tau = tau1)
 
 
-parm_cah2extmo3f <- CuadrasAugeH2ExtMO3FParam(
+parm_cah2extmo3f <- ArmageddonH2ExtMO3FParam(
   composition = composition, lambda = lambda, tau = tau2)
 parm_ash2extmo3f <- AlphaStableH2ExtMO3FParam(
   composition = composition, lambda = lambda, tau = tau2)
@@ -46,7 +46,7 @@ parm_guh2extar3f <- GumbelH2ExtArch3FParam(composition = composition, lambda = l
 parm_joh2extar3f <- JoeH2ExtArch3FParam(composition = composition, lambda = lambda, tau = tau2)
 
 bench::mark(
-  CuadrasAugeExtMO2FParam = expected_pcds_equation(
+  ArmageddonExtMO2FParam = expected_pcds_equation(
     parm_caextmo2f, times, discount_factors, recovery_rate, spread, 0,
     method = "mc", n_sim = n_sim),
   AlphaStableExtMO2FParam = expected_pcds_equation(
@@ -73,7 +73,7 @@ bench::mark(
   JoeExtArch2FParam = expected_pcds_equation(
     parm_joextar2f, times, discount_factors, recovery_rate, spread, 0,
     method = "mc", n_sim = n_sim),
-  CuadrasAugeH2ExtMO3FParam = expected_pcds_equation(
+  ArmageddonH2ExtMO3FParam = expected_pcds_equation(
     parm_cah2extmo3f, times, discount_factors, recovery_rate, spread, 0,
     method = "mc", n_sim = n_sim),
   AlphaStableH2ExtMO3FParam = expected_pcds_equation(

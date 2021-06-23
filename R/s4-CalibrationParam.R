@@ -20,7 +20,7 @@ WRN_MISSING_PARM <- "parameter `%s` missing; using default %s"
 #' @slot dim The dimension (number of portfolio items).
 #'
 #' @seealso [ExMarkovParam-class] [ExMOParam-class] [ExtMOParam-class]
-#'   [CuadrasAugeExtMO2FParam-class] [AlphaStableExtMO2FParam-class]
+#'   [ArmageddonExtMO2FParam-class] [AlphaStableExtMO2FParam-class]
 #'   [PoissonExtMO2FParam-class] [ExponentialExtMO2FParam-class]
 #'   [ExtArch2FParam-class] [ClaytonExtArch2FParam-class]
 #'   [FrankExtArch2FParam-class] [GumbelExtArch2FParam-class]
@@ -183,7 +183,7 @@ setGeneric("expected_value",
 #' @param .simulate_pv Internal parameter, not independent for the user.
 #'
 #' @examples
-#' expected_value(CuadrasAugeExtMO2FParam(
+#' expected_value(ArmageddonExtMO2FParam(
 #'   dim = 50L, lambda = 0.05, rho = 0.4), 0.25,
 #'   .trans_v = function(x) x, .lagg_ev = function(x) x)
 #' expected_value(AlphaStableExtMO2FParam(
@@ -198,15 +198,15 @@ setGeneric("expected_value",
 #'   .trans_v = function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
 #'   .lagg_ev = function(x) apply(x, 2L, mean))
 #'
-#' expected_value(CuadrasAugeExtMO2FParam(
+#' expected_value(ArmageddonExtMO2FParam(
 #'   dim = 50L, lambda = 0.05, rho = 0.4), 0.25,
 #'   method = "mc", n_sim = 1e4L,
 #'   .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim))
-#' expected_value(CuadrasAugeExtMO2FParam(
+#' expected_value(ArmageddonExtMO2FParam(
 #'   dim = 50L, lambda = 0.05, rho = 0.4), seq(25e-2, 5, by = 25e-2),
 #'   method = "mc", n_sim = 1e4L,
 #'   .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim))
-#' expected_value(CuadrasAugeExtMO2FParam(
+#' expected_value(ArmageddonExtMO2FParam(
 #'   dim = 50L, lambda = 0.05, rho = 0.4), seq(25e-2, 5, by = 25e-2),
 #'   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
 #'   method = "mc", n_sim = 1e4L,

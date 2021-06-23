@@ -141,7 +141,7 @@ setMethod("simulate_dt", "ExMarkovParam",
 #' @inheritParams probability_distribution
 #'
 #' @examples
-#' probability_distribution(CuadrasAugeExtMO2FParam(
+#' probability_distribution(ArmageddonExtMO2FParam(
 #'   dim = 5L, lambda = 0.05, rho = 0.4), 0.3)
 #' probability_distribution(AlphaStableExtMO2FParam(
 #'   dim = 5L, lambda = 0.05, rho = 0.4), 0.3)

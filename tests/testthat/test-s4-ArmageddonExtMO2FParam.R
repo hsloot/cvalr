@@ -15,9 +15,9 @@ bf <- ScaledBernsteinFunction(
 ex_qmatrix <- rmo::exQMatrix(bf, d)
 ex_intensities <- rmo::exIntensities(bf, d = d)
 
-test_that("`CuadrasAugeExtMO2FParam`-class is correctly initialized", {
-  parm <- CuadrasAugeExtMO2FParam()
-  expect_s4_class(parm, "CuadrasAugeExtMO2FParam")
+test_that("`ArmageddonExtMO2FParam`-class is correctly initialized", {
+  parm <- ArmageddonExtMO2FParam()
+  expect_s4_class(parm, "ArmageddonExtMO2FParam")
 
   setDimension(parm) <- d
   setBernsteinFunction(parm) <- bf
@@ -34,55 +34,55 @@ test_that("`CuadrasAugeExtMO2FParam`-class is correctly initialized", {
   expect_equal(getTau(parm), tau)
   expect_equal(getAlpha(parm), alpha)
 
-  expect_equal(parm, CuadrasAugeExtMO2FParam(d, lambda, nu))
-  expect_equal(parm, CuadrasAugeExtMO2FParam(d, lambda, rho = rho))
-  expect_equal(parm, CuadrasAugeExtMO2FParam(d, lambda, tau = tau))
-  expect_equal(parm, CuadrasAugeExtMO2FParam(d, lambda, alpha = alpha))
+  expect_equal(parm, ArmageddonExtMO2FParam(d, lambda, nu))
+  expect_equal(parm, ArmageddonExtMO2FParam(d, lambda, rho = rho))
+  expect_equal(parm, ArmageddonExtMO2FParam(d, lambda, tau = tau))
+  expect_equal(parm, ArmageddonExtMO2FParam(d, lambda, alpha = alpha))
   expect_equal(as(parm, "ExtMOParam"), ExtMOParam(d, bf))
   expect_equal(as(parm, "ExMOParam"), ExMOParam(ex_intensities))
   expect_equal(as(parm, "ExMarkovParam"), ExMarkovParam(ex_qmatrix))
 })
 
-test_that("`CuadrasAugeExtMO2FParam`-class setters can be used in arbitrary order", { # nolint
-  parm <- CuadrasAugeExtMO2FParam(d, lambda, nu)
+test_that("`ArmageddonExtMO2FParam`-class setters can be used in arbitrary order", { # nolint
+  parm <- ArmageddonExtMO2FParam(d, lambda, nu)
 
-  parm2 <- CuadrasAugeExtMO2FParam()
+  parm2 <- ArmageddonExtMO2FParam()
   setDimension(parm2) <- d
   setLambda(parm2) <- lambda
   setRho(parm2) <- rho
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeExtMO2FParam()
+  parm2 <- ArmageddonExtMO2FParam()
   setDimension(parm2) <- d
   setLambda(parm2) <- lambda
   setTau(parm2) <- tau
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeExtMO2FParam()
+  parm2 <- ArmageddonExtMO2FParam()
   setDimension(parm2) <- d
   setNu(parm2) <- nu
   setLambda(parm2) <- lambda
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeExtMO2FParam()
+  parm2 <- ArmageddonExtMO2FParam()
   setLambda(parm2) <- lambda
   setDimension(parm2) <- d
   setNu(parm2) <- nu
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeExtMO2FParam()
+  parm2 <- ArmageddonExtMO2FParam()
   setNu(parm2) <- nu
   setDimension(parm2) <- d
   setLambda(parm2) <- lambda
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeExtMO2FParam()
+  parm2 <- ArmageddonExtMO2FParam()
   setLambda(parm2) <- lambda
   setNu(parm2) <- nu
   setDimension(parm2) <- d
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeExtMO2FParam()
+  parm2 <- ArmageddonExtMO2FParam()
   setNu(parm2) <- nu
   setLambda(parm2) <- lambda
   setDimension(parm2) <- d

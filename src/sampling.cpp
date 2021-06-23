@@ -5,7 +5,7 @@
 // clang-format on
 
 #include "rmolib/algorithm/r_shuffle.hpp"
-#include "rmolib/random/multivariate/cuadras_auge_distribution.hpp"
+#include "rmolib/random/multivariate/armageddon_extmo_distribution.hpp"
 #include "rmolib/random/multivariate/markovian_exmo_distribution.hpp"
 #include "rmolib/random/univariate/exponential_distribution.hpp"
 #include "rmolib/random/univariate/discrete_distribution.hpp"
@@ -23,8 +23,8 @@ using uniform_int_distribution = rmolib::random::uniform_int_distribution<std::s
 using discrete_distribution =
     rmolib::random::discrete_distribution<std::size_t, double, uniform_real_distribution,
                                           uniform_int_distribution>;
-using cuadras_auge_distribution =
-    rmolib::random::cuadras_auge_distribution<double, exponential_distribution>;
+using armageddon_extmo_distribution =
+    rmolib::random::armageddon_extmo_distribution<double, exponential_distribution>;
 using markovian_exmo_distribution =
     rmolib::random::markovian_exmo_distribution<double, exponential_distribution,
                                                 uniform_int_distribution, discrete_distribution,
@@ -63,9 +63,9 @@ NumericMatrix Rcpp__rexmo_markovian_acdp(const std::size_t n, const NumericVecto
 }
 
 // [[Rcpp::export]]
-NumericMatrix Rcpp__rcamo_esm_adcp(const std::size_t n, const NumericVector &times,
+NumericMatrix Rcpp__rarmextmo_esm_adcp(const std::size_t n, const NumericVector &times,
                                    const std::size_t d, const double alpha, const double beta) {
-  using dist_t = cuadras_auge_distribution;
+  using dist_t = armageddon_extmo_distribution;
   using parm_t = typename dist_t::param_type;
 
   auto engine = r_engine{};
@@ -94,11 +94,11 @@ template <typename _MODistribution>
 typename _MODistribution::param_type extract_param(SEXP x, const double scale);
 
 template <>
-typename cuadras_auge_distribution::param_type extract_param<cuadras_auge_distribution>(
+typename armageddon_extmo_distribution::param_type extract_param<armageddon_extmo_distribution>(
     SEXP x, const double scale) {
-  using parm_t = typename cuadras_auge_distribution::param_type;
+  using parm_t = typename armageddon_extmo_distribution::param_type;
   const auto model = as_s4(x);
-  if (!model.is("CuadrasAugeExtMO2FParam")) stop("Not an CuadrasAugeExtMO2FParam");
+  if (!model.is("ArmageddonExtMO2FParam")) stop("Not an ArmageddonExtMO2FParam");
   const auto dim = as<std::size_t>(model.slot("dim"));
   const auto lambda = as<double>(model.slot("lambda"));
   const auto nu = as<double>(model.slot("nu"));
@@ -196,9 +196,9 @@ NumericMatrix Rcpp__rh2exmo_markovian_dt(const std::size_t n, const double fract
 }
 
 // [[Rcpp::export]]
-NumericMatrix Rcpp__rh2excamo_esm_dt(const std::size_t n, const double fraction,
+NumericMatrix Rcpp__rh2extarmmo_esm_dt(const std::size_t n, const double fraction,
                                      const List &models) {
-  return Rcpp__rh2exmo_dt<cuadras_auge_distribution>(n, fraction, models);
+  return Rcpp__rh2exmo_dt<armageddon_extmo_distribution>(n, fraction, models);
 }
 
 template <typename _MODistribution>
@@ -246,7 +246,7 @@ NumericMatrix Rcpp__rh2exmo_markovian_adcp(const std::size_t n, const NumericVec
 }
 
 // [[Rcpp::export]]
-NumericMatrix Rcpp__rh2excamo_esm_adcp(const std::size_t n, const NumericVector &times,
+NumericMatrix Rcpp__rh2extarmmo_esm_adcp(const std::size_t n, const NumericVector &times,
                                        const double fraction, const List &models) {
-  return Rcpp__rh2exmo_adcp<cuadras_auge_distribution>(n, times, fraction, models);
+  return Rcpp__rh2exmo_adcp<armageddon_extmo_distribution>(n, times, fraction, models);
 }

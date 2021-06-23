@@ -46,7 +46,7 @@ corr <- copula::p2P(rho, d = d)
 
 test_that("`simulate_dt` passes marginal hypothesis test for ext. params", {
   expect_dist_not_rejected(
-    simulate_dt(CuadrasAugeExtMO2FParam(dim = d, lambda = lambda, tau = tau), n_sim = n_sim),
+    simulate_dt(ArmageddonExtMO2FParam(dim = d, lambda = lambda, tau = tau), n_sim = n_sim),
     lambda, level = level)
   expect_dist_not_rejected(
     simulate_dt(AlphaStableExtMO2FParam(dim = d, lambda = lambda, tau = tau), n_sim = n_sim),
@@ -78,7 +78,7 @@ test_that("`simulate_dt` passes marginal hypothesis test for ext. params", {
 
 test_that("`simulate_dt` spearman correlation is in appr. CI for Ext. Param", {
   expect_cor_not_rejected(
-    simulate_dt(CuadrasAugeExtMO2FParam(dim = d, lambda = lambda, rho = rho), n_sim = n_sim),
+    simulate_dt(ArmageddonExtMO2FParam(dim = d, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
   expect_cor_not_rejected(
     simulate_dt(AlphaStableExtMO2FParam(dim = d, lambda = lambda, rho = rho), n_sim = n_sim),
@@ -109,7 +109,7 @@ fraction <- 0.4
 lambda <- 10e-2
 tau <- c(35e-2, 45e-2)
 rho <- c(35e-2, 45e-2)
-partition <- getPartition(CuadrasAugeH2ExtMO3FParam(
+partition <- getPartition(ArmageddonH2ExtMO3FParam(
   composition = composition, lambda = lambda, rho = rho))
 
 corr <- copula::p2P(rho[[1]], d = d)
@@ -119,39 +119,57 @@ walk(partition, ~{
 
 test_that("`simulate_dt` passes marginal hypothesis test for H2-ext. params", {
   expect_dist_not_rejected(
-    simulate_dt(CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = lambda, tau = tau), n_sim = n_sim),
+    simulate_dt(
+      ArmageddonH2ExtMO3FParam(composition = composition, lambda = lambda, tau = tau),
+      n_sim = n_sim),
     lambda, level = level)
   expect_dist_not_rejected(
-    simulate_dt(AlphaStableH2ExtMO3FParam(composition = composition, lambda = lambda, tau = tau), n_sim = n_sim),
+    simulate_dt(
+      AlphaStableH2ExtMO3FParam(composition = composition, lambda = lambda, tau = tau),
+      n_sim = n_sim),
     lambda, level = level)
   expect_dist_not_rejected(
-    simulate_dt(ExponentialH2ExtMO3FParam(composition = composition, lambda = lambda, tau = tau), n_sim = n_sim),
+    simulate_dt(
+      ExponentialH2ExtMO3FParam(composition = composition, lambda = lambda, tau = tau),
+      n_sim = n_sim),
     lambda, level = level)
   expect_dist_not_rejected(
-    simulate_dt(PoissonH2ExtMO3FParam(composition = composition, lambda = lambda, tau = tau), n_sim = n_sim),
+    simulate_dt(
+      PoissonH2ExtMO3FParam(composition = composition, lambda = lambda, tau = tau),
+      n_sim = n_sim),
     lambda, level = level)
 
   expect_dist_not_rejected(
-    simulate_dt(H2ExtGaussian3FParam(composition = composition, lambda = lambda, tau = tau), n_sim = n_sim),
+    simulate_dt(
+      H2ExtGaussian3FParam(composition = composition, lambda = lambda, tau = tau),
+      n_sim = n_sim),
     lambda, level = level)
 
   expect_dist_not_rejected(
-    simulate_dt(ClaytonH2ExtArch3FParam(composition = composition, lambda = lambda, tau = tau), n_sim = n_sim),
+    simulate_dt(
+      ClaytonH2ExtArch3FParam(composition = composition, lambda = lambda, tau = tau),
+      n_sim = n_sim),
     lambda, level = level)
   expect_dist_not_rejected(
-    simulate_dt(FrankH2ExtArch3FParam(composition = composition, lambda = lambda, tau = tau), n_sim = n_sim),
+    simulate_dt(
+      FrankH2ExtArch3FParam(composition = composition, lambda = lambda, tau = tau),
+      n_sim = n_sim),
     lambda, level = level)
   expect_dist_not_rejected(
-    simulate_dt(GumbelH2ExtArch3FParam(composition = composition, lambda = lambda, tau = tau), n_sim = n_sim),
+    simulate_dt(
+      GumbelH2ExtArch3FParam(composition = composition, lambda = lambda, tau = tau),
+      n_sim = n_sim),
     lambda, level = level)
   expect_dist_not_rejected(
-    simulate_dt(JoeH2ExtArch3FParam(composition = composition, lambda = lambda, tau = tau), n_sim = n_sim),
+    simulate_dt(
+      JoeH2ExtArch3FParam(composition = composition, lambda = lambda, tau = tau),
+      n_sim = n_sim),
     lambda, level = level)
 })
 
 test_that("`simulate_dt` spearman correlation is in appr. CI for H2-Ext. Param", {
   expect_cor_not_rejected(
-    simulate_dt(CuadrasAugeH2ExtMO3FParam(
+    simulate_dt(ArmageddonH2ExtMO3FParam(
       composition = composition, lambda = lambda, rho = rho), n_sim = n_sim),
     corr, level = level)
   expect_cor_not_rejected(

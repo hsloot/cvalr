@@ -7,10 +7,10 @@
 \alias{initialize,ExtMO2FParam,ANY-method}
 \alias{expected_pcds_equation,ExtMO2FParam-method}
 \alias{show,ExtMO2FParam-method}
-\alias{CuadrasAugeExtMO2FParam-class}
-\alias{CuadrasAugeExtMO2FParam}
-\alias{simulate_dt,CuadrasAugeExtMO2FParam-method}
-\alias{simulate_adcp,CuadrasAugeExtMO2FParam-method}
+\alias{ArmageddonExtMO2FParam-class}
+\alias{ArmageddonExtMO2FParam}
+\alias{simulate_dt,ArmageddonExtMO2FParam-method}
+\alias{simulate_adcp,ArmageddonExtMO2FParam-method}
 \alias{AlphaStableExtMO2FParam-class}
 \alias{AlphaStableExtMO2FParam}
 \alias{PoissonExtMO2FParam-class}
@@ -34,9 +34,9 @@
 
 \S4method{show}{ExtMO2FParam}(object)
 
-\S4method{simulate_dt}{CuadrasAugeExtMO2FParam}(object, ..., n_sim = 10000L)
+\S4method{simulate_dt}{ArmageddonExtMO2FParam}(object, ..., n_sim = 10000L)
 
-\S4method{simulate_adcp}{CuadrasAugeExtMO2FParam}(object, times, ..., n_sim = 10000L)
+\S4method{simulate_adcp}{ArmageddonExtMO2FParam}(object, times, ..., n_sim = 10000L)
 }
 \arguments{
 \item{.Object}{ An object:  see the \dQuote{Initialize Methods} section.}
@@ -106,10 +106,10 @@ the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
 \item \code{show,ExtMO2FParam-method}: Display the object.
 
-\item \code{simulate_dt,CuadrasAugeExtMO2FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt,ArmageddonExtMO2FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{simulate_adcp,CuadrasAugeExtMO2FParam-method}: simulates the \emph{average default counting process} and returns a
+\item \code{simulate_adcp,ArmageddonExtMO2FParam-method}: simulates the \emph{average default counting process} and returns a
 matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
 }}
 
@@ -135,7 +135,7 @@ with \eqn{g(x) = (1 - R) \cdot x} and \eqn{F} being the Exponential
 distribution function for rate \eqn{\lambda}.
 }
 
-\section{Cuadras-Augé calibration parameter class}{
+\section{Armageddon-shock calibration parameter class}{
 
 Corresponds to a Lévy subordinator which is a convex combination of
 a pure-killing subordinator and a pure-drift subordinator.
@@ -147,7 +147,7 @@ a pure-killing subordinator and a pure-drift subordinator.
 
 \section{Simulation}{
 
-The default times are sampled using \code{\link[rmo:rmo_esm_cuadras_auge]{rmo::rcamo_esm()}}.
+The default times are sampled using \code{\link[rmo:rarmextmo_esm]{rmo::rarmextmo_esm()}}.
 
 
 The default times are sampled using \code{\link[rmo:rexmo_markovian]{rmo::rexmo_markovian()}}.
@@ -185,15 +185,15 @@ and \eqn{\alpha = 2 / (1 + \nu) - 2 / (2 + \nu)}
 }
 
 \examples{
-CuadrasAugeExtMO2FParam()
-CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+ArmageddonExtMO2FParam()
+ArmageddonExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 AlphaStableExtMO2FParam()
 AlphaStableExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 PoissonExtMO2FParam()
 PoissonExtMO2FParam(dim = 5L, lambda = 8e-2, tau = 4e-1)
 ExponentialExtMO2FParam()
 ExponentialExtMO2FParam(dim = 5L, lambda = 8e-2, alpha = 4e-1)
-parm <- CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4)
+parm <- ArmageddonExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4)
 expected_pcds_equation(
   parm, times = seq(25e-2, 5, by = 25e-2), discount_factors = rep(1, 20L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0)
@@ -201,10 +201,10 @@ expected_pcds_equation(
   parm, times = seq(25e-2, 5, by = 25e-2), discount_factors = rep(1, 20L), recovery_rate = 0.4,
   coupon = 1e-1, upfront = 0, method = "mc", n_sim = 1e1)
 
-parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+parm <- ArmageddonExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 simulate_dt(parm, n_sim = 5L)
 
-parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+parm <- ArmageddonExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 simulate_adcp(parm, times = seq(25e-2, 5, by = 25e-2), n_sim = 5L)
 
 }

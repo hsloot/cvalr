@@ -89,7 +89,7 @@ ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 parm <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 simulate_dt(parm, n_sim = 5L)
 
-probability_distribution(CuadrasAugeExtMO2FParam(
+probability_distribution(ArmageddonExtMO2FParam(
   dim = 5L, lambda = 0.05, rho = 0.4), 0.3)
 probability_distribution(AlphaStableExtMO2FParam(
   dim = 5L, lambda = 0.05, rho = 0.4), 0.3)

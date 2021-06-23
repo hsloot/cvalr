@@ -203,7 +203,7 @@ parm <- ExMarkovParam(rmo::exQMatrix(rmo::AlphaStableBernsteinFunction(0.4), d =
 simulate_adcp(parm, 1, n_sim = 10L)
 simulate_adcp(parm, seq(25e-2, 5, by = 25e-2), n_sim = 10L)
 
-expected_value(CuadrasAugeExtMO2FParam(
+expected_value(ArmageddonExtMO2FParam(
   dim = 50L, lambda = 0.05, rho = 0.4), 0.25,
   .trans_v = function(x) x, .lagg_ev = function(x) x)
 expected_value(AlphaStableExtMO2FParam(
@@ -218,15 +218,15 @@ expected_value(ExponentialExtMO2FParam(
   .trans_v = function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
   .lagg_ev = function(x) apply(x, 2L, mean))
 
-expected_value(CuadrasAugeExtMO2FParam(
+expected_value(ArmageddonExtMO2FParam(
   dim = 50L, lambda = 0.05, rho = 0.4), 0.25,
   method = "mc", n_sim = 1e4L,
   .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim))
-expected_value(CuadrasAugeExtMO2FParam(
+expected_value(ArmageddonExtMO2FParam(
   dim = 50L, lambda = 0.05, rho = 0.4), seq(25e-2, 5, by = 25e-2),
   method = "mc", n_sim = 1e4L,
   .simulate_pv = function(object, times, n_sim) simulate_adcp(object, times, n_sim = n_sim))
-expected_value(CuadrasAugeExtMO2FParam(
+expected_value(ArmageddonExtMO2FParam(
   dim = 50L, lambda = 0.05, rho = 0.4), seq(25e-2, 5, by = 25e-2),
   function(x) pmin(pmax(0.6 * x - 0.1, 0), 0.2),
   method = "mc", n_sim = 1e4L,
@@ -256,7 +256,7 @@ expected_cdo_equation(
 }
 \seealso{
 \linkS4class{ExMarkovParam} \linkS4class{ExMOParam} \linkS4class{ExtMOParam}
-\linkS4class{CuadrasAugeExtMO2FParam} \linkS4class{AlphaStableExtMO2FParam}
+\linkS4class{ArmageddonExtMO2FParam} \linkS4class{AlphaStableExtMO2FParam}
 \linkS4class{PoissonExtMO2FParam} \linkS4class{ExponentialExtMO2FParam}
 \linkS4class{ExtArch2FParam} \linkS4class{ClaytonExtArch2FParam}
 \linkS4class{FrankExtArch2FParam} \linkS4class{GumbelExtArch2FParam}

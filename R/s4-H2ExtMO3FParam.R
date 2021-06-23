@@ -263,8 +263,8 @@ setValidity("H2ExtMO3FParam",
 #' @param fraction (Internal) proportion associated with the global model, see details.
 #'
 #' @examples
-#' CuadrasAugeH2ExtMO3FParam()
-#' CuadrasAugeH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
+#' ArmageddonH2ExtMO3FParam()
+#' ArmageddonH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 #' AlphaStableH2ExtMO3FParam()
 #' AlphaStableH2ExtMO3FParam(composition = c(2L, 4L, 2L), lambda = 8e-2, rho = c(3e-1, 5e-1))
 #' PoissonH2ExtMO3FParam()
@@ -407,21 +407,21 @@ setMethod("show", "H2ExtMO3FParam",
 
 #' @rdname H2ExtMO3FParam-class
 #'
-#' @inheritSection ExtMO2FParam-class Cuadras-Augé calibration parameter class
+#' @inheritSection ExtMO2FParam-class Armageddon-shock calibration parameter class
 #'
-#' @export CuadrasAugeH2ExtMO3FParam
-CuadrasAugeH2ExtMO3FParam <- setClass("CuadrasAugeH2ExtMO3FParam", # nolint
+#' @export ArmageddonH2ExtMO3FParam
+ArmageddonH2ExtMO3FParam <- setClass("ArmageddonH2ExtMO3FParam", # nolint
   contains = "H2ExtMO3FParam")
 
 
-setMethod("getModelName", "CuadrasAugeH2ExtMO3FParam",
+setMethod("getModelName", "ArmageddonH2ExtMO3FParam",
   function(object) {
-    "CuadrasAugeExtMO2FParam"
+    "ArmageddonExtMO2FParam"
   })
 
 #' @include utils.R
 #' @importFrom checkmate qassert
-setMethod("invAlpha", "CuadrasAugeH2ExtMO3FParam",
+setMethod("invAlpha", "ArmageddonH2ExtMO3FParam",
   function(object, value) {
     qassert(value, "N2[0,1]")
     fraction <- getFraction(object)
@@ -431,7 +431,7 @@ setMethod("invAlpha", "CuadrasAugeH2ExtMO3FParam",
 #' @describeIn H2ExtMO3FParam-class
 #'    simulates the vector of *default times* and returns a matrix `x` with
 #'    `dim(x) == c(n_sim, getDimension(object))`.
-#' @aliases simulate_dt,CuadrasAugeH2ExtMO3FParam-method
+#' @aliases simulate_dt,ArmageddonH2ExtMO3FParam-method
 #' @param n_sim Number of samples.
 #'
 #' @inheritParams simulate_dt
@@ -443,26 +443,26 @@ setMethod("invAlpha", "CuadrasAugeH2ExtMO3FParam",
 #' @examples
 #' composition <- c(2L, 4L, 2L)
 #' d <- sum(composition)
-#' parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+#' parm <- ArmageddonH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
 #' simulate_dt(parm, n_sim = 1e1L)
 #'
 #' @importFrom purrr map reduce
 #'
 #' @include utils.R
-setMethod("simulate_dt", "CuadrasAugeH2ExtMO3FParam",
+setMethod("simulate_dt", "ArmageddonH2ExtMO3FParam",
   function(object, ..., n_sim = 1e4L) {
-    Rcpp__rh2excamo_esm_dt(n_sim, getFraction(object), getModels(object))
+    Rcpp__rh2extarmmo_esm_dt(n_sim, getFraction(object), getModels(object))
   })
 
 #' @describeIn H2ExtMO3FParam-class
 #'   simulates the *average default counting process* and returns a
 #'   matrix `x` with `dim(x) == c(n_sim, length(times))`.
-#' @aliases simulate_adcp,CuadrasAugeH2ExtMO3FParam-methods
+#' @aliases simulate_adcp,ArmageddonH2ExtMO3FParam-methods
 #'
 #' @examples
 #' composition <- c(2L, 4L, 2L)
 #' d <- sum(composition)
-#' parm <- CuadrasAugeH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
+#' parm <- ArmageddonH2ExtMO3FParam(composition = composition, lambda = 1e-1, alpha = c(0.2, 0.5))
 #' simulate_adcp(parm, 1, n_sim = 1e1L)
 #' simulate_adcp(parm, seq(25e-2, 5, by = 25e-2), n_sim = 1e1L)
 #'
@@ -470,11 +470,11 @@ setMethod("simulate_dt", "CuadrasAugeH2ExtMO3FParam",
 #' @include RcppExports.R
 #'
 #' @export
-setMethod("simulate_adcp", "CuadrasAugeH2ExtMO3FParam",
+setMethod("simulate_adcp", "ArmageddonH2ExtMO3FParam",
   function(object, times, ..., n_sim = 1e4L) {
     qassert(times, "N+[0,)")
 
-      Rcpp__rh2excamo_esm_adcp(n_sim, times, getFraction(object), getModels(object))
+      Rcpp__rh2extarmmo_esm_adcp(n_sim, times, getFraction(object), getModels(object))
   })
 
 

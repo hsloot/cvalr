@@ -16,7 +16,7 @@ recovery_rate <- 4e-1
 test_that("`expected_pcds_equation` works as expected for `CalibrationParam`", {
   coupon <- 1e-1
   upfront <- -1e-2
-  parm <- as(CuadrasAugeExtMO2FParam(d, lambda, rho = rho), "ExMOParam")
+  parm <- as(ArmageddonExtMO2FParam(d, lambda, rho = rho), "ExMOParam")
 
   # using default
   x <- expected_pcds_equation(
@@ -45,7 +45,7 @@ test_that("`expected_cdo_equation` works as expected for `CalibrationParam`", {
   upper <- c(0.1, 0.2, 0.35, 1)
   coupon <- c(rep(5e-2, 3), 0)
   upfront <- c(8e-1, 5e-1, 1e-1, 0)
-  parm <- as(CuadrasAugeExtMO2FParam(d, lambda, rho = rho), "ExMOParam")
+  parm <- as(ArmageddonExtMO2FParam(d, lambda, rho = rho), "ExMOParam")
 
   # using default
   x <- expected_cdo_equation(

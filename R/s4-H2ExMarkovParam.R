@@ -213,7 +213,7 @@ setMethod("simulate_dt", "H2ExMarkovParam",
 #' @inheritParams probability_distribution
 #'
 #' @examples
-#' probability_distribution(CuadrasAugeH2ExtMO3FParam(
+#' probability_distribution(ArmageddonH2ExtMO3FParam(
 #'   composition = c(2L, 4L, 2L), lambda = 0.05, rho = c(3e-1, 6e-1)), 0.3)
 #' probability_distribution(AlphaStableH2ExtMO3FParam(
 #'   composition = c(2L, 4L, 2L), lambda = 0.05, rho = c(3e-1, 6e-1)), 0.3)

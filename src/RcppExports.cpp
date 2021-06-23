@@ -342,9 +342,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Rcpp__rcamo_esm_adcp
-NumericMatrix Rcpp__rcamo_esm_adcp(const std::size_t n, const NumericVector& times, const std::size_t d, const double alpha, const double beta);
-RcppExport SEXP _cvalr_Rcpp__rcamo_esm_adcp(SEXP nSEXP, SEXP timesSEXP, SEXP dSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
+// Rcpp__rarmextmo_esm_adcp
+NumericMatrix Rcpp__rarmextmo_esm_adcp(const std::size_t n, const NumericVector& times, const std::size_t d, const double alpha, const double beta);
+RcppExport SEXP _cvalr_Rcpp__rarmextmo_esm_adcp(SEXP nSEXP, SEXP timesSEXP, SEXP dSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -353,7 +353,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::size_t >::type d(dSEXP);
     Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< const double >::type beta(betaSEXP);
-    rcpp_result_gen = Rcpp::wrap(Rcpp__rcamo_esm_adcp(n, times, d, alpha, beta));
+    rcpp_result_gen = Rcpp::wrap(Rcpp__rarmextmo_esm_adcp(n, times, d, alpha, beta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -370,16 +370,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Rcpp__rh2excamo_esm_dt
-NumericMatrix Rcpp__rh2excamo_esm_dt(const std::size_t n, const double fraction, const List& models);
-RcppExport SEXP _cvalr_Rcpp__rh2excamo_esm_dt(SEXP nSEXP, SEXP fractionSEXP, SEXP modelsSEXP) {
+// Rcpp__rh2extarmmo_esm_dt
+NumericMatrix Rcpp__rh2extarmmo_esm_dt(const std::size_t n, const double fraction, const List& models);
+RcppExport SEXP _cvalr_Rcpp__rh2extarmmo_esm_dt(SEXP nSEXP, SEXP fractionSEXP, SEXP modelsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::size_t >::type n(nSEXP);
     Rcpp::traits::input_parameter< const double >::type fraction(fractionSEXP);
     Rcpp::traits::input_parameter< const List& >::type models(modelsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Rcpp__rh2excamo_esm_dt(n, fraction, models));
+    rcpp_result_gen = Rcpp::wrap(Rcpp__rh2extarmmo_esm_dt(n, fraction, models));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -397,9 +397,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Rcpp__rh2excamo_esm_adcp
-NumericMatrix Rcpp__rh2excamo_esm_adcp(const std::size_t n, const NumericVector& times, const double fraction, const List& models);
-RcppExport SEXP _cvalr_Rcpp__rh2excamo_esm_adcp(SEXP nSEXP, SEXP timesSEXP, SEXP fractionSEXP, SEXP modelsSEXP) {
+// Rcpp__rh2extarmmo_esm_adcp
+NumericMatrix Rcpp__rh2extarmmo_esm_adcp(const std::size_t n, const NumericVector& times, const double fraction, const List& models);
+RcppExport SEXP _cvalr_Rcpp__rh2extarmmo_esm_adcp(SEXP nSEXP, SEXP timesSEXP, SEXP fractionSEXP, SEXP modelsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -407,7 +407,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
     Rcpp::traits::input_parameter< const double >::type fraction(fractionSEXP);
     Rcpp::traits::input_parameter< const List& >::type models(modelsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Rcpp__rh2excamo_esm_adcp(n, times, fraction, models));
+    rcpp_result_gen = Rcpp::wrap(Rcpp__rh2extarmmo_esm_adcp(n, times, fraction, models));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -436,11 +436,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_Rcpp__pcds_edtl", (DL_FUNC) &_cvalr_Rcpp__pcds_edtl, 6},
     {"_cvalr_Rcpp__cdo_edtl", (DL_FUNC) &_cvalr_Rcpp__cdo_edtl, 8},
     {"_cvalr_Rcpp__rexmo_markovian_acdp", (DL_FUNC) &_cvalr_Rcpp__rexmo_markovian_acdp, 4},
-    {"_cvalr_Rcpp__rcamo_esm_adcp", (DL_FUNC) &_cvalr_Rcpp__rcamo_esm_adcp, 5},
+    {"_cvalr_Rcpp__rarmextmo_esm_adcp", (DL_FUNC) &_cvalr_Rcpp__rarmextmo_esm_adcp, 5},
     {"_cvalr_Rcpp__rh2exmo_markovian_dt", (DL_FUNC) &_cvalr_Rcpp__rh2exmo_markovian_dt, 3},
-    {"_cvalr_Rcpp__rh2excamo_esm_dt", (DL_FUNC) &_cvalr_Rcpp__rh2excamo_esm_dt, 3},
+    {"_cvalr_Rcpp__rh2extarmmo_esm_dt", (DL_FUNC) &_cvalr_Rcpp__rh2extarmmo_esm_dt, 3},
     {"_cvalr_Rcpp__rh2exmo_markovian_adcp", (DL_FUNC) &_cvalr_Rcpp__rh2exmo_markovian_adcp, 4},
-    {"_cvalr_Rcpp__rh2excamo_esm_adcp", (DL_FUNC) &_cvalr_Rcpp__rh2excamo_esm_adcp, 4},
+    {"_cvalr_Rcpp__rh2extarmmo_esm_adcp", (DL_FUNC) &_cvalr_Rcpp__rh2extarmmo_esm_adcp, 4},
     {NULL, NULL, 0}
 };
 

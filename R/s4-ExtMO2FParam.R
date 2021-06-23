@@ -335,8 +335,8 @@ setValidity("ExtMO2FParam", # nolint
 #' @param alpha Bivariate lower tail-dependence coefficient.
 #'
 #' @examples
-#' CuadrasAugeExtMO2FParam()
-#' CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' ArmageddonExtMO2FParam()
+#' ArmageddonExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 #' AlphaStableExtMO2FParam()
 #' AlphaStableExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 #' PoissonExtMO2FParam()
@@ -386,7 +386,7 @@ setMethod("initialize", signature = "ExtMO2FParam", # nolint
 #' distribution function for rate \eqn{\lambda}.
 #'
 #' @examples
-#' parm <- CuadrasAugeExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4)
+#' parm <- ArmageddonExtMO2FParam(dim = 75L, lambda = 0.05, rho = 0.4)
 #' expected_pcds_equation(
 #'   parm, times = seq(25e-2, 5, by = 25e-2), discount_factors = rep(1, 20L), recovery_rate = 0.4,
 #'   coupon = 1e-1, upfront = 0)
@@ -457,7 +457,7 @@ setMethod("show", "ExtMO2FParam",
 
 #' @rdname ExtMO2FParam-class
 #'
-#' @section Cuadras-Augé calibration parameter class:
+#' @section Armageddon-shock calibration parameter class:
 #' Corresponds to a Lévy subordinator which is a convex combination of
 #' a pure-killing subordinator and a pure-drift subordinator.
 #' \itemize{
@@ -465,14 +465,14 @@ setMethod("show", "ExtMO2FParam",
 #'   \item \eqn{\alpha = \nu}
 #' }
 #'
-#' @export CuadrasAugeExtMO2FParam
-CuadrasAugeExtMO2FParam <- setClass("CuadrasAugeExtMO2FParam", # nolint
+#' @export ArmageddonExtMO2FParam
+ArmageddonExtMO2FParam <- setClass("ArmageddonExtMO2FParam", # nolint
   contains = "ExtMO2FParam")
 
 #' @importFrom rmo ScaledBernsteinFunction SumOfBernsteinFunctions LinearBernsteinFunction
 #'   ConstantBernsteinFunction
 #' @importFrom checkmate qtest test_class
-setValidity("CuadrasAugeExtMO2FParam",
+setValidity("ArmageddonExtMO2FParam",
   function(object) {
     if (!qtest(object@nu, "N1[0,1]")) {
       return(sprintf(ERR_MSG_NU1_INTERVAL, "[0,1]"))
@@ -491,7 +491,7 @@ setValidity("CuadrasAugeExtMO2FParam",
 
 #' @importFrom rmo SumOfBernsteinFunctions LinearBernsteinFunction ConstantBernsteinFunction
 #' @importFrom checkmate qassert
-setMethod("constructBernsteinFunction", "CuadrasAugeExtMO2FParam",
+setMethod("constructBernsteinFunction", "ArmageddonExtMO2FParam",
   function(object, lambda, nu, ...) {
     qassert(lambda, "N1(0,)")
     qassert(nu, "N1[0,1]")
@@ -504,21 +504,21 @@ setMethod("constructBernsteinFunction", "CuadrasAugeExtMO2FParam",
   })
 
 #' @importFrom checkmate qassert
-setMethod("calcAlpha2Nu", "CuadrasAugeExtMO2FParam",
+setMethod("calcAlpha2Nu", "ArmageddonExtMO2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
     value
   })
 
 #' @importFrom checkmate qassert
-setMethod("calcNu2Alpha", "CuadrasAugeExtMO2FParam",
+setMethod("calcNu2Alpha", "ArmageddonExtMO2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
     value
   })
 
 #' @importFrom checkmate qassert
-setReplaceMethod("setNu", "CuadrasAugeExtMO2FParam",
+setReplaceMethod("setNu", "ArmageddonExtMO2FParam",
   function(object, value) {
     qassert(value, "N1[0,1]")
     callNextMethod()
@@ -527,26 +527,26 @@ setReplaceMethod("setNu", "CuadrasAugeExtMO2FParam",
 #' @describeIn ExtMO2FParam-class
 #'    simulates the vector of *default times* and returns a matrix `x` with
 #'    `dim(x) == c(n_sim, getDimension(object))`.
-#' @aliases simulate_dt,CuadrasAugeExtMO2FParam-method
+#' @aliases simulate_dt,ArmageddonExtMO2FParam-method
 #'
 #' @inheritParams simulate_dt
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
-#' The default times are sampled using [rmo::rcamo_esm()].
+#' The default times are sampled using [rmo::rarmextmo_esm()].
 #'
 #'
 #' @examples
-#' parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' parm <- ArmageddonExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 #' simulate_dt(parm, n_sim = 5L)
 #'
-#' @importFrom rmo rcamo_esm
+#' @importFrom rmo rarmextmo_esm
 #' @include utils.R
 #'
 #' @export
-setMethod("simulate_dt", "CuadrasAugeExtMO2FParam",
+setMethod("simulate_dt", "ArmageddonExtMO2FParam",
   function(object, ..., n_sim = 1e4L) {
-    rcamo_esm(
+    rarmextmo_esm(
       n_sim, getDimension(object),
       getLambda(object) * (1 - getNu(object)), getLambda(object) * getNu(object))
   })
@@ -555,7 +555,7 @@ setMethod("simulate_dt", "CuadrasAugeExtMO2FParam",
 #' @describeIn ExtMO2FParam-class
 #'   simulates the *average default counting process* and returns a
 #'   matrix `x` with `dim(x) == c(n_sim, length(times))`.
-#' @aliases simulate_adcp,CuadrasAugeExtMO2FParam-method
+#' @aliases simulate_adcp,ArmageddonExtMO2FParam-method
 #'
 #' @inheritParams simulate_adcp
 #' @param times A non-negative numeric vector of timepoints.
@@ -566,15 +566,15 @@ setMethod("simulate_dt", "CuadrasAugeExtMO2FParam",
 #'
 #'
 #' @examples
-#' parm <- CuadrasAugeExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
+#' parm <- ArmageddonExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 #' simulate_adcp(parm, times = seq(25e-2, 5, by = 25e-2), n_sim = 5L)
 #'
 #' @include RcppExports.R
 #'
 #' @export
-setMethod("simulate_adcp", "CuadrasAugeExtMO2FParam",
+setMethod("simulate_adcp", "ArmageddonExtMO2FParam",
   function(object, times, ..., n_sim = 1e4L) {
-    Rcpp__rcamo_esm_adcp(
+    Rcpp__rarmextmo_esm_adcp(
       n_sim, times, getDimension(object),
       getLambda(object) * (1 - getNu(object)), getLambda(object) * getNu(object))
   })

@@ -9,16 +9,16 @@ tau <- alpha / (2 - alpha)
 
 fraction <- (2 * alpha[[1]] + 1 - alpha[[2]]) / 2
 models <- purrr::map(composition, ~{
-  CuadrasAugeExtMO2FParam(.x, lambda, alpha = (alpha[[2]] - alpha[[1]]) / (1 - fraction))
+  ArmageddonExtMO2FParam(.x, lambda, alpha = (alpha[[2]] - alpha[[1]]) / (1 - fraction))
 })
 models <- c(
-  list(CuadrasAugeExtMO2FParam(d, lambda, alpha = alpha[[1]] / fraction)),
+  list(ArmageddonExtMO2FParam(d, lambda, alpha = alpha[[1]] / fraction)),
   models)
 nu <- purrr::map_dbl(models[1:2], getNu)
 
-test_that("`CuadrasAugeH2ExtMO3FParam`-class is correctly initialized", {
-  parm <- CuadrasAugeH2ExtMO3FParam()
-  expect_s4_class(parm, "CuadrasAugeH2ExtMO3FParam")
+test_that("`ArmageddonH2ExtMO3FParam`-class is correctly initialized", {
+  parm <- ArmageddonH2ExtMO3FParam()
+  expect_s4_class(parm, "ArmageddonH2ExtMO3FParam")
 
   setComposition(parm) <- composition
   setFraction(parm) <- fraction
@@ -35,54 +35,54 @@ test_that("`CuadrasAugeH2ExtMO3FParam`-class is correctly initialized", {
   expect_equal(getRho(parm), rho)
   expect_equal(getTau(parm), tau)
 
-  expect_equal(parm, CuadrasAugeH2ExtMO3FParam(composition, lambda, nu, fraction))
-  expect_equal(parm, CuadrasAugeH2ExtMO3FParam(composition, lambda, fraction = fraction, rho = rho))
-  expect_equal(parm, CuadrasAugeH2ExtMO3FParam(composition, lambda, fraction = fraction, tau = tau))
+  expect_equal(parm, ArmageddonH2ExtMO3FParam(composition, lambda, nu, fraction))
+  expect_equal(parm, ArmageddonH2ExtMO3FParam(composition, lambda, fraction = fraction, rho = rho))
+  expect_equal(parm, ArmageddonH2ExtMO3FParam(composition, lambda, fraction = fraction, tau = tau))
   expect_equal(as(parm, "H2ExMarkovParam"), H2ExMarkovParam(fraction, models))
   expect_equal(as(parm, "H2ExMOParam"), H2ExMOParam(fraction, models))
   expect_equal(as(parm, "H2ExtMOParam"), H2ExtMOParam(fraction, models))
 })
 
-test_that("`CuadrasAugeH2ExtMO3FParam`-class setters can be used in arbitrary order", { # nolint
-  parm <- CuadrasAugeH2ExtMO3FParam(composition, lambda, nu, fraction)
+test_that("`ArmageddonH2ExtMO3FParam`-class setters can be used in arbitrary order", { # nolint
+  parm <- ArmageddonH2ExtMO3FParam(composition, lambda, nu, fraction)
 
-  parm2 <- CuadrasAugeH2ExtMO3FParam()
+  parm2 <- ArmageddonH2ExtMO3FParam()
   setComposition(parm2) <- composition
   setLambda(parm2) <- lambda
   setRho(parm2) <- rho
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeH2ExtMO3FParam()
+  parm2 <- ArmageddonH2ExtMO3FParam()
   setComposition(parm2) <- composition
   setLambda(parm2) <- lambda
   setTau(parm2) <- tau
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeH2ExtMO3FParam()
+  parm2 <- ArmageddonH2ExtMO3FParam()
   setComposition(parm2) <- composition
   setRho(parm2) <- rho
   setLambda(parm2) <- lambda
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeH2ExtMO3FParam()
+  parm2 <- ArmageddonH2ExtMO3FParam()
   setLambda(parm2) <- lambda
   setComposition(parm2) <- composition
   setRho(parm2) <- rho
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeH2ExtMO3FParam()
+  parm2 <- ArmageddonH2ExtMO3FParam()
   setRho(parm2) <- rho
   setComposition(parm2) <- composition
   setLambda(parm2) <- lambda
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeH2ExtMO3FParam()
+  parm2 <- ArmageddonH2ExtMO3FParam()
   setLambda(parm2) <- lambda
   setRho(parm2) <- rho
   setComposition(parm2) <- composition
   expect_equal(parm, parm2)
 
-  parm2 <- CuadrasAugeH2ExtMO3FParam()
+  parm2 <- ArmageddonH2ExtMO3FParam()
   setRho(parm2) <- rho
   setLambda(parm2) <- lambda
   setComposition(parm2) <- composition
