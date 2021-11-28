@@ -1,3 +1,7 @@
+# cvalr 0.5
+
+- Realign with `rmo@v0.7.0` because of breaking changes in the `PoissonBernsteinFunction`-class, see hsloot/rmo#81. 
+
 # cvalr 0.4
 
 - Rename `"CuadrasAuge*"` classes to `"Armageddon*"` because of `rmo@v0.6`.
