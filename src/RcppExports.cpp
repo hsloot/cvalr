@@ -333,9 +333,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Rcpp__rexmo_markovian_acdp
-NumericMatrix Rcpp__rexmo_markovian_acdp(const std::size_t n, const NumericVector& times, const std::size_t d, const NumericVector& ex_intensities);
-RcppExport SEXP _cvalr_Rcpp__rexmo_markovian_acdp(SEXP nSEXP, SEXP timesSEXP, SEXP dSEXP, SEXP ex_intensitiesSEXP) {
+// Rcpp__rexmo_mdcm_acdp
+NumericMatrix Rcpp__rexmo_mdcm_acdp(const std::size_t n, const NumericVector& times, const std::size_t d, const NumericVector& ex_intensities);
+RcppExport SEXP _cvalr_Rcpp__rexmo_mdcm_acdp(SEXP nSEXP, SEXP timesSEXP, SEXP dSEXP, SEXP ex_intensitiesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -343,7 +343,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type times(timesSEXP);
     Rcpp::traits::input_parameter< const std::size_t >::type d(dSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type ex_intensities(ex_intensitiesSEXP);
-    rcpp_result_gen = Rcpp::wrap(Rcpp__rexmo_markovian_acdp(n, times, d, ex_intensities));
+    rcpp_result_gen = Rcpp::wrap(Rcpp__rexmo_mdcm_acdp(n, times, d, ex_intensities));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -440,7 +440,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_cvalr_Rcpp__cdo_dtl", (DL_FUNC) &_cvalr_Rcpp__cdo_dtl, 8},
     {"_cvalr_Rcpp__pcds_edtl", (DL_FUNC) &_cvalr_Rcpp__pcds_edtl, 6},
     {"_cvalr_Rcpp__cdo_edtl", (DL_FUNC) &_cvalr_Rcpp__cdo_edtl, 8},
-    {"_cvalr_Rcpp__rexmo_markovian_acdp", (DL_FUNC) &_cvalr_Rcpp__rexmo_markovian_acdp, 4},
+    {"_cvalr_Rcpp__rexmo_mdcm_acdp", (DL_FUNC) &_cvalr_Rcpp__rexmo_mdcm_acdp, 4},
     {"_cvalr_Rcpp__rarmextmo_esm_adcp", (DL_FUNC) &_cvalr_Rcpp__rarmextmo_esm_adcp, 5},
     {"_cvalr_Rcpp__rh2exmo_markovian_dt", (DL_FUNC) &_cvalr_Rcpp__rh2exmo_markovian_dt, 3},
     {"_cvalr_Rcpp__rh2extarmmo_esm_dt", (DL_FUNC) &_cvalr_Rcpp__rh2extarmmo_esm_dt, 3},

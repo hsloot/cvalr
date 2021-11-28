@@ -28,7 +28,7 @@ test_that("`simulate_dt` works as expected for `ExMOParam`", {
     qassert(n, "X1(0,)")
     d <- getDimension(parm)
     ex_intensities <- getExIntensities(parm)
-    out <- rmo::rexmo_markovian(n, d, ex_intensities)
+    out <- rmo::rexmo_mdcm(n, d, ex_intensities)
 
     out
   }

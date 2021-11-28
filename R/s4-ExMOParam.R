@@ -109,20 +109,20 @@ setMethod("initialize", "ExMOParam",
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
-#' The default times are sampled using [rmo::rexmo_markovian()].
+#' The default times are sampled using [rmo::rexmo_mdcm()].
 #'
 #'
 #' @examples
 #' parm <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 #' simulate_dt(parm, n_sim = 5L)
 #'
-#' @importFrom rmo rexmo_markovian
+#' @importFrom rmo rexmo_mdcm
 #' @include utils.R
 #'
 #' @export
 setMethod("simulate_dt", "ExMOParam",
   function(object, ..., n_sim = 1e4L) {
-    rexmo_markovian(n_sim, getDimension(object), getExIntensities(object))
+    rexmo_mdcm(n_sim, getDimension(object), getExIntensities(object))
   })
 
 
@@ -136,19 +136,19 @@ setMethod("simulate_dt", "ExMOParam",
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
-#' The default times are sampled using [rmo::rexmo_markovian()].
+#' The default times are sampled using [rmo::rexmo_mdcm()].
 #'
 #' @examples
 #' parm <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 #' simulate_adcp(parm, times = seq(25e-2, 5, by = 25e-2), n_sim = 5L)
 #'
-#' @importFrom rmo rexmo_markovian
+#' @importFrom rmo rexmo_mdcm
 #' @include RcppExports.R
 #'
 #' @export
 setMethod("simulate_adcp", "ExMOParam",
   function(object, times, ..., n_sim = 1e4L) {
-    Rcpp__rexmo_markovian_acdp(
+    Rcpp__rexmo_mdcm_acdp(
       n_sim, times, getDimension(object), getExIntensities(object))
   })
 

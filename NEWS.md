@@ -1,6 +1,10 @@
+# cvalr 0.5.1
+
+- Realign with `rmo@v0.7.1` because of renamed algorithms
+
 # cvalr 0.5
 
-- Realign with `rmo@v0.7.0` because of breaking changes in the `PoissonBernsteinFunction`-class, see hsloot/rmo#81. 
+- Realign with `rmo@v0.7.0` because of breaking changes in the `PoissonBernsteinFunction`-class, see hsloot/rmo#81.
 
 # cvalr 0.4
 
