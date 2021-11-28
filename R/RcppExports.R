@@ -89,8 +89,8 @@ Rcpp__cdo_edtl <- function(l, t, df, recovery_rate, lower, upper, coupon, upfron
     .Call(`_cvalr_Rcpp__cdo_edtl`, l, t, df, recovery_rate, lower, upper, coupon, upfront)
 }
 
-Rcpp__rexmo_markovian_acdp <- function(n, times, d, ex_intensities) {
-    .Call(`_cvalr_Rcpp__rexmo_markovian_acdp`, n, times, d, ex_intensities)
+Rcpp__rexmo_mdcm_acdp <- function(n, times, d, ex_intensities) {
+    .Call(`_cvalr_Rcpp__rexmo_mdcm_acdp`, n, times, d, ex_intensities)
 }
 
 Rcpp__rarmextmo_esm_adcp <- function(n, times, d, alpha, beta) {

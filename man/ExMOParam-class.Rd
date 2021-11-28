@@ -79,10 +79,10 @@ exchangeable Marshall-Olkin distribution (see \code{\link[rmo:BernsteinFunction-
 
 \section{Simulation}{
 
-The default times are sampled using \code{\link[rmo:rexmo_markovian]{rmo::rexmo_markovian()}}.
+The default times are sampled using \code{\link[rmo:rexmo_mdcm]{rmo::rexmo_mdcm()}}.
 
 
-The default times are sampled using \code{\link[rmo:rexmo_markovian]{rmo::rexmo_markovian()}}.
+The default times are sampled using \code{\link[rmo:rexmo_mdcm]{rmo::rexmo_mdcm()}}.
 }
 
 \examples{

@@ -562,7 +562,7 @@ setMethod("simulate_dt", "ArmageddonExtMO2FParam",
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
-#' The default times are sampled using [rmo::rexmo_markovian()].
+#' The default times are sampled using [rmo::rexmo_mdcm()].
 #'
 #'
 #' @examples
