@@ -10,7 +10,7 @@ bf <- ScaledBernsteinFunction(
   scale = lambda,
   original = SumOfBernsteinFunctions(
     first = LinearBernsteinFunction(scale = exp(-nu)),
-    second = PoissonBernsteinFunction(lambda = 1, eta = nu)))
+    second = PoissonBernsteinFunction(eta = nu)))
 ex_qmatrix <- rmo::exQMatrix(bf, d)
 ex_intensities <- rmo::exIntensities(bf, d = d)
 
