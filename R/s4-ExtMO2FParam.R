@@ -688,7 +688,7 @@ setMethod("constructBernsteinFunction", "PoissonExtMO2FParam",
       scale = lambda,
       original = SumOfBernsteinFunctions(
         first = LinearBernsteinFunction(scale = exp(-nu)),
-        second = PoissonBernsteinFunction(lambda = 1, eta = nu)
+        second = PoissonBernsteinFunction(eta = nu)
       )
     )
   })
