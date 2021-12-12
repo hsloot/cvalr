@@ -147,10 +147,10 @@ a pure-killing subordinator and a pure-drift subordinator.
 
 \section{Simulation}{
 
-The default times are sampled using \code{\link[rmo:rarmextmo_esm]{rmo::rarmextmo_esm()}}.
+The default times are sampled using algorithms from \link[rmo:rmo-package]{rmo::rmo-package}.
 
 
-The default times are sampled using \code{\link[rmo:rexmo_mdcm]{rmo::rexmo_mdcm()}}.
+The default times are sampled using \code{\link[rmo:rexmo]{rmo::rexmo()}}.
 }
 
 \section{Alpha-stable calibration parameter class}{

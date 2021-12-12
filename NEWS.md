@@ -1,3 +1,7 @@
+# cvalr 0.5.2
+
+- Realign with `rmo@v0.8` because of renamed algorithms
+
 # cvalr 0.5.1
 
 - Realign with `rmo@v0.7.1` because of renamed algorithms

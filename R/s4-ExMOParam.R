@@ -109,20 +109,20 @@ setMethod("initialize", "ExMOParam",
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
-#' The default times are sampled using [rmo::rexmo_mdcm()].
+#' The default times are sampled using [rmo::rexmo()].
 #'
 #'
 #' @examples
 #' parm <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 #' simulate_dt(parm, n_sim = 5L)
 #'
-#' @importFrom rmo rexmo_mdcm
+#' @importFrom rmo rexmo
 #' @include utils.R
 #'
 #' @export
 setMethod("simulate_dt", "ExMOParam",
   function(object, ..., n_sim = 1e4L) {
-    rexmo_mdcm(n_sim, getDimension(object), getExIntensities(object))
+    rexmo(n_sim, getDimension(object), getExIntensities(object), method = "MDCM")
   })
 
 
@@ -136,13 +136,13 @@ setMethod("simulate_dt", "ExMOParam",
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
-#' The default times are sampled using [rmo::rexmo_mdcm()].
+#' The default times are sampled using [rmo::rexmo()].
 #'
 #' @examples
 #' parm <- ExMOParam(rmo::exIntensities(rmo::AlphaStableBernsteinFunction(0.4), 5L))
 #' simulate_adcp(parm, times = seq(25e-2, 5, by = 25e-2), n_sim = 5L)
 #'
-#' @importFrom rmo rexmo_mdcm
+#' @importFrom rmo rexmo
 #' @include RcppExports.R
 #'
 #' @export

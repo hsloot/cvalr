@@ -533,22 +533,23 @@ setReplaceMethod("setNu", "ArmageddonExtMO2FParam",
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
-#' The default times are sampled using [rmo::rarmextmo_esm()].
+#' The default times are sampled using algorithms from [rmo::rmo-package].
 #'
 #'
 #' @examples
 #' parm <- ArmageddonExtMO2FParam(dim = 5L, lambda = 8e-2, rho = 4e-1)
 #' simulate_dt(parm, n_sim = 5L)
 #'
-#' @importFrom rmo rarmextmo_esm
+#' @importFrom rmo rpextmo
 #' @include utils.R
 #'
 #' @export
 setMethod("simulate_dt", "ArmageddonExtMO2FParam",
   function(object, ..., n_sim = 1e4L) {
-    rarmextmo_esm(
+    rpextmo(
       n_sim, getDimension(object),
-      getLambda(object) * (1 - getNu(object)), getLambda(object) * getNu(object))
+      a = getLambda(object) * getNu(object), b = getLambda(object) * (1 - getNu(object)),
+      family = "Armageddon", method = "ESM")
   })
 
 
@@ -562,7 +563,7 @@ setMethod("simulate_dt", "ArmageddonExtMO2FParam",
 #' @param n_sim Number of samples.
 #'
 #' @section Simulation:
-#' The default times are sampled using [rmo::rexmo_mdcm()].
+#' The default times are sampled using [rmo::rexmo()].
 #'
 #'
 #' @examples
