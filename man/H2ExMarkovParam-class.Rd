@@ -47,17 +47,17 @@ independent \linkS4class{ExMarkovParam} models. The inverse scaling factors are 
 }
 \section{Functions}{
 \itemize{
-\item \code{initialize,H2ExMarkovParam-method}: Constructor
+\item \code{initialize(H2ExMarkovParam)}: Constructor
 
-\item \code{simulate_dt,H2ExMarkovParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt(H2ExMarkovParam)}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{probability_distribution,H2ExMarkovParam-method}: calculates the \emph{probability vector} for the \emph{average default count process}
+\item \code{probability_distribution(H2ExMarkovParam)}: calculates the \emph{probability vector} for the \emph{average default count process}
 and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, length(times))}.
 
-\item \code{show,H2ExMarkovParam-method}: Display the object.
-}}
+\item \code{show(H2ExMarkovParam)}: Display the object.
 
+}}
 \section{Slots}{
 
 \describe{

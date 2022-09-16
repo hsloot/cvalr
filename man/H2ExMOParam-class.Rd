@@ -28,13 +28,13 @@ process} model. Extends \linkS4class{H2ExMarkovParam} and related to \linkS4clas
 }
 \section{Functions}{
 \itemize{
-\item \code{simulate_dt,H2ExMOParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt(H2ExMOParam)}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{simulate_adcp,H2ExMOParam-method}: simulates the \emph{average default counting process} and returns a
+\item \code{simulate_adcp(H2ExMOParam)}: simulates the \emph{average default counting process} and returns a
 matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
-}}
 
+}}
 \section{Simulation}{
 
 The default times are sampled using the stochastic representation described in details.

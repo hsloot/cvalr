@@ -114,25 +114,25 @@ included).
 }
 \section{Functions}{
 \itemize{
-\item \code{initialize,ExtArch2FParam-method}: Constructor
+\item \code{initialize(ExtArch2FParam)}: Constructor
 
-\item \code{simulate_dt,ExtArch2FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt(ExtArch2FParam)}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{expected_pcds_equation,ExtArch2FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+\item \code{expected_pcds_equation(ExtArch2FParam)}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
 the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{show,ExtArch2FParam-method}: Display the object.
+\item \code{show(ExtArch2FParam)}: Display the object.
 
-\item \code{initialize,ClaytonExtArch2FParam-method}: Constructor
+\item \code{initialize(ClaytonExtArch2FParam)}: Constructor
 
-\item \code{initialize,FrankExtArch2FParam-method}: Constructor
+\item \code{initialize(FrankExtArch2FParam)}: Constructor
 
-\item \code{initialize,GumbelExtArch2FParam-method}: Constructor
+\item \code{initialize(GumbelExtArch2FParam)}: Constructor
 
-\item \code{initialize,JoeExtArch2FParam-method}: Constructor
+\item \code{initialize(JoeExtArch2FParam)}: Constructor
+
 }}
-
 \section{Slots}{
 
 \describe{

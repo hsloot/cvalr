@@ -97,17 +97,17 @@ For details on the underlying extendible model, see \linkS4class{ExtGaussian2FPa
 }
 \section{Functions}{
 \itemize{
-\item \code{initialize,H2ExtGaussian3FParam-method}: Constructor
+\item \code{initialize(H2ExtGaussian3FParam)}: Constructor
 
-\item \code{simulate_dt,H2ExtGaussian3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt(H2ExtGaussian3FParam)}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{expected_pcds_equation,H2ExtGaussian3FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+\item \code{expected_pcds_equation(H2ExtGaussian3FParam)}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
 the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{show,H2ExtGaussian3FParam-method}: Display the object.
-}}
+\item \code{show(H2ExtGaussian3FParam)}: Display the object.
 
+}}
 \section{Slots}{
 
 \describe{

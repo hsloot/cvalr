@@ -105,23 +105,23 @@ Kendall's Tau is
 }
 \section{Functions}{
 \itemize{
-\item \code{initialize,ExtGaussian2FParam-method}: Constructor
+\item \code{initialize(ExtGaussian2FParam)}: Constructor
 
-\item \code{simulate_dt,ExtGaussian2FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt(ExtGaussian2FParam)}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{probability_distribution,ExtGaussian2FParam-method}: calculates the \emph{probability vector} for the \emph{average default count process}
+\item \code{probability_distribution(ExtGaussian2FParam)}: calculates the \emph{probability vector} for the \emph{average default count process}
 and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, length(times))}.
 
-\item \code{expected_pcds_equation,ExtGaussian2FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+\item \code{expected_pcds_equation(ExtGaussian2FParam)}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
 the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{expected_cdo_equation,ExtGaussian2FParam-method}: calculates the \emph{payoff equation} for a \emph{CDO} (vectorized w.r.t. the
+\item \code{expected_cdo_equation(ExtGaussian2FParam)}: calculates the \emph{payoff equation} for a \emph{CDO} (vectorized w.r.t. the
 argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{show,ExtGaussian2FParam-method}: Display the object.
-}}
+\item \code{show(ExtGaussian2FParam)}: Display the object.
 
+}}
 \section{Slots}{
 
 \describe{

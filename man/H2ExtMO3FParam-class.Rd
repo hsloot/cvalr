@@ -127,20 +127,20 @@ For details on the underlying extendible models, see \linkS4class{ExtMO2FParam}.
 }
 \section{Functions}{
 \itemize{
-\item \code{initialize,H2ExtMO3FParam-method}: Constructor
+\item \code{initialize(H2ExtMO3FParam)}: Constructor
 
-\item \code{expected_pcds_equation,H2ExtMO3FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+\item \code{expected_pcds_equation(H2ExtMO3FParam)}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
 the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{show,H2ExtMO3FParam-method}: Display the object.
+\item \code{show(H2ExtMO3FParam)}: Display the object.
 
-\item \code{simulate_dt,ArmageddonH2ExtMO3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt(ArmageddonH2ExtMO3FParam)}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{simulate_adcp,ArmageddonH2ExtMO3FParam-method}: simulates the \emph{average default counting process} and returns a
+\item \code{simulate_adcp(ArmageddonH2ExtMO3FParam)}: simulates the \emph{average default counting process} and returns a
 matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

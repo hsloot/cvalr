@@ -121,39 +121,39 @@ models.
 }
 \section{Functions}{
 \itemize{
-\item \code{simulate_dt}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt()}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{simulate_adcp}: simulates the \emph{average default counting process} and returns a
+\item \code{simulate_adcp()}: simulates the \emph{average default counting process} and returns a
 matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
 
-\item \code{simulate_adcp,CalibrationParam-method}: simulates the \emph{average default counting process} and returns a
+\item \code{simulate_adcp(CalibrationParam)}: simulates the \emph{average default counting process} and returns a
 matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
 
-\item \code{probability_distribution}: calculates the \emph{probability vector} for the \emph{average default count process}
+\item \code{probability_distribution()}: calculates the \emph{probability vector} for the \emph{average default count process}
 and returns a matrix \code{x} with \code{dim(x) == c(getDimension(object)+1L, length(times))}.
 
-\item \code{expected_value}: calculates the \emph{expected value} for the loss based on the \emph{average default
+\item \code{expected_value()}: calculates the \emph{expected value} for the loss based on the \emph{average default
 count process} for given timepoints and returns a vector \code{x} with
 \code{length(x) == length(times)}.
 
-\item \code{expected_value,CalibrationParam-method}: calculates the \emph{expected value} for the loss based on the \emph{average default
+\item \code{expected_value(CalibrationParam)}: calculates the \emph{expected value} for the loss based on the \emph{average default
 count process} for given timepoints and returns a vector \code{x} with
 \code{length(x) == length(times)}.
 
-\item \code{expected_pcds_equation}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+\item \code{expected_pcds_equation()}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
 the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{expected_pcds_equation,CalibrationParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+\item \code{expected_pcds_equation(CalibrationParam)}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
 the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{expected_cdo_equation}: calculates the \emph{payoff equation} for a \emph{CDO} (vectorized w.r.t. the
+\item \code{expected_cdo_equation()}: calculates the \emph{payoff equation} for a \emph{CDO} (vectorized w.r.t. the
 argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{expected_cdo_equation,CalibrationParam-method}: calculates the \emph{payoff equation} for a \emph{CDO} (vectorized w.r.t. the
+\item \code{expected_cdo_equation(CalibrationParam)}: calculates the \emph{payoff equation} for a \emph{CDO} (vectorized w.r.t. the
 argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
+
 }}
-
 \section{Slots}{
 
 \describe{

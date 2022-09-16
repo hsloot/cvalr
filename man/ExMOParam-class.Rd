@@ -59,17 +59,17 @@ The (scaled) exchangeable intensities, provided to the constructor are
 }
 \section{Functions}{
 \itemize{
-\item \code{initialize,ExMOParam-method}: Constructor
+\item \code{initialize(ExMOParam)}: Constructor
 
-\item \code{simulate_dt,ExMOParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt(ExMOParam)}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{simulate_adcp,ExMOParam-method}: simulates the \emph{average default counting process} and returns a
+\item \code{simulate_adcp(ExMOParam)}: simulates the \emph{average default counting process} and returns a
 matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
 
-\item \code{show,ExMOParam-method}: Display the object.
-}}
+\item \code{show(ExMOParam)}: Display the object.
 
+}}
 \section{Slots}{
 
 \describe{

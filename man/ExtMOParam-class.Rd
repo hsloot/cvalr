@@ -49,11 +49,11 @@ The parameter are implicitly defined by a +Bernstein function* \eqn{\psi}
 }
 \section{Functions}{
 \itemize{
-\item \code{initialize,ExtMOParam-method}: Constructor
+\item \code{initialize(ExtMOParam)}: Constructor
 
-\item \code{show,ExtMOParam-method}: Display the object.
+\item \code{show(ExtMOParam)}: Display the object.
+
 }}
-
 \section{Slots}{
 
 \describe{

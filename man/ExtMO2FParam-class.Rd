@@ -99,20 +99,20 @@ Spearman's Rho and Kendall's Tau is
 }
 \section{Functions}{
 \itemize{
-\item \code{initialize,ExtMO2FParam-method}: Constructor
+\item \code{initialize(ExtMO2FParam)}: Constructor
 
-\item \code{expected_pcds_equation,ExtMO2FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+\item \code{expected_pcds_equation(ExtMO2FParam)}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
 the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{show,ExtMO2FParam-method}: Display the object.
+\item \code{show(ExtMO2FParam)}: Display the object.
 
-\item \code{simulate_dt,ArmageddonExtMO2FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt(ArmageddonExtMO2FParam)}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{simulate_adcp,ArmageddonExtMO2FParam-method}: simulates the \emph{average default counting process} and returns a
+\item \code{simulate_adcp(ArmageddonExtMO2FParam)}: simulates the \emph{average default counting process} and returns a
 matrix \code{x} with \code{dim(x) == c(n_sim, length(times))}.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

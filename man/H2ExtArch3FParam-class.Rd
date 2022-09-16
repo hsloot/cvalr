@@ -121,25 +121,25 @@ For details on the underlying extendible model, see \linkS4class{ExtArch2FParam}
 }
 \section{Functions}{
 \itemize{
-\item \code{initialize,H2ExtArch3FParam-method}: Constructor
+\item \code{initialize(H2ExtArch3FParam)}: Constructor
 
-\item \code{expected_pcds_equation,H2ExtArch3FParam-method}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
+\item \code{expected_pcds_equation(H2ExtArch3FParam)}: calculates the \emph{payoff equation} for a \emph{portfolio CDS} (vectorized w.r.t.
 the argumentes \code{recovery_rate}, \code{coupon}, and \code{upfront}).
 
-\item \code{show,H2ExtArch3FParam-method}: Display the object.
+\item \code{show(H2ExtArch3FParam)}: Display the object.
 
-\item \code{simulate_dt,H2ExtArch3FParam-method}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
+\item \code{simulate_dt(H2ExtArch3FParam)}: simulates the vector of \emph{default times} and returns a matrix \code{x} with
 \code{dim(x) == c(n_sim, getDimension(object))}.
 
-\item \code{initialize,ClaytonH2ExtArch3FParam-method}: Constructor
+\item \code{initialize(ClaytonH2ExtArch3FParam)}: Constructor
 
-\item \code{initialize,FrankH2ExtArch3FParam-method}: Constructor
+\item \code{initialize(FrankH2ExtArch3FParam)}: Constructor
 
-\item \code{initialize,GumbelH2ExtArch3FParam-method}: Constructor
+\item \code{initialize(GumbelH2ExtArch3FParam)}: Constructor
 
-\item \code{initialize,JoeH2ExtArch3FParam-method}: Constructor
+\item \code{initialize(JoeH2ExtArch3FParam)}: Constructor
+
 }}
-
 \section{Slots}{
 
 \describe{
