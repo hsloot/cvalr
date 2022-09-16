@@ -1,3 +1,7 @@
+# cvalr 0.5.3
+
+- Update RoxygenNote and manual
+
 # cvalr 0.5.2
 
 - Realign with `rmo@v0.8` because of renamed algorithms

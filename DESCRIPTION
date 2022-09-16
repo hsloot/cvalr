@@ -1,6 +1,6 @@
 Package: cvalr
 Title: Credit Derivative Valuation in R
-Version: 0.5.2
+Version: 0.5.3
 Authors@R:
     person(given = "Henrik",
            family = "Sloot",
@@ -10,7 +10,6 @@ Authors@R:
 Description: Methods required for the valuation of credit derivatives.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Depends:
@@ -26,7 +25,6 @@ Imports:
     waldo,
     purrr,
     magrittr,
-    rlang,
     vctrs
 LinkingTo:
     Rcpp,
